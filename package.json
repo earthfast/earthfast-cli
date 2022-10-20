@@ -1,0 +1,20 @@
+{
+  "name": "armada-cli",
+  "version": "0.1.0",
+  "description": "Command line utility for the Armada Network",
+  "main": "cli.js",
+  "type": "module",
+  "bin": {
+    "armada": "./cli.js"
+  },
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "tar": "^6.1.11",
+    "yargs": "^17.3.1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/armada-network/armada-cli"
+  }
+}
