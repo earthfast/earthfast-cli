@@ -12,12 +12,10 @@ npm install armada-cli
 
 ### Creating a Bundle
 
-Once a site has been built and is ready for bundling, run the following command to generate an Armada Network compatible tarball:
+Once a site has been built and is ready for bundling, run the following command to generate an Armada-compatible archive:
 
 ```sh
-npx armada bundle <archive> <build-dir>
+npx armada bundle <name> <build-dir>
 ```
 
-Example: `npx armada bundle mysite.tgz ./dist`
-
-Note that running `bundle` will also print the SHA256 checksum of the archive, which is needed for publishing the site to the Armada Network.
+Example: `npx armada bundle my-site-v1.0.0 ./dist`

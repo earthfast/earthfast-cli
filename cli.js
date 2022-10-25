@@ -9,26 +9,22 @@ import { generateManifest } from './manifest.js';
 
 yargs(hideBin(process.argv))
     .command(
-        'bundle <archive> <build-dir>',
+        'bundle <name> <build-dir>',
         'Bundle an application for use on the Armada Network',
         (yargs) => {
             return yargs
-                .positional('archive', {
-                    describe: 'The output archive to create (e.g. site.tgz)',
+                .positional('name', {
+                    describe: 'The name of the bundle to create (e.g. my-site-v1.0.0)',
                 })
                 .positional('build-dir', {
-                    describe: 'Relative path to the build directory (e.g. ./dist)',
+                    describe: 'Relative path to the application\'s build directory (e.g. ./dist)',
                 })
         },
         async (argv) => {
-            const manifestPath = await generateManifest(argv.buildDir);
-            console.log(`Successfully created manifest: ${manifestPath}`);
-
-            await compress(argv.archive, argv.buildDir);
-            console.log(`Successfully created archive: ${argv.archive}`);
-
-            const sum = await sha256File(argv.archive);
-            console.log(`${argv.archive} has SHA256 checksum: ${sum}`);
+            await generateManifest(argv.buildDir);
+            const bundleName = normalizeBundleExtension(argv.name);
+            await compress(bundleName, argv.buildDir);
+            console.log(bundleName);
         }
     )
     .command(
@@ -55,11 +51,18 @@ yargs(hideBin(process.argv))
         },
         async (argv) => {
             const manifestPath = await generateManifest(argv.buildDir);
-            console.log(`Successfully created manifest: ${manifestPath}`);
+            console.log(manifestPath);
         }
     )
     .demandCommand(1)
     .parse();
+
+function normalizeBundleExtension(name) {
+    if (name.endsWith('.tar.gz') || name.endsWith('.tgz')) {
+        return name;
+    }
+    return name += '.tgz';
+}
 
 async function compress(archive, buildDir) {
     return tar.c(
