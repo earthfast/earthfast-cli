@@ -7,7 +7,7 @@ import { getWallets, openKeyStoreFile } from "../../keystore";
 import { defaultNetworks, getArmadaAbi, getNetworkRpcUrl, supportedNetworks } from "../../networks";
 import { LedgerSigner } from "../../ledger";
 
-export const command = "project create <name> <email>";
+export const command = "project-create <name> <email>";
 export const desc = "Create a new project";
 
 export const builder = function (yargs: yargs.Argv) {

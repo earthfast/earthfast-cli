@@ -2,7 +2,7 @@ import { ethers } from "ethers";
 import yargs, { Arguments } from "yargs";
 import { defaultNetworks, getArmadaAbi, getNetworkRpcUrl, supportedNetworks } from "../../networks";
 
-export const command = "node list";
+export const command = "node-list";
 export const desc = "List all armada nodes";
 
 export const builder = function (yargs: yargs.Argv) {

@@ -1,7 +1,7 @@
 import inquirer from "inquirer";
 import { generateKeyStore, openKeyStoreFile } from "../../keystore";
 
-export const command = "key import";
+export const command = "key-import";
 export const desc =
   "Imports a wallet into armada cli for signing txs. An encrypted keystore is generated from private key and stored on your local computer. The private key itself is not stored.";
 
