@@ -1,4 +1,5 @@
 import path from "path";
+import tar from "tar";
 import yargs, { CommandModule } from "yargs";
 import { hideBin } from "yargs/helpers";
 import { sha256File } from "./checksum";
@@ -62,11 +63,10 @@ function normalizeBundleExtension(name: string) {
   if (name.endsWith('.tar.gz') || name.endsWith('.tgz')) {
       return name;
   }
-  return name += '.tgz';
+  return name + '.tgz';
 }
 
-async function compress(archive: unknown, buildDir: string) {
-  // @ts-ignore
+async function compress(archive: string, buildDir: string) {
   return tar.c(
     {
       gzip: true,

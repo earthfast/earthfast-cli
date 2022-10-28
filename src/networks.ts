@@ -37,10 +37,10 @@ const contracts = {
   },
 };
 
-export const getArmadaAbi = (network: supportedNetworks, contract: supportedContracts): any => {
+export const getArmadaAbi = (network: supportedNetworks | false, contract: supportedContracts): any => {
   return contracts[network || "testnet"][contract];
 };
 
-export const getNetworkRpcUrl = (network: supportedNetworks): string => {
+export const getNetworkRpcUrl = (network: supportedNetworks | false): string => {
   return defaultNetworks[network || "testnet"].url;
 };
