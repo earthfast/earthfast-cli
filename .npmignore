@@ -1,2 +1,13 @@
+# Environment
 .envrc
+.nvmrc
 shell.nix
+
+# Tools
+.github
+.prettierrc
+tsconfig.json
+
+# Source
+abi/
+src/
