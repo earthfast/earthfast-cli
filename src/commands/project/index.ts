@@ -1,3 +1,4 @@
-import * as a from "./create";
+import * as content from "./content";
+import * as create from "./create";
 
-export const commands = [a];
+export const commands = [create, content];
