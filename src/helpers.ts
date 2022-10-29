@@ -1,4 +1,6 @@
+import { TransactionReceipt } from "@ethersproject/abstract-provider";
 import { Contract, ethers, Signer } from "ethers";
+import { Result } from "ethers/lib/utils";
 import inquirer from "inquirer";
 import keytar from "keytar";
 import { Arguments } from "yargs";
@@ -37,7 +39,7 @@ export async function getSigner(argv: Arguments): Promise<Signer> {
       process.exit(1);
     }
 
-    let res = await inquirer.prompt([
+    const res = await inquirer.prompt([
       {
         name: "address",
         message: "Pick the wallet to sign the transaction:",
@@ -49,7 +51,7 @@ export async function getSigner(argv: Arguments): Promise<Signer> {
     const address = res.address;
     let password = await keytar.getPassword("armada-cli", address);
     if (!password) {
-      let res = await inquirer.prompt([
+      const res = await inquirer.prompt([
         {
           name: "password",
           message: "Enter the wallet encryption password:",
@@ -84,7 +86,11 @@ export async function getContract(
   }
 }
 
-export async function decodeEvent(receipt: { logs: string | any[] }, contract: Contract, event: string) {
+export async function decodeEvent(
+  receipt: TransactionReceipt,
+  contract: Contract,
+  event: string
+): Promise<Result | Result[]> {
   const results = [];
   for (let i = 0; i < receipt.logs.length; i++) {
     const log = receipt.logs[i];

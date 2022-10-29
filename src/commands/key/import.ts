@@ -1,15 +1,16 @@
 import inquirer from "inquirer";
+import { Argv } from "yargs";
 import { loadWallet, saveWallet } from "../../keystore";
 
 export const command = "key-import";
 export const desc = "Save a private key for signing transactions";
 
-export const builder = function (yargs: any) {
-  return yargs;
+export const builder = function (argv: Argv) {
+  return argv;
 };
 
 export const handler = async function () {
-  let responses = await inquirer.prompt([
+  const responses = await inquirer.prompt([
     {
       name: "privateKey",
       message: "Enter the wallet private key to import",

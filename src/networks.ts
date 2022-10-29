@@ -2,6 +2,7 @@ import ArmadaProjectsTestnetDeployment from "../abi/testnet/ArmadaProjects.json"
 import ArmadaProjectsStagingDeployment from "../abi/staging/ArmadaProjects.json";
 import ArmadaNodesTestnetDeployment from "../abi/testnet/ArmadaNodes.json";
 import ArmadaNodesStagingDeployment from "../abi/staging/ArmadaNodes.json";
+import { ContractInterface } from "ethers";
 
 export interface NetworkInfo {
   url: string;
@@ -37,7 +38,10 @@ const contracts = {
   },
 };
 
-export const getArmadaAbi = (network: supportedNetworks | false, contract: supportedContracts): any => {
+export const getArmadaAbi = (
+  network: supportedNetworks | false,
+  contract: supportedContracts
+): { address: string; abi: ContractInterface } => {
   return contracts[network || "testnet"][contract];
 };
 

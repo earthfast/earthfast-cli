@@ -18,7 +18,7 @@ Once a site has been built and is ready for bundling, run the following command 
 npx armada bundle <name> <build-dir>
 ```
 
-Example: `npx armada bundle my-site-v1.0.0 ./dist`
+Example: `npx armada bundle my-site-v1.0.0.tgz ./dist`
 
 ## Publishing a Bundle
 
