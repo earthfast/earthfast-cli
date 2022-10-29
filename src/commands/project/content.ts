@@ -21,6 +21,10 @@ export const builder = function (yargs: yargs.Argv) {
 };
 
 export const handler = async function (argv: Arguments) {
+  if (<any>(argv.bundleUrl != "") ^ <any>(argv.bundleSha != "")) {
+    console.error("Error: bundleUrl and bundleSha must be specified together");
+    process.exit(1);
+  }
   const signer = await getSigner(argv);
   const projects = await getContract(argv, "projects", signer);
   const projectId = normalizeHex(argv.projectId as string);

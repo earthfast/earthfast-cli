@@ -25,7 +25,7 @@ Example: `npx armada bundle my-site-v1.0.0 ./dist`
 Once the bundle has been made available on a publicly accessible URL, such as Github Releases or S3, it can be published on the Armada Network. This can be done by a DAO vote, for example through Tally, or manually like this:
 
 ```sh
-npx armada project-content <project-id> <bundle-url> <bundle-sha>
+npx armada publish <project-id> <bundle-url> <bundle-sha>
 ```
 
 Example: `npx armada publish 0x0123... https://.../my-site-v1.0.0.tgz 0xabcd...`

@@ -33,7 +33,7 @@ export async function getSigner(argv: Arguments): Promise<Signer> {
   } else {
     const addresses = await listWallets();
     if (!addresses.length) {
-      console.error("ERROR: No private keys found. Use npx armada key-import.");
+      console.error("Error: No private keys found. Use npx armada key-import.");
       process.exit(1);
     }
 
