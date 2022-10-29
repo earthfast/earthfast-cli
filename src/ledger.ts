@@ -1,10 +1,10 @@
 // Adapted from https://github.com/ethers-io/ethers.js/tree/ce8f1e4015c0f27bf178238770b1325136e3351a/packages/hardware-wallets
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-nocheck
 
-import { ethers } from "ethers";
 import Eth from "@ledgerhq/hw-app-eth";
-
 import type { Transport } from "@ledgerhq/hw-transport-node-hid";
+import { ethers } from "ethers";
 
 export type TransportCreator = {
   create: () => Promise<Transport>;
@@ -18,7 +18,8 @@ const hidWrapper = Object.freeze({
     if (hidCache == null) {
       hidCache = new Promise((resolve, reject) => {
         try {
-          let hid = require("@ledgerhq/hw-transport-node-hid");
+          // eslint-disable-next-line @typescript-eslint/no-var-requires
+          const hid = require("@ledgerhq/hw-transport-node-hid");
           if (hid.create == null) {
             resolve(hid["default"]);
           }
@@ -85,7 +86,7 @@ export class LedgerSigner extends ethers.Signer {
         (transport) => {
           const eth = new Eth(transport);
           return eth.getAppConfiguration().then(
-            (config) => {
+            () => {
               return eth;
             },
             (error) => {
@@ -100,7 +101,8 @@ export class LedgerSigner extends ethers.Signer {
     );
   }
 
-  _retry<T = any>(callback: (eth: Eth) => Promise<T>, timeout?: number): Promise<T> {
+  _retry<T>(callback: (eth: Eth) => Promise<T>, timeout?: number): Promise<T> {
+    // eslint-disable-next-line no-async-promise-executor
     return new Promise(async (resolve, reject) => {
       if (timeout && timeout > 0) {
         setTimeout(() => {

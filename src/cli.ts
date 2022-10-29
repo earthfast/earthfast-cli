@@ -12,9 +12,9 @@ import { generateManifest } from "./manifest";
 import { defaultNetworks } from "./networks";
 
 yargs(hideBin(process.argv))
-  .command(keyCommands as unknown as CommandModule<{}, unknown>)
-  .command(nodeCommands as unknown as CommandModule<{}, unknown>)
-  .command(projectCommands as unknown as CommandModule<{}, unknown>)
+  .command(keyCommands as unknown as CommandModule<unknown, unknown>)
+  .command(nodeCommands as unknown as CommandModule<unknown, unknown>)
+  .command(projectCommands as unknown as CommandModule<unknown, unknown>)
   .command(
     "bundle <name> <build-dir>",
     "Bundle an application for use on the Armada Network",

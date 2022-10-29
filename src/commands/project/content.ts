@@ -1,11 +1,11 @@
-import yargs, { Arguments } from "yargs";
+import { Arguments, Argv } from "yargs";
 import { decodeEvent, getContract, getSigner, normalizeHex } from "../../helpers";
 
 export const command = ["project-content <project-id> <bundle-url> <bundle-sha>", "publish"];
 export const desc = "Publish content on the network";
 
-export const builder = function (yargs: yargs.Argv) {
-  return yargs
+export const builder = function (argv: Argv) {
+  return argv
     .positional("project-id", {
       describe: "The ID of the project",
       type: "string",
@@ -20,16 +20,16 @@ export const builder = function (yargs: yargs.Argv) {
     });
 };
 
-export const handler = async function (argv: Arguments) {
-  if ((argv.bundleUrl != "") !== (argv.bundleSha != "")) {
+export const handler = async function (args: Arguments) {
+  if ((args.bundleUrl != "") !== (args.bundleSha != "")) {
     console.error("Error: bundleUrl and bundleSha must be specified together");
     process.exit(1);
   }
-  const signer = await getSigner(argv);
-  const projects = await getContract(argv, "projects", signer);
-  const projectId = normalizeHex(argv.projectId as string);
-  const bundleSha = normalizeHex(argv.bundleSha as string);
-  const tx = await projects.setProjectContent(projectId, argv.bundleUrl, bundleSha);
+  const signer = await getSigner(args);
+  const projects = await getContract(args, "projects", signer);
+  const projectId = normalizeHex(args.projectId as string);
+  const bundleSha = normalizeHex(args.bundleSha as string);
+  const tx = await projects.setProjectContent(projectId, args.bundleUrl, bundleSha);
   console.log(`Transaction ${tx.hash}...`);
   const receipt = await tx.wait();
   const events = await decodeEvent(receipt, projects, "ProjectContentChanged");

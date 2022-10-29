@@ -1,11 +1,11 @@
-import yargs, { Arguments } from "yargs";
+import { Arguments, Argv } from "yargs";
 import { getContract, getProvider, normalizeHex } from "../../helpers";
 
 export const command = "node-list";
 export const desc = "List network content nodes";
 
-export const builder = function (yargs: yargs.Argv) {
-  return yargs
+export const builder = function (argv: Argv) {
+  return argv
     .option("skip", {
       describe: "The number of results to skip",
       default: 0,
@@ -28,11 +28,11 @@ export const builder = function (yargs: yargs.Argv) {
     });
 };
 
-export const handler = async function (argv: Arguments) {
-  const provider = await getProvider(argv);
-  const nodes = await getContract(argv, "nodes", provider);
-  const operator = normalizeHex(argv.operator as string);
-  const data = await nodes.getNodes(operator, argv.topology, argv.skip, argv.size);
+export const handler = async function (args: Arguments) {
+  const provider = await getProvider(args);
+  const nodes = await getContract(args, "nodes", provider);
+  const operator = normalizeHex(args.operator as string);
+  const data = await nodes.getNodes(operator, args.topology, args.skip, args.size);
   console.log(data);
   console.log("OK");
 };
