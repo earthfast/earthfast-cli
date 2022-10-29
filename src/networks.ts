@@ -1,8 +1,8 @@
-import ArmadaProjectsTestnetDeployment from "../abi/testnet/ArmadaProjects.json";
+import type { ContractInterface } from "ethers";
+import ArmadaNodesStagingDeployment from "../abi/staging/ArmadaNodes.json";
 import ArmadaProjectsStagingDeployment from "../abi/staging/ArmadaProjects.json";
 import ArmadaNodesTestnetDeployment from "../abi/testnet/ArmadaNodes.json";
-import ArmadaNodesStagingDeployment from "../abi/staging/ArmadaNodes.json";
-import { ContractInterface } from "ethers";
+import ArmadaProjectsTestnetDeployment from "../abi/testnet/ArmadaProjects.json";
 
 export interface NetworkInfo {
   url: string;

@@ -1,4 +1,4 @@
-import { TransactionReceipt } from "@ethersproject/abstract-provider";
+import type { TransactionReceipt } from "@ethersproject/abstract-provider";
 import { Contract, ethers, Signer } from "ethers";
 import { Result } from "ethers/lib/utils";
 import inquirer from "inquirer";

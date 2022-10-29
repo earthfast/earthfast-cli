@@ -2,10 +2,9 @@
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-nocheck
 
-import { ethers } from "ethers";
 import Eth from "@ledgerhq/hw-app-eth";
-
 import type { Transport } from "@ledgerhq/hw-transport-node-hid";
+import { ethers } from "ethers";
 
 export type TransportCreator = {
   create: () => Promise<Transport>;

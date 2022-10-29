@@ -1,8 +1,8 @@
-import { encryptKeystore } from "@ethersproject/json-wallets";
 import fs from "fs";
-import { Wallet } from "ethers";
-import path from "path";
 import os from "os";
+import path from "path";
+import { encryptKeystore } from "@ethersproject/json-wallets";
+import { Wallet } from "ethers";
 import keytar from "keytar";
 import { normalizeHex } from "./helpers";
 
