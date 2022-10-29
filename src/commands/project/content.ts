@@ -25,9 +25,10 @@ export const handler = async function (argv: Arguments) {
   const projects = await getContract(argv, "projects", signer);
   const projectId = normalizeHex(argv.projectId as string);
   const bundleSha = normalizeHex(argv.bundleSha as string);
-  const receipt = await projects.setProjectContent(projectId, argv.bundleUrl, bundleSha);
-  const response = await receipt.wait();
-  const events = await decodeEvent(response, projects, "ProjectContentChanged");
+  const tx = await projects.setProjectContent(projectId, argv.bundleUrl, bundleSha);
+  console.log(`Transaction ${tx.hash}...`);
+  const receipt = await tx.wait();
+  const events = await decodeEvent(receipt, projects, "ProjectContentChanged");
   console.log(events);
   console.log("OK");
 };
