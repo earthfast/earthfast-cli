@@ -11,6 +11,43 @@
           "type": "bytes32"
         },
         {
+          "indexed": false,
+          "internalType": "string",
+          "name": "oldContent",
+          "type": "string"
+        },
+        {
+          "indexed": false,
+          "internalType": "bytes32",
+          "name": "oldChecksum",
+          "type": "bytes32"
+        },
+        {
+          "indexed": false,
+          "internalType": "string",
+          "name": "newContent",
+          "type": "string"
+        },
+        {
+          "indexed": false,
+          "internalType": "bytes32",
+          "name": "newChecksum",
+          "type": "bytes32"
+        }
+      ],
+      "name": "ProjectContentChanged",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "bytes32",
+          "name": "projectId",
+          "type": "bytes32"
+        },
+        {
           "indexed": true,
           "internalType": "address",
           "name": "owner",
@@ -87,6 +124,29 @@
           "type": "bytes32"
         }
       ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "projectId",
+          "type": "bytes32"
+        },
+        {
+          "internalType": "string",
+          "name": "content",
+          "type": "string"
+        },
+        {
+          "internalType": "bytes32",
+          "name": "checksum",
+          "type": "bytes32"
+        }
+      ],
+      "name": "setProjectContent",
+      "outputs": [],
       "stateMutability": "nonpayable",
       "type": "function"
     }

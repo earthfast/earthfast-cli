@@ -1,10 +1,6 @@
 import { createHash } from "crypto";
 import { createReadStream, PathLike } from "fs";
 
-export async function sha1File(path: any): Promise<string> {
-  return hashFile("sha1", path);
-}
-
 export async function sha256File(path: string): Promise<string> {
   return hashFile("sha256", path);
 }

@@ -1,15 +1,95 @@
-import { Contract } from "ethers";
+import { Contract, ethers, Signer } from "ethers";
+import inquirer from "inquirer";
+import keytar from "keytar";
+import { Arguments } from "yargs";
+import { listWallets, loadWallet } from "./keystore";
+import { LedgerSigner } from "./ledger";
+import { getArmadaAbi, getNetworkRpcUrl, supportedContracts, supportedNetworks } from "./networks";
 
-export async function decodeEvent(receipt: { logs: string | any[]; }, contract: Contract, event: string) {
+export function normalizeHex(s: string): string {
+  if (!s.length) {
+    return "0x0000000000000000000000000000000000000000000000000000000000000000";
+  } else {
+    return s.startsWith("0x") ? s : "0x" + s;
+  }
+}
+
+export async function getProvider(argv: Arguments) {
+  const url = getNetworkRpcUrl(argv.network as supportedNetworks);
+  const provider = new ethers.providers.JsonRpcProvider(url);
+  return provider;
+}
+
+export async function getSigner(argv: Arguments): Promise<Signer> {
+  const url = getNetworkRpcUrl(argv.network as supportedNetworks);
+  const provider = new ethers.providers.JsonRpcProvider(url);
+
+  let signer: Signer;
+  if (argv.ledger) {
+    console.log("Make sure the Ledger wallet is unlocked and the Ethereum application is open");
+    signer = new LedgerSigner(provider);
+    const address = await signer.getAddress();
+    console.log("Using Ledger wallet. Wallet address: ", address);
+  } else {
+    const addresses = await listWallets();
+    if (!addresses.length) {
+      console.error("Error: No private keys found. Use npx armada key-import.");
+      process.exit(1);
+    }
+
+    let res = await inquirer.prompt([
+      {
+        name: "address",
+        message: "Pick the wallet to sign the transaction:",
+        type: "list",
+        choices: addresses,
+      },
+    ]);
+
+    const address = res.address;
+    let password = await keytar.getPassword("armada-cli", address);
+    if (!password) {
+      let res = await inquirer.prompt([
+        {
+          name: "password",
+          message: "Enter the wallet encryption password:",
+          type: "password",
+        },
+      ]);
+      password = res.password as string;
+    }
+
+    signer = await loadWallet(`keystore_${address}.json`, password);
+    signer = signer.connect(provider);
+  }
+
+  return signer;
+}
+
+export async function getContract(
+  argv: Arguments,
+  name: supportedContracts,
+  signerOrProvider: Signer | ethers.providers.Provider
+): Promise<Contract> {
+  const abi = getArmadaAbi(argv.network as supportedNetworks, name);
+  if (signerOrProvider instanceof Signer) {
+    const signer = signerOrProvider;
+    const contract = new Contract(abi.address, abi.abi, signer.provider);
+    const contractWithSigner = contract.connect(signer);
+    return contractWithSigner;
+  } else {
+    const provider = signerOrProvider;
+    const contract = new Contract(abi.address, abi.abi, provider);
+    return contract;
+  }
+}
+
+export async function decodeEvent(receipt: { logs: string | any[] }, contract: Contract, event: string) {
   const results = [];
   for (let i = 0; i < receipt.logs.length; i++) {
     const log = receipt.logs[i];
     try {
-      const args = contract.interface.decodeEventLog(
-        event,
-        log.data,
-        log.topics
-      );
+      const args = contract.interface.decodeEventLog(event, log.data, log.topics);
       if (args) {
         results.push(args);
       }
@@ -18,8 +98,4 @@ export async function decodeEvent(receipt: { logs: string | any[]; }, contract: 
     }
   }
   return results.length === 1 ? results[0] : results;
-}
-
-export async function waitTx(txPromise: any) {
-  return await (await txPromise).wait();
 }

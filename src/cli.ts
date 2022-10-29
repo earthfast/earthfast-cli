@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 import path from "path";
 import tar from "tar";
 import yargs, { CommandModule } from "yargs";
@@ -7,6 +9,7 @@ import { commands as keyCommands } from "./commands/key";
 import { commands as nodeCommands } from "./commands/node";
 import { commands as projectCommands } from "./commands/project";
 import { generateManifest } from "./manifest";
+import { defaultNetworks } from "./networks";
 
 yargs(hideBin(process.argv))
   .command(keyCommands as unknown as CommandModule<{}, unknown>)
@@ -17,11 +20,11 @@ yargs(hideBin(process.argv))
     "Bundle an application for use on the Armada Network",
     (yargs) => {
       return yargs
-        .positional('name', {
-          describe: 'The name of the bundle to create (e.g. my-site-v1.0.0)',
+        .positional("name", {
+          describe: "The name of the bundle to create (e.g. my-site-v1.0.0)",
         })
         .positional("build-dir", {
-          describe: 'Relative path to the application\'s build directory (e.g. ./dist)',
+          describe: "Relative path to the application's build directory (e.g. ./dist)",
         });
     },
     async (argv) => {
@@ -56,14 +59,25 @@ yargs(hideBin(process.argv))
       console.log(manifestPath);
     }
   )
+  .option("network", {
+    describe: "The network to use.",
+    type: "string",
+    choices: Object.keys(defaultNetworks),
+    default: "testnet",
+  })
+  .option("ledger", {
+    describe: "Use Ledger hardware wallet",
+    type: "boolean",
+    default: false,
+  })
   .demandCommand(1)
   .parse();
 
 function normalizeBundleExtension(name: string) {
-  if (name.endsWith('.tar.gz') || name.endsWith('.tgz')) {
-      return name;
+  if (name.endsWith(".tar.gz") || name.endsWith(".tgz")) {
+    return name;
   }
-  return name + '.tgz';
+  return name + ".tgz";
 }
 
 async function compress(archive: string, buildDir: string) {

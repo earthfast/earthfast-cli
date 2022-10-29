@@ -1,47 +1,38 @@
-import { ethers } from "ethers";
 import yargs, { Arguments } from "yargs";
-import { defaultNetworks, getArmadaAbi, getNetworkRpcUrl, supportedNetworks } from "../../networks";
+import { getContract, getProvider, normalizeHex } from "../../helpers";
 
 export const command = "node-list";
-export const desc = "List all armada nodes";
+export const desc = "List network content nodes";
 
 export const builder = function (yargs: yargs.Argv) {
   return yargs
     .option("skip", {
-      describe: "The number of nodes to skip. Example: 0",
+      describe: "The number of results to skip",
       default: 0,
       type: "number",
     })
     .option("size", {
-      describe: "The number of nodes to return. Example: 100",
+      describe: "The number of results to list",
       default: 100,
       type: "number",
     })
     .option("operator", {
-      describe: "The operator id to filter by.",
-      default: "0x0000000000000000000000000000000000000000000000000000000000000000",
+      describe: "The operator ID to filter by",
+      default: "",
       type: "string",
     })
     .option("topology", {
-      describe: "Return topology nodes.",
+      describe: "List topology nodes instead",
       type: "boolean",
       default: false,
-    })
-    .option("network", {
-      describe: `The network to use. Default is testnet. Options: ${Object.keys(defaultNetworks).join(", ")}`,
-      type: "string",
-      default: false,
-    })
+    });
 };
 
 export const handler = async function (argv: Arguments) {
-  console.log(`Listing all nodes.`);
-
-  const url = getNetworkRpcUrl(argv.network as supportedNetworks);
-  const provider = new ethers.providers.JsonRpcProvider(url);
-  let { address: armadaNodesAddress, abi: armadaNodesAbi } = getArmadaAbi(argv.network as supportedNetworks, "nodes");
-
-  const contract = new ethers.Contract(armadaNodesAddress, armadaNodesAbi, provider);
-  const nodes = await contract.getNodes(argv.operator, argv.topology, argv.skip, argv.size);
-  console.log(nodes);
+  const provider = await getProvider(argv);
+  const nodes = await getContract(argv, "nodes", provider);
+  const operator = normalizeHex(argv.operator as string);
+  const data = await nodes.getNodes(operator, argv.topology, argv.skip, argv.size);
+  console.log(data);
+  console.log("OK");
 };
