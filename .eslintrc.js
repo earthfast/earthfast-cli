@@ -18,6 +18,7 @@ module.exports = {
   },
   settings: {
     node: {
+      // Configuration for node/no-missing-import rule
       tryExtensions: [".js", ".json", ".ts", ".d.ts"],
     },
   },
