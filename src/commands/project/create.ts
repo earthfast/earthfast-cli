@@ -27,7 +27,7 @@ export const builder = function (yargs: yargs.Argv) {
 };
 
 export const handler = async function (argv: Arguments) {
-  if (<any>(argv.bundleUrl != "") ^ <any>(argv.bundleSha != "")) {
+  if ((argv.bundleUrl != "") !== (argv.bundleSha != "")) {
     console.error("Error: bundleUrl and bundleSha must be specified together");
     process.exit(1);
   }
