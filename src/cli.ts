@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-
+/* eslint-disable node/shebang */
 import path from "path";
 import tar from "tar";
 import yargs, { CommandModule } from "yargs";
