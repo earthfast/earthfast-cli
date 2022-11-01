@@ -5,7 +5,7 @@ export default class ProjectContent extends TransactionCommand {
   static summary = "Publishes the provided bundle on the network.";
   static examples = ["<%= config.bin %> <%= command.id %>"];
   static usage = "<%= command.id %> ID URL SHA";
-  static aliases = ["project:content", "project:publish", "bundle:publish", "publish"];
+  static aliases = ["project:content", "project:publish"];
   static args = [
     { name: "ID", description: "The ID of the project to publish to.", required: true },
     { name: "URL", description: "The public URL to fetch the bundle.", required: true },
