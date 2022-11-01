@@ -29,7 +29,7 @@ export default class KeyDelete extends Command {
     }
 
     const address = args.ADDR;
-    await deleteWallet(`keystore_${address}.json`);
+    await deleteWallet(address);
     await keytar.deletePassword("armada-cli", address);
     console.log(`Account ${address} deleted`);
   }

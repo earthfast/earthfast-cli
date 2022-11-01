@@ -22,16 +22,18 @@ export async function saveWallet(privateKey: string, password: string): Promise<
 
   fs.writeFileSync(path.join(keyStoreFolderPath, filename), json);
   keytar.setPassword("armada-cli", address, password);
-  return filename;
+  return address;
 }
 
-export async function loadWallet(filename: string, password: string): Promise<Wallet> {
+export async function loadWallet(address: string, password: string): Promise<Wallet> {
+  const filename = `keystore_${address}.json`;
   const json = fs.readFileSync(path.join(keyStoreFolderPath, filename), "utf8");
   const wallet = await Wallet.fromEncryptedJson(json, password);
   return wallet;
 }
 
-export async function deleteWallet(filename: string): Promise<void> {
+export async function deleteWallet(address: string): Promise<void> {
+  const filename = `keystore_${address}.json`;
   fs.unlinkSync(path.join(keyStoreFolderPath, filename));
 }
 

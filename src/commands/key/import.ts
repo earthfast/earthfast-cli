@@ -15,7 +15,7 @@ export default class KeyImport extends Command {
     ]);
 
     const filename = await saveWallet(responses.privateKey, responses.password);
-    const wallet = await loadWallet(filename, responses.password);
-    console.log(`Account ${wallet.address} imported`);
+    const address = await loadWallet(filename, responses.password);
+    console.log(`Account ${address} imported`);
   }
 }

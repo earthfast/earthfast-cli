@@ -55,7 +55,7 @@ export async function getSigner(network: NetworkName, ledger: boolean): Promise<
       password = res.password as string;
     }
 
-    signer = await loadWallet(`keystore_${address}.json`, password);
+    signer = await loadWallet(address, password);
     signer = signer.connect(provider);
   }
 
