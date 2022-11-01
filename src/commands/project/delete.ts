@@ -5,7 +5,7 @@ import { decodeEvent, getContract, getSigner, normalizeHex } from "../../helpers
 
 export default class ProjectDelete extends TransactionCommand {
   static description = "Deletes a project from the Armada Network.";
-  static examples = ["<%= config.bin %> <%= command.id %>"];
+  static examples = ["<%= config.bin %> <%= command.id %> ID"];
   static usage = "project delete ID";
   static args: Arg[] = [{ name: "ID", description: "The ID of the project to delete.", required: true }];
 
