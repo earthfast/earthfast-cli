@@ -1,12 +1,14 @@
+import { CliUx } from "@oclif/core";
+import { Arg } from "@oclif/core/lib/interfaces";
 import { TransactionCommand } from "../../base";
 import { decodeEvent, getContract, getSigner, normalizeHex } from "../../helpers";
 
 export default class ProjectContent extends TransactionCommand {
-  static summary = "Publishes the provided bundle on the network.";
-  static examples = ["<%= config.bin %> <%= command.id %>"];
+  static description = "Publishes the provided bundle on the network.";
+  static examples = ["<%= config.bin %> <%= command.id %> 0x123abc... https://.../my-site-v1.0.0.tgz 0x456def..."];
   static usage = "<%= command.id %> ID URL SHA";
   static aliases = ["project:content", "project:publish"];
-  static args = [
+  static args: Arg[] = [
     { name: "ID", description: "The ID of the project to publish to.", required: true },
     { name: "URL", description: "The public URL to fetch the bundle.", required: true },
     { name: "SHA", description: "The SHA-256 checksum of the bundle.", required: true },
@@ -18,9 +20,13 @@ export default class ProjectContent extends TransactionCommand {
     const projects = await getContract(flags.network, "projects", signer);
     const projectId = normalizeHex(args.ID);
     const bundleSha = normalizeHex(args.SHA);
+    CliUx.ux.action.start("- Submitting transaction");
     const tx = await projects.setProjectContent(projectId, args.URL, bundleSha);
-    console.log(`Transaction ${tx.hash}...`);
+    CliUx.ux.action.stop("done");
+    console.log(`> Transaction ${tx.hash}`);
+    CliUx.ux.action.start("- Processing transaction");
     const receipt = await tx.wait();
+    CliUx.ux.action.stop("done");
     const events = await decodeEvent(receipt, projects, "ProjectContentChanged");
     console.log(events);
   }

@@ -5,7 +5,7 @@ import { getContract, getProvider, normalizeHex } from "../../helpers";
 export default class NodeList extends BlockchainCommand {
   static description = "Lists content nodes on the Armada Network.";
   static examples = ["<%= config.bin %> <%= command.id %>"];
-  static usage = "node list [--topology] [--operator ID] [--skip N] [--size N]";
+  static usage = "<%= command.id %> [--topology] [--operator ID] [--skip N] [--size N]";
   static flags = {
     topology: Flags.boolean({ description: "List topology nodes instead." }),
     operator: Flags.string({ description: "Filter by operator ID.", helpValue: "ID" }),
