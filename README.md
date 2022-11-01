@@ -28,4 +28,4 @@ Once the bundle has been made available on a publicly accessible URL, such as Gi
 npx armada publish <project-id> <bundle-url> <bundle-sha>
 ```
 
-Example: `npx armada project publish 0x0123... https://.../my-site-v1.0.0.tgz 0xabcd...`
+Example: `npx armada project publish 0x123abc... https://.../my-site-v1.0.0.tgz 0x456def...`

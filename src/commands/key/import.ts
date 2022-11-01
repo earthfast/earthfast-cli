@@ -5,7 +5,7 @@ import { loadWallet, saveWallet } from "../../keystore";
 export default class KeyImport extends Command {
   static description = "Saves a private key for signing transactions.\nThe keys are stored in an encrypted keystore.";
   static examples = ["<%= config.bin %> <%= command.id %>"];
-  static usage = "key import";
+  static usage = "<%= command.id %>";
 
   public async run(): Promise<void> {
     await this.parse(KeyImport);

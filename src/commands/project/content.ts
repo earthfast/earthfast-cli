@@ -5,7 +5,7 @@ import { decodeEvent, getContract, getSigner, normalizeHex } from "../../helpers
 
 export default class ProjectContent extends TransactionCommand {
   static description = "Publishes the provided bundle on the network.";
-  static examples = ["<%= config.bin %> <%= command.id %>"];
+  static examples = ["<%= config.bin %> <%= command.id %> 0x123abc... https://.../my-site-v1.0.0.tgz 0x456def..."];
   static usage = "<%= command.id %> ID URL SHA";
   static aliases = ["project:content", "project:publish"];
   static args: Arg[] = [
