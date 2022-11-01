@@ -27,6 +27,5 @@ export default class ProjectCreate extends TransactionCommand {
     const receipt = await tx.wait();
     const events = await decodeEvent(receipt, projects, "ProjectCreated");
     console.log(events);
-    console.log("OK");
   }
 }

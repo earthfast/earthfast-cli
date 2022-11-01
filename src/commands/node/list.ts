@@ -20,6 +20,5 @@ export default class NodeList extends BlockchainCommand {
     const operator = normalizeHex(flags.operator);
     const data = await nodes.getNodes(operator, flags.topology, flags.skip, flags.size);
     console.log(data);
-    console.log("OK");
   }
 }
