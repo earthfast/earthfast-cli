@@ -5,14 +5,19 @@
   "homepage": "https://armadanetwork.com",
   "license": "MIT",
   "scripts": {
-    "build": "tsc",
-    "clean": "rm -rf build",
-    "bin": "node build/src/cli.js",
-    "dev": "ts-node src/cli.ts"
+    "build": "rm -rf dist && tsc",
+    "clean": "rm -rf dist",
+    "postpack": "rm -f oclif.manifest.json",
+    "prepack": "npm run build && oclif manifest"
   },
   "bin": {
-    "armada": "./build/src/cli.js"
+    "armada": "./bin/run"
   },
+  "files": [
+    "/bin",
+    "/dist",
+    "/oclif.manifest.json"
+  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/armada-network/armada-cli"
@@ -20,9 +25,34 @@
   "engines": {
     "node": ">=16.0.0"
   },
+  "oclif": {
+    "bin": "armada",
+    "dirname": "armada",
+    "commands": "./src/commands",
+    "plugins": [
+      "@oclif/plugin-help"
+    ],
+    "topicSeparator": " ",
+    "topics": {
+      "bundle": {
+        "description": "Build Armada Network content bundles."
+      },
+      "key": {
+        "description": "Manage keys for signing transactions."
+      },
+      "node": {
+        "description": "Work with nodes on the Armada Network."
+      },
+      "project": {
+        "description": "Work with projects on the Armada Network."
+      }
+    }
+  },
   "dependencies": {
     "@ledgerhq/hw-app-eth": "^6.29.10",
     "@ledgerhq/hw-transport-node-hid": "^6.27.6",
+    "@oclif/core": "^1.20.2",
+    "@oclif/plugin-help": "^5.1.17",
     "ethers": "^5.7.1",
     "inquirer": "^7.1.4",
     "keytar": "^7.9.0",
@@ -45,6 +75,7 @@
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-prettier": "^4.2.1",
     "eslint-plugin-promise": "^6.1.1",
+    "oclif": "^3.2.24",
     "prettier": "^2.7.1",
     "ts-node": "^10.9.1",
     "typescript": "^4.8.4"

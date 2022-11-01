@@ -3,26 +3,25 @@ import { Contract, ethers, Signer } from "ethers";
 import { Result } from "ethers/lib/utils";
 import inquirer from "inquirer";
 import keytar from "keytar";
-import { Arguments } from "yargs";
 import { listWallets, loadWallet } from "./keystore";
 import { LedgerSigner } from "./ledger";
 import { getArmadaAbi, getNetworkRpcUrl, supportedContracts, supportedNetworks } from "./networks";
 
-export function normalizeHex(s: string): string {
-  if (!s.length) {
+export function normalizeHex(s: string | undefined): string {
+  if (!s?.length) {
     return "0x0000000000000000000000000000000000000000000000000000000000000000";
   } else {
     return s.startsWith("0x") ? s : "0x" + s;
   }
 }
 
-export async function getProvider(argv: Arguments) {
+export async function getProvider(argv: { [name: string]: unknown }) {
   const url = getNetworkRpcUrl(argv.network as supportedNetworks);
   const provider = new ethers.providers.JsonRpcProvider(url);
   return provider;
 }
 
-export async function getSigner(argv: Arguments): Promise<Signer> {
+export async function getSigner(argv: { [name: string]: unknown }): Promise<Signer> {
   const url = getNetworkRpcUrl(argv.network as supportedNetworks);
   const provider = new ethers.providers.JsonRpcProvider(url);
 
@@ -69,7 +68,7 @@ export async function getSigner(argv: Arguments): Promise<Signer> {
 }
 
 export async function getContract(
-  argv: Arguments,
+  argv: { [name: string]: unknown },
   name: supportedContracts,
   signerOrProvider: Signer | ethers.providers.Provider
 ): Promise<Contract> {
