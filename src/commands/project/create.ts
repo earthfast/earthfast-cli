@@ -1,3 +1,4 @@
+import { CliUx } from "@oclif/core";
 import { TransactionCommand } from "../../base";
 import { decodeEvent, getContract, getSigner, normalizeHex } from "../../helpers";
 
@@ -8,8 +9,8 @@ export default class ProjectCreate extends TransactionCommand {
   static args = [
     { name: "NAME", description: "The name of the project to create.", required: true },
     { name: "EMAIL", description: "The project email for admin notifications.", required: true },
-    { name: "URL", description: "The public URL to fetch the content bundle." },
-    { name: "SHA", description: "The SHA-256 checksum of the content bundle." },
+    { name: "URL", description: "The public URL to fetch the content bundle.", default: "" },
+    { name: "SHA", description: "The SHA-256 checksum of the content bundle.", default: "" },
   ];
 
   public async run(): Promise<void> {
@@ -22,9 +23,13 @@ export default class ProjectCreate extends TransactionCommand {
     const projects = await getContract(flags.network, "projects", signer);
     const address = await signer.getAddress();
     const bundleSha = normalizeHex(args.SHA);
+    CliUx.ux.action.start("- Submitting transaction");
     const tx = await projects.createProject([address, args.NAME, args.EMAIL, args.URL, bundleSha]);
-    console.log(`Transaction ${tx.hash}...`);
+    CliUx.ux.action.stop("done");
+    console.log(`- Transaction ${tx.hash}`);
+    CliUx.ux.action.start("- Processing transaction");
     const receipt = await tx.wait();
+    CliUx.ux.action.stop("done");
     const events = await decodeEvent(receipt, projects, "ProjectCreated");
     console.log(events);
   }

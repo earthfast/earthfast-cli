@@ -1,3 +1,4 @@
+import { CliUx } from "@oclif/core";
 import { TransactionCommand } from "../../base";
 import { decodeEvent, getContract, getSigner, normalizeHex } from "../../helpers";
 
@@ -12,9 +13,13 @@ export default class ProjectDelete extends TransactionCommand {
     const signer = await getSigner(flags.network, flags.ledger);
     const projects = await getContract(flags.network, "projects", signer);
     const projectId = normalizeHex(args.ID);
+    CliUx.ux.action.start("- Submitting transaction");
     const tx = await projects.deleteProject(projectId);
-    console.log(`Transaction ${tx.hash}...`);
+    CliUx.ux.action.stop("done");
+    console.log(`> Transaction ${tx.hash}`);
+    CliUx.ux.action.start("- Processing transaction");
     const receipt = await tx.wait();
+    CliUx.ux.action.stop("done");
     const events = await decodeEvent(receipt, projects, "ProjectDeleted");
     console.log(events);
   }
