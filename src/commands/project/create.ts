@@ -4,7 +4,7 @@ import { decodeEvent, getContract, getSigner, normalizeHex } from "../../helpers
 export default class ProjectCreate extends TransactionCommand {
   static summary = "Registers a new project on the Armada Network.";
   static examples = ["<%= config.bin %> <%= command.id %>"];
-  static usage = "project create NAME EMAIL [URL SHA]";
+  static usage = "project create NAME EMAIL [URL] [SHA]";
   static args = [
     { name: "NAME", description: "The name of the project to create.", required: true },
     { name: "EMAIL", description: "The project email for admin notifications.", required: true },
