@@ -1,51 +1,41 @@
 import type { ContractInterface } from "ethers";
 
-import ArmadaNodesStagingDeployment from "../abi/staging/ArmadaNodes.json";
-import ArmadaProjectsStagingDeployment from "../abi/staging/ArmadaProjects.json";
-import ArmadaNodesTestnetDeployment from "../abi/testnet/ArmadaNodes.json";
-import ArmadaProjectsTestnetDeployment from "../abi/testnet/ArmadaProjects.json";
+import StagingNodesDeployment from "../abi/staging/ArmadaNodes.json";
+import StagingProjectsDeployment from "../abi/staging/ArmadaProjects.json";
+
+import TestnetNodesDeployment from "../abi/testnet/ArmadaNodes.json";
+import TestnetProjectsDeployment from "../abi/testnet/ArmadaProjects.json";
+
+export type NetworkName = "testnet" | "staging";
+export type ContractName = "nodes" | "projects";
 
 export interface NetworkInfo {
   url: string;
-  id?: number;
-  label?: string;
 }
 
-export type supportedNetworks = "testnet" | "staging";
-export type supportedContracts = "projects" | "nodes";
+export interface ContractInfo {
+  address: string;
+  abi: ContractInterface;
+}
 
-export type Networks = { [name: string]: NetworkInfo };
-
-export const defaultNetworks: Networks = {
+export const Networks: Record<NetworkName, NetworkInfo> = {
   testnet: {
     url: "https://rpc.ankr.com/eth_goerli",
-    id: 5, // Goerli
   },
   staging: {
     url: "https://rpc.ankr.com/eth_goerli",
-    id: 5, // Goerli
   },
 };
 
-const contracts = {
-  staging: {
-    projects: ArmadaProjectsStagingDeployment,
-    nodes: ArmadaNodesStagingDeployment,
-  },
-
+export const Contracts: Record<NetworkName, Record<ContractName, ContractInfo>> = {
   testnet: {
-    projects: ArmadaProjectsTestnetDeployment,
-    nodes: ArmadaNodesTestnetDeployment,
+    nodes: TestnetNodesDeployment,
+    projects: TestnetProjectsDeployment,
+  },
+  staging: {
+    nodes: StagingNodesDeployment,
+    projects: StagingProjectsDeployment,
   },
 };
 
-export const getArmadaAbi = (
-  network: supportedNetworks | false,
-  contract: supportedContracts
-): { address: string; abi: ContractInterface } => {
-  return contracts[network || "testnet"][contract];
-};
-
-export const getNetworkRpcUrl = (network: supportedNetworks | false): string => {
-  return defaultNetworks[network || "testnet"].url;
-};
+export const NetworkNames = Object.keys(Networks) as NetworkName[];

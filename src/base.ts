@@ -1,11 +1,11 @@
 import { Command, Flags } from "@oclif/core";
-import { defaultNetworks } from "./networks";
+import { NetworkName, NetworkNames } from "./networks";
 
 export abstract class BlockchainCommand extends Command {
   static globalFlags = {
-    network: Flags.enum({
+    network: Flags.enum<NetworkName>({
       description: "The network to use",
-      options: Object.keys(defaultNetworks),
+      options: NetworkNames,
       default: "testnet",
     }),
   };
