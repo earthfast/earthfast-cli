@@ -2,7 +2,7 @@ import { TransactionCommand } from "../../base";
 import { decodeEvent, getContract, getSigner, normalizeHex } from "../../helpers";
 
 export default class ProjectContent extends TransactionCommand {
-  static summary = "Publishes the provided bundle on the network.";
+  static description = "Publishes the provided bundle on the network.";
   static examples = ["<%= config.bin %> <%= command.id %>"];
   static usage = "<%= command.id %> ID URL SHA";
   static aliases = ["project:content", "project:publish"];

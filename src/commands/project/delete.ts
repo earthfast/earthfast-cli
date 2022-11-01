@@ -2,7 +2,7 @@ import { TransactionCommand } from "../../base";
 import { decodeEvent, getContract, getSigner, normalizeHex } from "../../helpers";
 
 export default class ProjectDelete extends TransactionCommand {
-  static summary = "Deletes a project from the Armada Network.";
+  static description = "Deletes a project from the Armada Network.";
   static examples = ["<%= config.bin %> <%= command.id %>"];
   static usage = "project delete ID";
   static args = [{ name: "ID", description: "The ID of the project to delete.", required: true }];
@@ -17,6 +17,5 @@ export default class ProjectDelete extends TransactionCommand {
     const receipt = await tx.wait();
     const events = await decodeEvent(receipt, projects, "ProjectDeleted");
     console.log(events);
-    console.log("OK");
   }
 }

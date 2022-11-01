@@ -2,7 +2,7 @@ import { Command } from "@oclif/core";
 import { generateManifest } from "../../manifest";
 
 export default class BundleManifest extends Command {
-  static summary = "Generates a new site manifest.";
+  static description = "Generates a new site manifest.";
   static examples = ["<%= config.bin %> <%= command.id %> ./dist"];
   static usage = "bundle manifest DIR";
   static hidden = true;

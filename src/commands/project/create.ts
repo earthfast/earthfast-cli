@@ -2,7 +2,7 @@ import { TransactionCommand } from "../../base";
 import { decodeEvent, getContract, getSigner, normalizeHex } from "../../helpers";
 
 export default class ProjectCreate extends TransactionCommand {
-  static summary = "Registers a new project on the Armada Network.";
+  static description = "Registers a new project on the Armada Network.";
   static examples = ["<%= config.bin %> <%= command.id %>"];
   static usage = "project create NAME EMAIL [URL] [SHA]";
   static args = [
