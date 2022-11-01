@@ -1,5 +1,6 @@
 import { TransactionCommand } from "../../base";
 import { decodeEvent, getContract, getSigner, normalizeHex } from "../../helpers";
+import { supportedNetworks } from "../../networks";
 
 export default class ProjectCreate extends TransactionCommand {
   static summary = "Registers a new project on the Armada Network.";
@@ -13,14 +14,14 @@ export default class ProjectCreate extends TransactionCommand {
   ];
 
   public async run(): Promise<void> {
-    const { args } = await this.parse(ProjectCreate);
+    const { args, flags } = await this.parse(ProjectCreate);
     if ((args.URL != "") !== (args.SHA != "")) {
       console.error("Error: URL and SHA must be specified together");
       process.exit(1);
     }
 
-    const signer = await getSigner(args);
-    const projects = await getContract(args, "projects", signer);
+    const signer = await getSigner(flags.network as supportedNetworks, flags.ledger);
+    const projects = await getContract(flags.network as supportedNetworks, "projects", signer);
     const address = await signer.getAddress();
     const bundleSha = normalizeHex(args.SHA);
     const tx = await projects.createProject([address, args.NAME, args.EMAIL, args.URL, bundleSha]);
