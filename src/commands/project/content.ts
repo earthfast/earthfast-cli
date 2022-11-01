@@ -1,6 +1,5 @@
 import { TransactionCommand } from "../../base";
 import { decodeEvent, getContract, getSigner, normalizeHex } from "../../helpers";
-import { supportedNetworks } from "../../networks";
 
 export default class ProjectContent extends TransactionCommand {
   static summary = "Publishes the provided bundle on the network.";
@@ -15,8 +14,8 @@ export default class ProjectContent extends TransactionCommand {
 
   public async run(): Promise<void> {
     const { args, flags } = await this.parse(ProjectContent);
-    const signer = await getSigner(flags.network as supportedNetworks, flags.ledger);
-    const projects = await getContract(flags.network as supportedNetworks, "projects", signer);
+    const signer = await getSigner(flags.network, flags.ledger);
+    const projects = await getContract(flags.network, "projects", signer);
     const projectId = normalizeHex(args.ID);
     const bundleSha = normalizeHex(args.SHA);
     const tx = await projects.setProjectContent(projectId, args.URL, bundleSha);

@@ -1,6 +1,5 @@
 import { TransactionCommand } from "../../base";
 import { decodeEvent, getContract, getSigner, normalizeHex } from "../../helpers";
-import { supportedNetworks } from "../../networks";
 
 export default class ProjectCreate extends TransactionCommand {
   static summary = "Registers a new project on the Armada Network.";
@@ -19,8 +18,8 @@ export default class ProjectCreate extends TransactionCommand {
       this.error("URL and SHA must be specified together");
     }
 
-    const signer = await getSigner(flags.network as supportedNetworks, flags.ledger);
-    const projects = await getContract(flags.network as supportedNetworks, "projects", signer);
+    const signer = await getSigner(flags.network, flags.ledger);
+    const projects = await getContract(flags.network, "projects", signer);
     const address = await signer.getAddress();
     const bundleSha = normalizeHex(args.SHA);
     const tx = await projects.createProject([address, args.NAME, args.EMAIL, args.URL, bundleSha]);

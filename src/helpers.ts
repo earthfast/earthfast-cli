@@ -5,7 +5,7 @@ import inquirer from "inquirer";
 import keytar from "keytar";
 import { listWallets, loadWallet } from "./keystore";
 import { LedgerSigner } from "./ledger";
-import { getArmadaAbi, getNetworkRpcUrl, supportedContracts, supportedNetworks } from "./networks";
+import { ContractName, Contracts, NetworkName, Networks } from "./networks";
 
 export function normalizeHex(s: string | undefined): string {
   if (!s?.length) {
@@ -15,14 +15,14 @@ export function normalizeHex(s: string | undefined): string {
   }
 }
 
-export async function getProvider(network: supportedNetworks): Promise<Provider> {
-  const url = getNetworkRpcUrl(network);
+export async function getProvider(network: NetworkName): Promise<Provider> {
+  const url = Networks[network].url;
   const provider = new ethers.providers.JsonRpcProvider(url);
   return provider;
 }
 
-export async function getSigner(network: supportedNetworks, ledger: boolean): Promise<Signer> {
-  const url = getNetworkRpcUrl(network);
+export async function getSigner(network: NetworkName, ledger: boolean): Promise<Signer> {
+  const url = Networks[network].url;
   const provider = new ethers.providers.JsonRpcProvider(url);
 
   let signer: Signer;
@@ -67,11 +67,11 @@ export async function getSigner(network: supportedNetworks, ledger: boolean): Pr
 }
 
 export async function getContract(
-  network: supportedNetworks,
-  name: supportedContracts,
+  network: NetworkName,
+  contract: ContractName,
   signerOrProvider: Signer | ethers.providers.Provider
 ): Promise<Contract> {
-  const abi = getArmadaAbi(network, name);
+  const abi = Contracts[network][contract];
   if (signerOrProvider instanceof Signer) {
     const signer = signerOrProvider;
     const contract = new Contract(abi.address, abi.abi, signer.provider);
