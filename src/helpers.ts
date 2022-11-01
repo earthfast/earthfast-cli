@@ -1,4 +1,4 @@
-import type { TransactionReceipt } from "@ethersproject/abstract-provider";
+import type { Provider, TransactionReceipt } from "@ethersproject/abstract-provider";
 import { Contract, ethers, Signer } from "ethers";
 import { Result } from "ethers/lib/utils";
 import inquirer from "inquirer";
@@ -15,18 +15,18 @@ export function normalizeHex(s: string | undefined): string {
   }
 }
 
-export async function getProvider(argv: { [name: string]: unknown }) {
-  const url = getNetworkRpcUrl(argv.network as supportedNetworks);
+export async function getProvider(network: supportedNetworks): Promise<Provider> {
+  const url = getNetworkRpcUrl(network);
   const provider = new ethers.providers.JsonRpcProvider(url);
   return provider;
 }
 
-export async function getSigner(argv: { [name: string]: unknown }): Promise<Signer> {
-  const url = getNetworkRpcUrl(argv.network as supportedNetworks);
+export async function getSigner(network: supportedNetworks, ledger: boolean): Promise<Signer> {
+  const url = getNetworkRpcUrl(network);
   const provider = new ethers.providers.JsonRpcProvider(url);
 
   let signer: Signer;
-  if (argv.ledger) {
+  if (ledger) {
     console.log("Make sure the Ledger wallet is unlocked and the Ethereum application is open");
     signer = new LedgerSigner(provider);
     const address = await signer.getAddress();
@@ -67,11 +67,11 @@ export async function getSigner(argv: { [name: string]: unknown }): Promise<Sign
 }
 
 export async function getContract(
-  argv: { [name: string]: unknown },
+  network: supportedNetworks,
   name: supportedContracts,
   signerOrProvider: Signer | ethers.providers.Provider
 ): Promise<Contract> {
-  const abi = getArmadaAbi(argv.network as supportedNetworks, name);
+  const abi = getArmadaAbi(network, name);
   if (signerOrProvider instanceof Signer) {
     const signer = signerOrProvider;
     const contract = new Contract(abi.address, abi.abi, signer.provider);
