@@ -28,7 +28,7 @@
   "oclif": {
     "bin": "armada",
     "dirname": "armada",
-    "commands": "./src/commands",
+    "commands": "./dist/src/commands",
     "plugins": [
       "@oclif/plugin-help"
     ],
