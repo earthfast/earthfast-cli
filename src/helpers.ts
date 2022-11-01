@@ -34,8 +34,7 @@ export async function getSigner(argv: { [name: string]: unknown }): Promise<Sign
   } else {
     const addresses = await listWallets();
     if (!addresses.length) {
-      console.error("Error: No private keys found. Use npx armada key-import.");
-      process.exit(1);
+      throw Error("Error: No private keys found. Use key import command.");
     }
 
     const res = await inquirer.prompt([

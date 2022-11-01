@@ -14,9 +14,8 @@ export default class ProjectCreate extends TransactionCommand {
 
   public async run(): Promise<void> {
     const { args } = await this.parse(ProjectCreate);
-    if ((args.URL != "") !== (args.SHA != "")) {
-      console.error("Error: URL and SHA must be specified together");
-      process.exit(1);
+    if (!!args.URL !== !!args.SHA) {
+      this.error("URL and SHA must be specified together");
     }
 
     const signer = await getSigner(args);
