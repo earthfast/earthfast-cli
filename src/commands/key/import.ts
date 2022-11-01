@@ -1,29 +1,21 @@
+import { Command } from "@oclif/core";
 import inquirer from "inquirer";
-import { Argv } from "yargs";
 import { loadWallet, saveWallet } from "../../keystore";
 
-export const command = "key-import";
-export const desc = "Save a private key for signing transactions";
+export default class KeyImport extends Command {
+  static description = "Saves a private key for signing transactions.";
+  static examples = ["<%= config.bin %> <%= command.id %>"];
+  static usage = "key import";
 
-export const builder = function (argv: Argv) {
-  return argv;
-};
+  public async run(): Promise<void> {
+    await this.parse(KeyImport);
+    const responses = await inquirer.prompt([
+      { name: "privateKey", message: "Enter the private key to import", type: "password" },
+      { name: "password", message: "Enter the password to encrypt the key", type: "password" },
+    ]);
 
-export const handler = async function () {
-  const responses = await inquirer.prompt([
-    {
-      name: "privateKey",
-      message: "Enter the wallet private key to import",
-      type: "password",
-    },
-    {
-      name: "password",
-      message: "Enter the password to encrypt the key",
-      type: "password",
-    },
-  ]);
-
-  const filename = await saveWallet(responses.privateKey, responses.password);
-  const wallet = await loadWallet(filename, responses.password);
-  console.log(`Account ${wallet.address} imported`);
-};
+    const filename = await saveWallet(responses.privateKey, responses.password);
+    const wallet = await loadWallet(filename, responses.password);
+    console.log(`Account ${wallet.address} imported`);
+  }
+}
