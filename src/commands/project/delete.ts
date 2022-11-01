@@ -1,4 +1,5 @@
 import { CliUx } from "@oclif/core";
+import { Arg } from "@oclif/core/lib/interfaces";
 import { TransactionCommand } from "../../base";
 import { decodeEvent, getContract, getSigner, normalizeHex } from "../../helpers";
 
@@ -6,7 +7,7 @@ export default class ProjectDelete extends TransactionCommand {
   static description = "Deletes a project from the Armada Network.";
   static examples = ["<%= config.bin %> <%= command.id %>"];
   static usage = "project delete ID";
-  static args = [{ name: "ID", description: "The ID of the project to delete.", required: true }];
+  static args: Arg[] = [{ name: "ID", description: "The ID of the project to delete.", required: true }];
 
   public async run(): Promise<void> {
     const { args, flags } = await this.parse(ProjectDelete);

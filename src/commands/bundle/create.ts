@@ -1,5 +1,6 @@
 import path from "path";
 import { Command } from "@oclif/core";
+import { Arg } from "@oclif/core/lib/interfaces";
 import tar from "tar";
 import { generateManifest } from "../../manifest";
 
@@ -7,7 +8,7 @@ export default class BundleCreate extends Command {
   static description = "Bundles an application for use on the Armada Network.";
   static examples = ["<%= config.bin %> <%= command.id %> my-site-v1.0.0 ./dist"];
   static usage = "bundle create NAME DIR";
-  static args = [
+  static args: Arg[] = [
     { name: "NAME", description: "The name of the bundle to create (e.g. my-site-v1.0.0).", required: true },
     { name: "DIR", description: "Relative path to the app's build directory (e.g. ./dist).", required: true },
   ];
