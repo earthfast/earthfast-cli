@@ -37,29 +37,25 @@ export async function getSigner(network: NetworkName, ledger: boolean): Promise<
       throw Error("Error: No private keys found. Use key import command.");
     }
 
-    const res = await inquirer.prompt([
-      {
-        name: "address",
-        message: "Pick the wallet to sign the transaction:",
-        type: "list",
-        choices: addresses,
-      },
-    ]);
+    const res = await inquirer.prompt({
+      name: "address",
+      message: "Pick the wallet to sign the transaction:",
+      type: "list",
+      choices: addresses,
+    });
 
     const address = res.address;
     let password = await keytar.getPassword("armada-cli", address);
     if (!password) {
-      const res = await inquirer.prompt([
-        {
-          name: "password",
-          message: "Enter the wallet encryption password:",
-          type: "password",
-        },
-      ]);
+      const res = await inquirer.prompt({
+        name: "password",
+        message: "Enter the wallet password:",
+        type: "password",
+      });
       password = res.password as string;
     }
 
-    signer = await loadWallet(`keystore_${address}.json`, password);
+    signer = await loadWallet(address, password);
     signer = signer.connect(provider);
   }
 

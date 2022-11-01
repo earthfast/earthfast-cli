@@ -10,12 +10,12 @@ export default class KeyImport extends Command {
   public async run(): Promise<void> {
     await this.parse(KeyImport);
     const responses = await inquirer.prompt([
-      { name: "privateKey", message: "Enter the private key to import", type: "password" },
-      { name: "password", message: "Enter the password to encrypt the key", type: "password" },
+      { name: "privateKey", message: "Paste the private key to import:", type: "password", mask: "*" },
+      { name: "password", message: "Enter a key encryption password:", type: "password", mask: "*" },
     ]);
 
     const filename = await saveWallet(responses.privateKey, responses.password);
-    const wallet = await loadWallet(filename, responses.password);
-    console.log(`Account ${wallet.address} imported`);
+    const address = await loadWallet(filename, responses.password);
+    console.log(`Account ${address} imported`);
   }
 }
