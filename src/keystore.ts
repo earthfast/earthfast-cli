@@ -31,6 +31,10 @@ export async function loadWallet(filename: string, password: string): Promise<Wa
   return wallet;
 }
 
+export async function deleteWallet(filename: string): Promise<void> {
+  fs.unlinkSync(path.join(keyStoreFolderPath, filename));
+}
+
 export async function listWallets(): Promise<string[]> {
   if (!fs.existsSync(keyStoreFolderPath)) {
     return [];
