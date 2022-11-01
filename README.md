@@ -18,7 +18,7 @@ Once a site has been built and is ready for bundling, run the following command 
 npx armada bundle <name> <build-dir>
 ```
 
-Example: `npx armada bundle my-site-v1.0.0 ./dist`
+Example: `npx armada bundle create my-site-v1.0.0 ./dist`
 
 ## Publishing a Bundle
 
@@ -28,4 +28,4 @@ Once the bundle has been made available on a publicly accessible URL, such as Gi
 npx armada publish <project-id> <bundle-url> <bundle-sha>
 ```
 
-Example: `npx armada publish 0x0123... https://.../my-site-v1.0.0.tgz 0xabcd...`
+Example: `npx armada project publish 0x0123... https://.../my-site-v1.0.0.tgz 0xabcd...`

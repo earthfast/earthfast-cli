@@ -28,7 +28,5 @@ module.exports = {
     "import/no-unresolved": "off",
     // Disabled because typescript adds support for module import/export to node
     "node/no-unsupported-features/es-syntax": ["error", { ignores: ["modules"] }],
-    // Disabled because process.exit() is better than throw Error() for CLI tool
-    "no-process-exit": "off",
   },
 };
