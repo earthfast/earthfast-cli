@@ -139,3 +139,16 @@ export async function decodeEvents(receipt: TransactionReceipt, contract: Contra
 export async function decodeEvent(receipt: TransactionReceipt, contract: Contract, event: string): Promise<Result> {
   return (await decodeEvents(receipt, contract, event))[0];
 }
+
+// Returns all results of a paged function call (a function that accepts skip and size parameters).
+export async function getAll(page: number, call: (skip: number, size: number) => Promise<Result[]>): Promise<Result[]> {
+  const results: Result[] = [];
+  while (page > 0) {
+    const records = await call(results.length, page);
+    results.push(...records);
+    if (records.length !== page) {
+      break;
+    }
+  }
+  return results;
+}
