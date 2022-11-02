@@ -32,7 +32,7 @@ export default class ReservationCreate extends TransactionCommand {
       .map((id) => normalizeHex(id));
 
     const signer = await getSigner(flags.network, flags.address, flags.signer);
-    const reservations = await getContract(flags.network, "reservations", signer);
+    const reservations = await getContract(flags.network, flags.abi, "ArmadaReservations", signer);
     const projectId = normalizeHex(args.ID);
     const prices = nodeIds.map(() => parseUnits("1", 18));
     CliUx.ux.action.start("- Submitting transaction");

@@ -24,7 +24,7 @@ export default class ReservationDelete extends TransactionCommand {
       .map((id) => normalizeHex(id));
 
     const signer = await getSigner(flags.network, flags.address, flags.signer);
-    const reservations = await getContract(flags.network, "reservations", signer);
+    const reservations = await getContract(flags.network, flags.abi, "ArmadaReservations", signer);
     const projectId = normalizeHex(args.ID);
     CliUx.ux.action.start("- Submitting transaction");
     const slot = { last: false, next: true };

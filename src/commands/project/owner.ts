@@ -16,7 +16,7 @@ export default class ProjectOwner extends TransactionCommand {
   public async run(): Promise<void> {
     const { args, flags } = await this.parse(ProjectOwner);
     const signer = await getSigner(flags.network, flags.address, flags.signer);
-    const projects = await getContract(flags.network, "projects", signer);
+    const projects = await getContract(flags.network, flags.abi, "ArmadaProjects", signer);
     const projectId = normalizeHex(args.ID);
     CliUx.ux.action.start("- Submitting transaction");
     const tx = await projects.setProjectOwner(projectId, args.ADDR);

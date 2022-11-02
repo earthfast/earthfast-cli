@@ -13,6 +13,11 @@ export abstract class BlockchainCommand extends Command {
       options: NetworkNames,
       default: "testnet",
     }),
+    abi: Flags.string({
+      helpGroup: "BASE",
+      description: "The ABI directory (.../<network>/<contract>.json).",
+      helpValue: "DIR",
+    }),
   };
 }
 

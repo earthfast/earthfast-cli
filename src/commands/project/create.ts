@@ -24,7 +24,7 @@ export default class ProjectCreate extends TransactionCommand {
     }
 
     const signer = await getSigner(flags.network, flags.address, flags.signer);
-    const projects = await getContract(flags.network, "projects", signer);
+    const projects = await getContract(flags.network, flags.abi, "ArmadaProjects", signer);
     const owner = flags.owner ? normalizeHex(flags.owner) : await signer.getAddress();
     const bundleSha = normalizeHex(args.SHA);
     CliUx.ux.action.start("- Submitting transaction");

@@ -24,7 +24,7 @@ export default class ProjectContent extends TransactionCommand {
     }
 
     const signer = await getSigner(flags.network, flags.address, flags.signer);
-    const projects = await getContract(flags.network, "projects", signer);
+    const projects = await getContract(flags.network, flags.abi, "ArmadaProjects", signer);
     const projectId = normalizeHex(args.ID);
     const bundleSha = normalizeHex(args.SHA);
     CliUx.ux.action.start("- Submitting transaction");

@@ -26,7 +26,7 @@ module.exports = {
     "import/order": ["error", { alphabetize: { order: "asc", caseInsensitive: true } }],
     // Disabled to avoid duplicate diagnostics with node/no-missing-import rule
     "import/no-unresolved": "off",
-    // Disabled because typescript adds support for module import/export to node
-    "node/no-unsupported-features/es-syntax": ["error", { ignores: ["modules"] }],
+    // Disabled because typescript adds support for much of this syntax to node
+    "node/no-unsupported-features/es-syntax": "off",
   },
 };
