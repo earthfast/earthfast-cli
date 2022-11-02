@@ -6,7 +6,7 @@ import { decodeEvents, getContract, getSigner, getTxUrl, normalizeHex, normalize
 
 export default class ReservationCreate extends TransactionCommand {
   static description = `Reserves content nodes for a project.
-    By default, the nodes are reserved from the next epoch going forward.`;
+    By default, new reservations begin at the start of the next epoch.`;
   static examples = ["<%= config.bin %> <%= command.id %> 0x123abc... 0x456def..."];
   static usage = "<%= command.id %> ID IDS... [--spot] [--norenew]";
   static strict = false;

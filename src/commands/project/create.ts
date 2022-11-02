@@ -14,7 +14,7 @@ export default class ProjectCreate extends TransactionCommand {
     { name: "SHA", description: "The SHA-256 checksum of the content bundle.", default: "" },
   ];
   static flags = {
-    owner: Flags.string({ description: "The owner to set for the new project.", helpValue: "ADDR" }),
+    owner: Flags.string({ description: "[default: caller] The owner for the new project.", helpValue: "ADDR" }),
   };
 
   public async run(): Promise<void> {

@@ -4,13 +4,13 @@ import { TransactionCommand } from "../../base";
 import { decodeEvent, getContract, getSigner, getTxUrl, normalizeHex, normalizeRecord } from "../../helpers";
 
 export default class ProjectOwner extends TransactionCommand {
-  static description = "Changes detailed properties of a project.";
+  static description = "Transfers ownership of a project.";
   static examples = ["<%= config.bin %> <%= command.id %> 0x123abc... 0x456def..."];
   static usage = "<%= command.id %> ID ADDR";
   static aliases = ["project:owner", "project:transfer"];
   static args: Arg[] = [
-    { name: "ID", description: "The ID of the project to change properties.", required: true },
-    { name: "ADDR", description: "The address of the new owner of the project.", required: true },
+    { name: "ID", description: "The ID of the project to change owner.", required: true },
+    { name: "ADDR", description: "The address of the new project owner.", required: true },
   ];
 
   public async run(): Promise<void> {
