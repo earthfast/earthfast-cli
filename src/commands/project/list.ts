@@ -1,6 +1,6 @@
 import { Flags } from "@oclif/core";
 import { BlockchainCommand } from "../../base";
-import { getContract, getProvider, normalizeHex, normalizeRecord, normalizeRecords } from "../../helpers";
+import { getContract, getProvider, normalizeHex, normalizeRecords } from "../../helpers";
 
 export default class ProjectList extends BlockchainCommand {
   static description = "Lists projects on the Armada Network.";
