@@ -8,7 +8,7 @@ export default class ProjectCreate extends TransactionCommand {
   static examples = ['<%= config.bin %> <%= command.id %> "My Project" notify@myproject.com'];
   static usage = "<%= command.id %> NAME EMAIL [URL] [SHA]";
   static args: Arg[] = [
-    { name: "NAME", description: "The name of the project to create.", required: true },
+    { name: "NAME", description: "The human readable name of the new project.", required: true },
     { name: "EMAIL", description: "The project email for admin notifications.", required: true },
     { name: "URL", description: "The public URL to fetch the content bundle.", default: "" },
     { name: "SHA", description: "The SHA-256 checksum of the content bundle.", default: "" },
