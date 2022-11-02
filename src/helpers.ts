@@ -1,6 +1,6 @@
 import type { Provider, TransactionReceipt } from "@ethersproject/abstract-provider";
-import { Contract, ethers, Signer, type Transaction } from "ethers";
-import { Result } from "ethers/lib/utils";
+import { BigNumber, Contract, ethers, Signer, type Transaction } from "ethers";
+import { formatUnits, Result } from "ethers/lib/utils";
 import inquirer from "inquirer";
 import keytar from "keytar";
 import { listWallets, loadWallet } from "./keystore";
@@ -26,7 +26,12 @@ export function normalizeRecord(r: { [key: string]: unknown } | Result): { [key:
   return Object.fromEntries(
     Object.keys(r)
       .filter((k) => isNaN(Number(k)))
-      .map((k) => [k, r[k]])
+      .map((k) => {
+        if (r[k] instanceof BigNumber) {
+          return [k, normalizeBigNumber(r[k])];
+        }
+        return [k, r[k]];
+      })
   );
 }
 
@@ -40,6 +45,14 @@ export function normalizeHex(s: string | undefined): string {
     return "0x0000000000000000000000000000000000000000000000000000000000000000";
   } else {
     return s.startsWith("0x") ? s : "0x" + s;
+  }
+}
+
+function normalizeBigNumber(n: BigNumber): string {
+  try {
+    return n.toNumber().toString();
+  } catch {
+    return formatUnits(n, 18);
   }
 }
 
