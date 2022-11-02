@@ -14,8 +14,13 @@ export abstract class BlockchainCommand extends Command {
 export abstract class TransactionCommand extends BlockchainCommand {
   static globalFlags = {
     ...super.globalFlags,
+    address: Flags.string({
+      description: "The account address to use.",
+      exclusive: ["ledger"],
+    }),
     ledger: Flags.boolean({
       description: "Use Ledger wallet to sign transactions",
+      exclusive: ["address"],
     }),
   };
 }

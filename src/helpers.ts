@@ -21,7 +21,7 @@ export async function getProvider(network: NetworkName): Promise<Provider> {
   return provider;
 }
 
-export async function getSigner(network: NetworkName, ledger: boolean): Promise<Signer> {
+export async function getSigner(network: NetworkName, address: string | undefined, ledger: boolean): Promise<Signer> {
   const url = Networks[network].url;
   const provider = new ethers.providers.JsonRpcProvider(url);
 
@@ -32,19 +32,27 @@ export async function getSigner(network: NetworkName, ledger: boolean): Promise<
     const address = await signer.getAddress();
     console.log("Using Ledger wallet. Wallet address: ", address);
   } else {
-    const addresses = await listWallets();
-    if (!addresses.length) {
-      throw Error("Error: No private keys found. Use key import command.");
+    if (!address) {
+      const addresses = await listWallets();
+      if (!addresses.length) {
+        throw Error("Error: No private keys found. Use key import command.");
+      }
+
+      const res = await inquirer.prompt({
+        name: "address",
+        message: "Pick the wallet to sign the transaction:",
+        type: "list",
+        choices: addresses,
+      });
+
+      address = res.address as string;
+    } else {
+      const addresses = await listWallets();
+      if (!addresses.includes(address)) {
+        throw Error(`No saved key for address ${address}`);
+      }
     }
 
-    const res = await inquirer.prompt({
-      name: "address",
-      message: "Pick the wallet to sign the transaction:",
-      type: "list",
-      choices: addresses,
-    });
-
-    const address = res.address;
     let password = await keytar.getPassword("armada-cli", address);
     if (!password) {
       const res = await inquirer.prompt({

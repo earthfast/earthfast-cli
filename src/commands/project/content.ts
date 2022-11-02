@@ -23,7 +23,7 @@ export default class ProjectContent extends TransactionCommand {
       this.error("URL and SHA must be specified");
     }
 
-    const signer = await getSigner(flags.network, flags.ledger);
+    const signer = await getSigner(flags.network, flags.address, flags.ledger);
     const projects = await getContract(flags.network, "projects", signer);
     const projectId = normalizeHex(args.ID);
     const bundleSha = normalizeHex(args.SHA);
