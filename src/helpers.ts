@@ -1,11 +1,16 @@
 import type { Provider, TransactionReceipt } from "@ethersproject/abstract-provider";
-import { Contract, ethers, Signer } from "ethers";
+import { Contract, ethers, Signer, type Transaction } from "ethers";
 import { Result } from "ethers/lib/utils";
 import inquirer from "inquirer";
 import keytar from "keytar";
 import { listWallets, loadWallet } from "./keystore";
 import { LedgerSigner } from "./ledger";
 import { ContractName, Contracts, NetworkName, Networks } from "./networks";
+
+export function getTxUrl(tx: Transaction): string {
+  const prefix = tx.chainId === 0 ? "" : tx.chainId === 5 ? "goerli" : "unknown";
+  return `https://${prefix === "" ? "" : prefix + "."}etherscan.io/tx/${tx.hash}`;
+}
 
 // Converts a union array-map returned by ethers to plain object record.
 export function normalizeRecord(r: Record<string, never>): Record<string, never> {
