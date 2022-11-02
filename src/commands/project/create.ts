@@ -1,4 +1,4 @@
-import { CliUx } from "@oclif/core";
+import { CliUx, Flags } from "@oclif/core";
 import { Arg } from "@oclif/core/lib/interfaces";
 import { TransactionCommand } from "../../base";
 import { decodeEvent, getContract, getSigner, getTxUrl, normalizeHex, normalizeRecord } from "../../helpers";
@@ -6,13 +6,16 @@ import { decodeEvent, getContract, getSigner, getTxUrl, normalizeHex, normalizeR
 export default class ProjectCreate extends TransactionCommand {
   static description = "Registers a new project on the Armada Network.";
   static examples = ['<%= config.bin %> <%= command.id %> "My Project" notify@myproject.com'];
-  static usage = "<%= command.id %> NAME EMAIL [URL] [SHA]";
+  static usage = "<%= command.id %> [--owner ADDR] NAME EMAIL [URL] [SHA]";
   static args: Arg[] = [
-    { name: "NAME", description: "The name of the project to create.", required: true },
+    { name: "NAME", description: "The human readable name of the new project.", required: true },
     { name: "EMAIL", description: "The project email for admin notifications.", required: true },
     { name: "URL", description: "The public URL to fetch the content bundle.", default: "" },
     { name: "SHA", description: "The SHA-256 checksum of the content bundle.", default: "" },
   ];
+  static flags = {
+    owner: Flags.string({ description: "[default: caller] The owner for the new project.", helpValue: "ADDR" }),
+  };
 
   public async run(): Promise<void> {
     const { args, flags } = await this.parse(ProjectCreate);
@@ -22,10 +25,10 @@ export default class ProjectCreate extends TransactionCommand {
 
     const signer = await getSigner(flags.network, flags.address, flags.signer);
     const projects = await getContract(flags.network, "projects", signer);
-    const address = await signer.getAddress();
+    const owner = flags.owner ? normalizeHex(flags.owner) : await signer.getAddress();
     const bundleSha = normalizeHex(args.SHA);
     CliUx.ux.action.start("- Submitting transaction");
-    const tx = await projects.createProject([address, args.NAME, args.EMAIL, args.URL, bundleSha]);
+    const tx = await projects.createProject([owner, args.NAME, args.EMAIL, args.URL, bundleSha]);
     CliUx.ux.action.stop("done");
     console.log(`> ${getTxUrl(tx)}`);
     CliUx.ux.action.start("- Processing transaction");

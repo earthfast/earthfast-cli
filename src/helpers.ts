@@ -22,7 +22,7 @@ export function getTxUrl(tx: Transaction): string {
 }
 
 // Converts union objects returned by ethers to plain objects.
-export function normalizeRecord(r: { [key: string]: unknown } | Result): { [key: string]: unknown } {
+export function normalizeRecord(r: Record<string, unknown> | Result): Record<string, unknown> {
   return Object.fromEntries(
     Object.keys(r)
       .filter((k) => isNaN(Number(k)))
@@ -35,7 +35,7 @@ export function normalizeRecord(r: { [key: string]: unknown } | Result): { [key:
   );
 }
 
-export function normalizeRecords(rs: Record<string, unknown>[]): Record<string, unknown>[] {
+export function normalizeRecords(rs: (Record<string, unknown> | Result)[]): Record<string, unknown>[] {
   return rs.map((r) => normalizeRecord(r));
 }
 
