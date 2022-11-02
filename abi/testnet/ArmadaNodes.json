@@ -5,6 +5,67 @@
       "inputs": [
         {
           "internalType": "bytes32",
+          "name": "nodeId",
+          "type": "bytes32"
+        }
+      ],
+      "name": "getNode",
+      "outputs": [
+        {
+          "components": [
+            {
+              "internalType": "bytes32",
+              "name": "id",
+              "type": "bytes32"
+            },
+            {
+              "internalType": "bytes32",
+              "name": "operatorId",
+              "type": "bytes32"
+            },
+            {
+              "internalType": "string",
+              "name": "host",
+              "type": "string"
+            },
+            {
+              "internalType": "string",
+              "name": "region",
+              "type": "string"
+            },
+            {
+              "internalType": "bool",
+              "name": "topology",
+              "type": "bool"
+            },
+            {
+              "internalType": "bool",
+              "name": "disabled",
+              "type": "bool"
+            },
+            {
+              "internalType": "uint256[2]",
+              "name": "prices",
+              "type": "uint256[2]"
+            },
+            {
+              "internalType": "bytes32[2]",
+              "name": "projectIds",
+              "type": "bytes32[2]"
+            }
+          ],
+          "internalType": "struct ArmadaNode",
+          "name": "",
+          "type": "tuple"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32",
           "name": "operatorIdOrZero",
           "type": "bytes32"
         },

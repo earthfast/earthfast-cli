@@ -17,8 +17,8 @@ export default class NodeList extends BlockchainCommand {
     const { flags } = await this.parse(NodeList);
     const provider = await getProvider(flags.network);
     const nodes = await getContract(flags.network, "nodes", provider);
-    const operator = normalizeHex(flags.operator);
-    const data = await nodes.getNodes(operator, flags.topology, flags.skip, flags.size);
+    const operatorId = normalizeHex(flags.operator);
+    const data = await nodes.getNodes(operatorId, flags.topology, flags.skip, flags.size);
     console.log(data);
   }
 }
