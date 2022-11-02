@@ -14,8 +14,8 @@ export default class KeyImport extends Command {
       { name: "password", message: "Enter a key encryption password:", type: "password", mask: "*" },
     ]);
 
-    const filename = await saveWallet(responses.privateKey, responses.password);
-    const address = await loadWallet(filename, responses.password);
+    const address = await saveWallet(responses.privateKey, responses.password);
+    await loadWallet(address, responses.password);
     console.log(`Account ${address} imported`);
   }
 }

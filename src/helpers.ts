@@ -1,5 +1,5 @@
 import type { Provider, TransactionReceipt } from "@ethersproject/abstract-provider";
-import { Contract, ethers, Signer } from "ethers";
+import { Contract, ethers, Signer, type Transaction } from "ethers";
 import { Result } from "ethers/lib/utils";
 import inquirer from "inquirer";
 import keytar from "keytar";
@@ -7,6 +7,31 @@ import { listWallets, loadWallet } from "./keystore";
 import { LedgerSigner } from "./ledger";
 import { ContractName, Contracts, NetworkName, Networks } from "./networks";
 
+const Chains: Record<number, string> = {
+  0: "mainnet",
+  5: "goerli",
+};
+
+export function getTxUrl(tx: Transaction): string {
+  const chain = Chains[tx.chainId];
+  const prefix = chain === "mainnet" ? "" : chain + ".";
+  return `https://${prefix}etherscan.io/tx/${tx.hash}`;
+}
+
+// Converts union objects returned by ethers to plain objects.
+export function normalizeRecord(r: { [key: string]: unknown } | Result): { [key: string]: unknown } {
+  return Object.fromEntries(
+    Object.keys(r)
+      .filter((k) => isNaN(Number(k)))
+      .map((k) => [k, r[k]])
+  );
+}
+
+export function normalizeRecords(rs: Record<string, unknown>[]): Record<string, unknown>[] {
+  return rs.map((r) => normalizeRecord(r));
+}
+
+// Prepends 0x, and replaces undefined and empty with 256-bit zero hash.
 export function normalizeHex(s: string | undefined): string {
   if (!s?.length) {
     return "0x0000000000000000000000000000000000000000000000000000000000000000";
@@ -21,7 +46,7 @@ export async function getProvider(network: NetworkName): Promise<Provider> {
   return provider;
 }
 
-export async function getSigner(network: NetworkName, ledger: boolean): Promise<Signer> {
+export async function getSigner(network: NetworkName, address: string | undefined, ledger: boolean): Promise<Signer> {
   const url = Networks[network].url;
   const provider = new ethers.providers.JsonRpcProvider(url);
 
@@ -32,19 +57,27 @@ export async function getSigner(network: NetworkName, ledger: boolean): Promise<
     const address = await signer.getAddress();
     console.log("Using Ledger wallet. Wallet address: ", address);
   } else {
-    const addresses = await listWallets();
-    if (!addresses.length) {
-      throw Error("Error: No private keys found. Use key import command.");
+    if (!address) {
+      const addresses = await listWallets();
+      if (!addresses.length) {
+        throw Error("Error: No private keys found. Use key import command.");
+      }
+
+      const res = await inquirer.prompt({
+        name: "address",
+        message: "Pick the wallet to sign the transaction:",
+        type: "list",
+        choices: addresses,
+      });
+
+      address = res.address as string;
+    } else {
+      const addresses = await listWallets();
+      if (!addresses.includes(address)) {
+        throw Error(`No saved key for address ${address}`);
+      }
     }
 
-    const res = await inquirer.prompt({
-      name: "address",
-      message: "Pick the wallet to sign the transaction:",
-      type: "list",
-      choices: addresses,
-    });
-
-    const address = res.address;
     let password = await keytar.getPassword("armada-cli", address);
     if (!password) {
       const res = await inquirer.prompt({
@@ -80,11 +113,7 @@ export async function getContract(
   }
 }
 
-export async function decodeEvent(
-  receipt: TransactionReceipt,
-  contract: Contract,
-  event: string
-): Promise<Result | Result[]> {
+export async function decodeEvents(receipt: TransactionReceipt, contract: Contract, event: string): Promise<Result[]> {
   const results = [];
   for (let i = 0; i < receipt.logs.length; i++) {
     const log = receipt.logs[i];
@@ -97,5 +126,9 @@ export async function decodeEvent(
       continue;
     }
   }
-  return results.length === 1 ? results[0] : results;
+  return results;
+}
+
+export async function decodeEvent(receipt: TransactionReceipt, contract: Contract, event: string): Promise<Result> {
+  return (await decodeEvents(receipt, contract, event))[0];
 }
