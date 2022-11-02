@@ -21,21 +21,16 @@ export default class ProjectList extends BlockchainCommand {
     const owner = normalizeHex(flags.owner);
     const blockTag = await provider.getBlockNumber();
     const results: Result[] = [];
-    for (let i = flags.skip; results.length < flags.size; ) {
-      const records = await projects.getProjects(i, flags.page, { blockTag });
-      i += records.length;
+    for (let i = flags.skip; i != Number.MAX_VALUE && results.length < flags.size; ) {
+      let records: Result[] = await projects.getProjects(i, flags.page, { blockTag });
+      // Advance to the next page or signal early exit if exhausted all records
+      i = records.length !== flags.page ? Number.MAX_VALUE : i + records.length;
+      // Apply filters
       if (flags.owner) {
-        results.push(
-          ...records
-            .filter((value: { owner: string }) => value.owner.toLowerCase() === owner.toLowerCase())
-            .slice(0, flags.size - results.length)
-        );
-      } else {
-        results.push(...records.slice(0, flags.size - results.length));
+        records = records.filter((value) => value.owner.toLowerCase() === owner.toLowerCase());
       }
-      if (records.length !== flags.page) {
-        break;
-      }
+      // Append as many results as requested, but no more than that
+      results.push(...records.slice(0, flags.size - results.length));
     }
     console.log(normalizeRecords(results));
   }
