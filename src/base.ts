@@ -1,5 +1,6 @@
 import { Command, Flags } from "@oclif/core";
 import { CommandError } from "@oclif/core/lib/interfaces";
+import { SignerType, SignerTypes } from "./helpers";
 import { NetworkName, NetworkNames } from "./networks";
 
 type TxError = { error: { reason: string } };
@@ -7,7 +8,7 @@ type TxError = { error: { reason: string } };
 export abstract class BlockchainCommand extends Command {
   static globalFlags = {
     network: Flags.enum<NetworkName>({
-      description: "The network to use",
+      description: "The network to use.",
       options: NetworkNames,
       default: "testnet",
     }),
@@ -19,11 +20,11 @@ export abstract class TransactionCommand extends BlockchainCommand {
     ...super.globalFlags,
     address: Flags.string({
       description: "The account address to use.",
-      exclusive: ["ledger"],
     }),
-    ledger: Flags.boolean({
-      description: "Use Ledger wallet to sign transactions",
-      exclusive: ["address"],
+    signer: Flags.enum<SignerType>({
+      description: "The method for signing transactions.",
+      options: SignerTypes,
+      default: "keystore",
     }),
   };
 

@@ -7,6 +7,9 @@ import { listWallets, loadWallet } from "./keystore";
 import { LedgerSigner } from "./ledger";
 import { ContractName, Contracts, NetworkName, Networks } from "./networks";
 
+export type SignerType = "keystore" | "ledger";
+export const SignerTypes: SignerType[] = ["keystore", "ledger"];
+
 const Chains: Record<number, string> = {
   0: "mainnet",
   5: "goerli",
@@ -46,15 +49,19 @@ export async function getProvider(network: NetworkName): Promise<Provider> {
   return provider;
 }
 
-export async function getSigner(network: NetworkName, address: string | undefined, ledger: boolean): Promise<Signer> {
+export async function getSigner(
+  network: NetworkName,
+  address: string | undefined,
+  signer: SignerType
+): Promise<Signer> {
   const url = Networks[network].url;
   const provider = new ethers.providers.JsonRpcProvider(url);
 
-  let signer: Signer;
-  if (ledger) {
+  let wallet: Signer;
+  if (signer === "ledger") {
     console.log("Make sure the Ledger wallet is unlocked and the Ethereum application is open");
-    signer = new LedgerSigner(provider);
-    const address = await signer.getAddress();
+    wallet = new LedgerSigner(provider);
+    const address = await wallet.getAddress();
     console.log("Using Ledger wallet. Wallet address: ", address);
   } else {
     if (!address) {
@@ -88,11 +95,11 @@ export async function getSigner(network: NetworkName, address: string | undefine
       password = res.password as string;
     }
 
-    signer = await loadWallet(address, password);
-    signer = signer.connect(provider);
+    wallet = await loadWallet(address, password);
+    wallet = wallet.connect(provider);
   }
 
-  return signer;
+  return wallet;
 }
 
 export async function getContract(
@@ -131,4 +138,17 @@ export async function decodeEvents(receipt: TransactionReceipt, contract: Contra
 
 export async function decodeEvent(receipt: TransactionReceipt, contract: Contract, event: string): Promise<Result> {
   return (await decodeEvents(receipt, contract, event))[0];
+}
+
+// Returns all results of a paged function call (a function that accepts skip and size parameters).
+export async function getAll(page: number, call: (skip: number, size: number) => Promise<Result[]>): Promise<Result[]> {
+  const results: Result[] = [];
+  while (page > 0) {
+    const records = await call(results.length, page);
+    results.push(...records);
+    if (records.length !== page) {
+      break;
+    }
+  }
+  return results;
 }

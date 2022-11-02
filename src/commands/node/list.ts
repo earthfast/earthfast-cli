@@ -1,6 +1,7 @@
 import { Flags } from "@oclif/core";
+import { Result } from "ethers/lib/utils";
 import { BlockchainCommand } from "../../base";
-import { getContract, getProvider, normalizeHex, normalizeRecords } from "../../helpers";
+import { getAll, getContract, getProvider, normalizeHex, normalizeRecords } from "../../helpers";
 
 export default class NodeList extends BlockchainCommand {
   static description = "Lists content nodes on the Armada Network.";
@@ -11,6 +12,7 @@ export default class NodeList extends BlockchainCommand {
     operator: Flags.string({ description: "Filter by operator ID.", helpValue: "ID" }),
     skip: Flags.integer({ description: "The number of results to skip.", helpValue: "N", default: 0 }),
     size: Flags.integer({ description: "The number of results to list.", helpValue: "N", default: 100 }),
+    page: Flags.integer({ description: "The contract call paging size.", helpValue: "N", default: 100 }),
   };
 
   public async run(): Promise<void> {
@@ -18,7 +20,10 @@ export default class NodeList extends BlockchainCommand {
     const provider = await getProvider(flags.network);
     const nodes = await getContract(flags.network, "nodes", provider);
     const operatorId = normalizeHex(flags.operator);
-    const records = await nodes.getNodes(operatorId, flags.topology, flags.skip, flags.size);
-    console.log(normalizeRecords(records));
+    const blockTag = await provider.getBlockNumber();
+    const results: Result[] = await getAll(flags.page, async (i, n) => {
+      return await nodes.getNodes(operatorId, flags.topology, i, n, { blockTag });
+    });
+    console.log(normalizeRecords(results.slice(flags.skip, flags.skip + flags.size)));
   }
 }

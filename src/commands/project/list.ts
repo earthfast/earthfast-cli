@@ -1,6 +1,7 @@
 import { Flags } from "@oclif/core";
+import { Result } from "ethers/lib/utils";
 import { BlockchainCommand } from "../../base";
-import { getContract, getProvider, normalizeHex, normalizeRecords } from "../../helpers";
+import { getAll, getContract, getProvider, normalizeHex, normalizeRecords } from "../../helpers";
 
 export default class ProjectList extends BlockchainCommand {
   static description = "Lists projects on the Armada Network.";
@@ -10,17 +11,21 @@ export default class ProjectList extends BlockchainCommand {
     owner: Flags.string({ description: "Filter by owner address.", helpValue: "ADDR" }),
     skip: Flags.integer({ description: "The number of results to skip.", helpValue: "N", default: 0 }),
     size: Flags.integer({ description: "The number of results to list.", helpValue: "N", default: 100 }),
+    page: Flags.integer({ description: "The contract call paging size.", helpValue: "N", default: 100 }),
   };
 
   public async run(): Promise<void> {
     const { flags } = await this.parse(ProjectList);
     const provider = await getProvider(flags.network);
     const projects = await getContract(flags.network, "projects", provider);
-    let records = await projects.getProjects(flags.skip, flags.size);
+    const owner = normalizeHex(flags.owner);
+    const blockTag = await provider.getBlockNumber();
+    let results: Result[] = await getAll(flags.page, async (i, n) => {
+      return await projects.getProjects(i, n, { blockTag });
+    });
     if (flags.owner) {
-      const owner = normalizeHex(flags.owner);
-      records = records.filter((value: { owner: string }) => value.owner.toLowerCase() === owner.toLowerCase());
+      results = results.filter((v) => v.owner.toLowerCase() === owner.toLowerCase());
     }
-    console.log(normalizeRecords(records));
+    console.log(normalizeRecords(results.slice(flags.skip, flags.skip + flags.size)));
   }
 }
