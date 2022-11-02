@@ -1,6 +1,6 @@
 import { Flags } from "@oclif/core";
 import { BlockchainCommand } from "../../base";
-import { getContract, getProvider, normalizeHex, normalizeRecord } from "../../helpers";
+import { getContract, getProvider, normalizeHex, normalizeRecord, normalizeRecords } from "../../helpers";
 
 export default class NodeList extends BlockchainCommand {
   static description = "Lists content nodes on the Armada Network.";
@@ -19,6 +19,6 @@ export default class NodeList extends BlockchainCommand {
     const nodes = await getContract(flags.network, "nodes", provider);
     const operatorId = normalizeHex(flags.operator);
     const records = await nodes.getNodes(operatorId, flags.topology, flags.skip, flags.size);
-    console.log(records.map((r: never) => normalizeRecord(r)));
+    console.log(normalizeRecords(records));
   }
 }

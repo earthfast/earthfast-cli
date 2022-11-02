@@ -1,7 +1,7 @@
 import { CliUx } from "@oclif/core";
 import { Arg } from "@oclif/core/lib/interfaces";
 import { TransactionCommand } from "../../base";
-import { decodeEvent, getContract, getSigner, normalizeHex } from "../../helpers";
+import { decodeEvent, getContract, getSigner, getTxUrl, normalizeHex, normalizeRecord } from "../../helpers";
 
 export default class ProjectContent extends TransactionCommand {
   static description = "Publishes the provided bundle on the network.";
@@ -30,11 +30,11 @@ export default class ProjectContent extends TransactionCommand {
     CliUx.ux.action.start("- Submitting transaction");
     const tx = await projects.setProjectContent(projectId, args.URL, bundleSha);
     CliUx.ux.action.stop("done");
-    console.log(`> Transaction ${tx.hash}`);
+    console.log(`> ${getTxUrl(tx)}`);
     CliUx.ux.action.start("- Processing transaction");
     const receipt = await tx.wait();
     CliUx.ux.action.stop("done");
-    const events = await decodeEvent(receipt, projects, "ProjectContentChanged");
-    console.log(events);
+    const event = await decodeEvent(receipt, projects, "ProjectContentChanged");
+    console.log(normalizeRecord(event));
   }
 }

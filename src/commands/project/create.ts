@@ -1,7 +1,7 @@
 import { CliUx } from "@oclif/core";
 import { Arg } from "@oclif/core/lib/interfaces";
 import { TransactionCommand } from "../../base";
-import { decodeEvent, getContract, getSigner, normalizeHex } from "../../helpers";
+import { decodeEvent, getContract, getSigner, getTxUrl, normalizeHex, normalizeRecord } from "../../helpers";
 
 export default class ProjectCreate extends TransactionCommand {
   static description = "Registers a new project on the Armada Network.";
@@ -27,11 +27,11 @@ export default class ProjectCreate extends TransactionCommand {
     CliUx.ux.action.start("- Submitting transaction");
     const tx = await projects.createProject([address, args.NAME, args.EMAIL, args.URL, bundleSha]);
     CliUx.ux.action.stop("done");
-    console.log(`- Transaction ${tx.hash}`);
+    console.log(`> ${getTxUrl(tx)}`);
     CliUx.ux.action.start("- Processing transaction");
     const receipt = await tx.wait();
     CliUx.ux.action.stop("done");
-    const events = await decodeEvent(receipt, projects, "ProjectCreated");
-    console.log(events);
+    const event = await decodeEvent(receipt, projects, "ProjectCreated");
+    console.log(normalizeRecord(event));
   }
 }

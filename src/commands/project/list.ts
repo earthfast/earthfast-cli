@@ -1,6 +1,6 @@
 import { Flags } from "@oclif/core";
 import { BlockchainCommand } from "../../base";
-import { getContract, getProvider, normalizeHex, normalizeRecord } from "../../helpers";
+import { getContract, getProvider, normalizeHex, normalizeRecord, normalizeRecords } from "../../helpers";
 
 export default class ProjectList extends BlockchainCommand {
   static description = "Lists projects on the Armada Network.";
@@ -21,6 +21,6 @@ export default class ProjectList extends BlockchainCommand {
       const owner = normalizeHex(flags.owner);
       records = records.filter((value: { owner: string }) => value.owner.toLowerCase() === owner.toLowerCase());
     }
-    console.log(records.map((r: never) => normalizeRecord(r)));
+    console.log(normalizeRecords(records));
   }
 }

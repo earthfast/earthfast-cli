@@ -7,18 +7,28 @@ import { listWallets, loadWallet } from "./keystore";
 import { LedgerSigner } from "./ledger";
 import { ContractName, Contracts, NetworkName, Networks } from "./networks";
 
+const Chains: Record<number, string> = {
+  0: "mainnet",
+  5: "goerli",
+};
+
 export function getTxUrl(tx: Transaction): string {
-  const prefix = tx.chainId === 0 ? "" : tx.chainId === 5 ? "goerli" : "unknown";
-  return `https://${prefix === "" ? "" : prefix + "."}etherscan.io/tx/${tx.hash}`;
+  const chain = Chains[tx.chainId];
+  const prefix = chain === "mainnet" ? "" : chain + ".";
+  return `https://${prefix}etherscan.io/tx/${tx.hash}`;
 }
 
-// Converts a union array-map returned by ethers to plain object record.
-export function normalizeRecord(r: Record<string, never>): Record<string, never> {
+// Converts union objects returned by ethers to plain objects.
+export function normalizeRecord(r: { [key: string]: unknown } | Result): { [key: string]: unknown } {
   return Object.fromEntries(
     Object.keys(r)
       .filter((k) => isNaN(Number(k)))
       .map((k) => [k, r[k]])
   );
+}
+
+export function normalizeRecords(rs: Record<string, unknown>[]): Record<string, unknown>[] {
+  return rs.map((r) => normalizeRecord(r));
 }
 
 // Prepends 0x, and replaces undefined and empty with 256-bit zero hash.
@@ -103,11 +113,7 @@ export async function getContract(
   }
 }
 
-export async function decodeEvent(
-  receipt: TransactionReceipt,
-  contract: Contract,
-  event: string
-): Promise<Result | Result[]> {
+export async function decodeEvents(receipt: TransactionReceipt, contract: Contract, event: string): Promise<Result[]> {
   const results = [];
   for (let i = 0; i < receipt.logs.length; i++) {
     const log = receipt.logs[i];
@@ -120,5 +126,9 @@ export async function decodeEvent(
       continue;
     }
   }
-  return results.length === 1 ? results[0] : results;
+  return results;
+}
+
+export async function decodeEvent(receipt: TransactionReceipt, contract: Contract, event: string): Promise<Result> {
+  return (await decodeEvents(receipt, contract, event))[0];
 }
