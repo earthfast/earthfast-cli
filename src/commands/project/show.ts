@@ -1,6 +1,6 @@
 import { Arg } from "@oclif/core/lib/interfaces";
 import { BlockchainCommand } from "../../base";
-import { getContract, getProvider, normalizeHex } from "../../helpers";
+import { getContract, getProvider, normalizeHex, normalizeRecord } from "../../helpers";
 
 export default class ProjectShow extends BlockchainCommand {
   static description = "Shows details of an Armada Network project.";
@@ -13,7 +13,7 @@ export default class ProjectShow extends BlockchainCommand {
     const provider = await getProvider(flags.network);
     const projects = await getContract(flags.network, "projects", provider);
     const projectId = normalizeHex(args.ID);
-    const data = await projects.getProject(projectId);
-    console.log(data);
+    const record = await projects.getProject(projectId);
+    console.log(normalizeRecord(record));
   }
 }

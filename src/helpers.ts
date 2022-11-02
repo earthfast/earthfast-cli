@@ -7,6 +7,16 @@ import { listWallets, loadWallet } from "./keystore";
 import { LedgerSigner } from "./ledger";
 import { ContractName, Contracts, NetworkName, Networks } from "./networks";
 
+// Converts a union array-map returned by ethers to plain object record.
+export function normalizeRecord(r: Record<string, never>): Record<string, never> {
+  return Object.fromEntries(
+    Object.keys(r)
+      .filter((k) => isNaN(Number(k)))
+      .map((k) => [k, r[k]])
+  );
+}
+
+// Prepends 0x, and replaces undefined and empty with 256-bit zero hash.
 export function normalizeHex(s: string | undefined): string {
   if (!s?.length) {
     return "0x0000000000000000000000000000000000000000000000000000000000000000";
