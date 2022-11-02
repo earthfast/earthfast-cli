@@ -7,7 +7,7 @@ import { getAll, getContract, getProvider, normalizeHex, normalizeRecords } from
 export default class ReservationList extends BlockchainCommand {
   static description = "Lists node reservations by a project.";
   static examples = ["<%= config.bin %> <%= command.id %>"];
-  static usage = "<%= command.id %> [--skip N] [--size N]";
+  static usage = "<%= command.id %> [--skip N] [--size N] [--page N]";
   static args: Arg[] = [{ name: "ID", description: "The ID of the project.", required: true }];
   static flags = {
     skip: Flags.integer({ description: "The number of results to skip.", helpValue: "N", default: 0 }),

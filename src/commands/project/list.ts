@@ -6,7 +6,7 @@ import { getAll, getContract, getProvider, normalizeHex, normalizeRecords } from
 export default class ProjectList extends BlockchainCommand {
   static description = "Lists projects on the Armada Network.";
   static examples = ["<%= config.bin %> <%= command.id %>"];
-  static usage = "<%= command.id %> [--owner ADDR] [--skip N] [--size N]";
+  static usage = "<%= command.id %> [--owner ADDR] [--skip N] [--size N] [--page N]";
   static flags = {
     owner: Flags.string({ description: "Filter by owner address.", helpValue: "ADDR" }),
     skip: Flags.integer({ description: "The number of results to skip.", helpValue: "N", default: 0 }),
