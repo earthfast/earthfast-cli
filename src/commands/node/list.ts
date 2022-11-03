@@ -25,7 +25,7 @@ export default class NodeList extends BlockchainCommand {
     const results: Result[] = await getAll(flags.page, async (i, n) => {
       return await nodes.getNodes(operatorId, flags.topology, i, n, { blockTag });
     });
-    const records = normalizeRecords(results.slice(flags.skip, flags.skip + flags.size));
+    const records = results.slice(flags.skip, flags.skip + flags.size);
 
     const output = normalizeRecords(records);
     if (!flags.json) console.log(output);
