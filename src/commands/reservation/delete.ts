@@ -14,7 +14,7 @@ export default class ReservationDelete extends TransactionCommand {
     { name: "IDS", description: "The IDs of the nodes to release from the project.", required: true },
   ];
 
-  public async run(): Promise<void> {
+  public async run(): Promise<Record<string, unknown>[]> {
     const { args, flags, raw } = await this.parse(ReservationDelete);
     // Parse vararg IDS
     const nodeIds = raw
@@ -30,11 +30,14 @@ export default class ReservationDelete extends TransactionCommand {
     const slot = { last: false, next: true };
     const tx = await reservations.deleteReservations(projectId, nodeIds, slot);
     CliUx.ux.action.stop("done");
-    console.log(`> ${getTxUrl(tx)}`);
+    this.log(`> ${getTxUrl(tx)}`);
     CliUx.ux.action.start("- Processing transaction");
     const receipt = await tx.wait();
     CliUx.ux.action.stop("done");
     const events = await decodeEvents(receipt, reservations, "ReservationDeleted");
-    console.log(normalizeRecords(events));
+
+    const output = normalizeRecords(events);
+    if (!flags.json) console.log(output);
+    return output;
   }
 }

@@ -13,8 +13,9 @@ export default class ProjectProps extends TransactionCommand {
     { name: "EMAIL", description: "The new email for admin notifications.", required: true },
   ];
 
-  public async run(): Promise<void> {
+  public async run(): Promise<Record<string, unknown>> {
     const { args, flags } = await this.parse(ProjectProps);
+
     const signer = await getSigner(flags.network, flags.address, flags.signer);
     const projects = await getContract(flags.network, "projects", signer);
     const projectId = normalizeHex(args.ID);
@@ -26,6 +27,9 @@ export default class ProjectProps extends TransactionCommand {
     const receipt = await tx.wait();
     CliUx.ux.action.stop("done");
     const event = await decodeEvent(receipt, projects, "ProjectPropsChanged");
-    console.log(normalizeRecord(event));
+
+    const output = normalizeRecord(event);
+    if (!flags.json) console.log(output);
+    return output;
   }
 }

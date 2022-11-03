@@ -14,8 +14,9 @@ export default class ProjectList extends BlockchainCommand {
     page: Flags.integer({ description: "The contract call paging size.", helpValue: "N", default: 100 }),
   };
 
-  public async run(): Promise<void> {
+  public async run(): Promise<Record<string, unknown>[]> {
     const { flags } = await this.parse(ProjectList);
+
     const provider = await getProvider(flags.network);
     const projects = await getContract(flags.network, "projects", provider);
     const owner = normalizeHex(flags.owner);
@@ -26,6 +27,9 @@ export default class ProjectList extends BlockchainCommand {
     if (flags.owner) {
       results = results.filter((v) => v.owner.toLowerCase() === owner.toLowerCase());
     }
-    console.log(normalizeRecords(results.slice(flags.skip, flags.skip + flags.size)));
+
+    const output = normalizeRecords(results.slice(flags.skip, flags.skip + flags.size));
+    if (!flags.json) console.log(output);
+    return output;
   }
 }

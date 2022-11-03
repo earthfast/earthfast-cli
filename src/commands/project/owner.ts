@@ -13,19 +13,23 @@ export default class ProjectOwner extends TransactionCommand {
     { name: "ADDR", description: "The address of the new project owner.", required: true },
   ];
 
-  public async run(): Promise<void> {
+  public async run(): Promise<Record<string, unknown>> {
     const { args, flags } = await this.parse(ProjectOwner);
+
     const signer = await getSigner(flags.network, flags.address, flags.signer);
     const projects = await getContract(flags.network, "projects", signer);
     const projectId = normalizeHex(args.ID);
     CliUx.ux.action.start("- Submitting transaction");
     const tx = await projects.setProjectOwner(projectId, args.ADDR);
     CliUx.ux.action.stop("done");
-    console.log(`> ${getTxUrl(tx)}`);
+    this.log(`> ${getTxUrl(tx)}`);
     CliUx.ux.action.start("- Processing transaction");
     const receipt = await tx.wait();
     CliUx.ux.action.stop("done");
     const event = await decodeEvent(receipt, projects, "ProjectOwnerChanged");
-    console.log(normalizeRecord(event));
+
+    const output = normalizeRecord(event);
+    if (!flags.json) console.log(output);
+    return output;
   }
 }

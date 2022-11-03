@@ -17,7 +17,7 @@ export default class ProjectContent extends TransactionCommand {
     { name: "SHA", description: "The SHA-256 checksum of the bundle." },
   ];
 
-  public async run(): Promise<void> {
+  public async run(): Promise<Record<string, unknown>> {
     const { args, flags } = await this.parse(ProjectContent);
     if (args.URL === undefined || args.SHA === undefined) {
       this.error("URL and SHA must be specified");
@@ -30,11 +30,14 @@ export default class ProjectContent extends TransactionCommand {
     CliUx.ux.action.start("- Submitting transaction");
     const tx = await projects.setProjectContent(projectId, args.URL, bundleSha);
     CliUx.ux.action.stop("done");
-    console.log(`> ${getTxUrl(tx)}`);
+    this.log(`> ${getTxUrl(tx)}`);
     CliUx.ux.action.start("- Processing transaction");
     const receipt = await tx.wait();
     CliUx.ux.action.stop("done");
     const event = await decodeEvent(receipt, projects, "ProjectContentChanged");
-    console.log(normalizeRecord(event));
+
+    const output = normalizeRecord(event);
+    if (!flags.json) console.log(output);
+    return output;
   }
 }
