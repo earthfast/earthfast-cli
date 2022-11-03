@@ -8,12 +8,14 @@ export default class NodeShow extends BlockchainCommand {
   static usage = "<%= command.id %> ID";
   static args: Arg[] = [{ name: "ID", description: "The ID of the node to show.", required: true }];
 
-  public async run(): Promise<void> {
+  public async run(): Promise<Record<string, unknown>> {
     const { args, flags } = await this.parse(NodeShow);
     const provider = await getProvider(flags.network, flags.rpc);
     const nodes = await getContract(flags.network, flags.abi, "ArmadaNodes", provider);
     const nodeId = normalizeHex(args.ID);
     const record = await nodes.getNode(nodeId);
-    console.log(normalizeRecord(record));
+    const output = normalizeRecord(record);
+    if (!flags.json) console.log(output);
+    return output;
   }
 }
