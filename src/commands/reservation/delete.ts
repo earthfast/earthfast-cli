@@ -1,7 +1,7 @@
 import { CliUx } from "@oclif/core";
 import { Arg } from "@oclif/core/lib/interfaces";
 import { TransactionCommand } from "../../base";
-import { decodeEvents, getContract, getSigner, getTxUrl, normalizeHex, normalizeRecords } from "../../helpers";
+import { decodeEvents, getContract, getSigner, getTxUrl, normalizeHash, normalizeRecords } from "../../helpers";
 
 export default class ReservationDelete extends TransactionCommand {
   static description = `Releases content nodes from a project.
@@ -21,11 +21,11 @@ export default class ReservationDelete extends TransactionCommand {
       .filter((arg) => arg.type == "arg")
       .map((arg) => arg.input)
       .slice(1) // Skip ID
-      .map((id) => normalizeHex(id));
+      .map((id) => normalizeHash(id));
 
     const signer = await getSigner(flags.network, flags.rpc, flags.address, flags.signer);
     const reservations = await getContract(flags.network, flags.abi, "ArmadaReservations", signer);
-    const projectId = normalizeHex(args.ID);
+    const projectId = normalizeHash(args.ID);
     CliUx.ux.action.start("- Submitting transaction");
     const slot = { last: false, next: true };
     const tx = await reservations.deleteReservations(projectId, nodeIds, slot);
