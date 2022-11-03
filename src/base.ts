@@ -15,8 +15,13 @@ export abstract class BlockchainCommand extends Command {
     }),
     abi: Flags.string({
       helpGroup: "BASE",
-      description: "The ABI directory (.../<network>/<contract>.json).",
+      description: "The ABI base directory.",
       helpValue: "DIR",
+    }),
+    rpc: Flags.string({
+      helpGroup: "BASE",
+      description: "Ethereum node endpoint.",
+      helpValue: "URL",
     }),
   };
 }

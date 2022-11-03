@@ -16,7 +16,7 @@ export default class ProjectList extends BlockchainCommand {
 
   public async run(): Promise<void> {
     const { flags } = await this.parse(ProjectList);
-    const provider = await getProvider(flags.network);
+    const provider = await getProvider(flags.network, flags.rpc);
     const projects = await getContract(flags.network, flags.abi, "ArmadaProjects", provider);
     const owner = normalizeHex(flags.owner);
     const blockTag = await provider.getBlockNumber();

@@ -58,18 +58,19 @@ function normalizeBigNumber(n: BigNumber): string {
   }
 }
 
-export async function getProvider(network: NetworkName): Promise<Provider> {
-  const url = Networks[network].url;
+export async function getProvider(network: NetworkName, rpcUrl: string | undefined): Promise<Provider> {
+  const url = rpcUrl ?? Networks[network].url;
   const provider = new ethers.providers.JsonRpcProvider(url);
   return provider;
 }
 
 export async function getSigner(
   network: NetworkName,
+  rpcUrl: string | undefined,
   address: string | undefined,
   signer: SignerType
 ): Promise<Signer> {
-  const url = Networks[network].url;
+  const url = rpcUrl ?? Networks[network].url;
   const provider = new ethers.providers.JsonRpcProvider(url);
 
   let wallet: Signer;

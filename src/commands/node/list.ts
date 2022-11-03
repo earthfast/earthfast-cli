@@ -17,7 +17,7 @@ export default class NodeList extends BlockchainCommand {
 
   public async run(): Promise<void> {
     const { flags } = await this.parse(NodeList);
-    const provider = await getProvider(flags.network);
+    const provider = await getProvider(flags.network, flags.rpc);
     const nodes = await getContract(flags.network, flags.abi, "ArmadaNodes", provider);
     const operatorId = normalizeHex(flags.operator);
     const blockTag = await provider.getBlockNumber();
