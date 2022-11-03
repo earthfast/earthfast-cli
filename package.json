@@ -40,6 +40,9 @@
       "key": {
         "description": "Manage keys for signing transactions."
       },
+      "escrow": {
+        "description": "Manage the Armada project escrows."
+      },
       "node": {
         "description": "Work with nodes on the Armada Network."
       },
