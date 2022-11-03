@@ -1,7 +1,7 @@
 import { CliUx } from "@oclif/core";
 import { Arg } from "@oclif/core/lib/interfaces";
 import { TransactionCommand } from "../../base";
-import { decodeEvent, getContract, getSigner, getTxUrl, normalizeHex, normalizeRecord } from "../../helpers";
+import { decodeEvent, getContract, getSigner, getTxUrl, normalizeHash, normalizeRecord } from "../../helpers";
 
 export default class ProjectProps extends TransactionCommand {
   static description = "Changes detailed properties of a project.";
@@ -17,7 +17,7 @@ export default class ProjectProps extends TransactionCommand {
     const { args, flags } = await this.parse(ProjectProps);
     const signer = await getSigner(flags.network, flags.rpc, flags.address, flags.signer);
     const projects = await getContract(flags.network, flags.abi, "ArmadaProjects", signer);
-    const projectId = normalizeHex(args.ID);
+    const projectId = normalizeHash(args.ID);
     CliUx.ux.action.start("- Submitting transaction");
     const tx = await projects.setProjectProps(projectId, args.NAME, args.EMAIL);
     CliUx.ux.action.stop("done");

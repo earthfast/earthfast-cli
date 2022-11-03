@@ -1,7 +1,8 @@
 import path from "path";
 import type { Provider, TransactionReceipt } from "@ethersproject/abstract-provider";
+import { AddressZero, HashZero } from "@ethersproject/constants";
 import { BigNumber, Contract, ethers, Signer, type Transaction } from "ethers";
-import { formatUnits, Result } from "ethers/lib/utils";
+import { formatUnits, getAddress, Result } from "ethers/lib/utils";
 import inquirer from "inquirer";
 import keytar from "keytar";
 import { ContractName, loadAbi } from "./contracts";
@@ -41,13 +42,19 @@ export function normalizeRecords(rs: (Record<string, unknown> | Result)[]): Reco
   return rs.map((r) => normalizeRecord(r));
 }
 
-// Prepends 0x, and replaces undefined and empty with 256-bit zero hash.
-export function normalizeHex(s: string | undefined): string {
+export function normalizeHash(s: string | undefined): string {
   if (!s?.length) {
-    return "0x0000000000000000000000000000000000000000000000000000000000000000";
-  } else {
-    return s.startsWith("0x") ? s : "0x" + s;
+    return HashZero;
   }
+  if (!s.match(/^(0x)?[0-9a-fA-F]{64}$/)) {
+    throw Error(`invalid hash: ${s}`);
+  }
+  return s.startsWith("0x") ? s : "0x" + s;
+}
+
+export function normalizeAddress(s: string | undefined): string {
+  // getAddress throws on invalid input which is what we want here
+  return !s?.length ? AddressZero : getAddress(s);
 }
 
 function normalizeBigNumber(n: BigNumber): string {

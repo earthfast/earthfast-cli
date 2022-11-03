@@ -2,7 +2,7 @@ import { CliUx, Flags } from "@oclif/core";
 import { Arg } from "@oclif/core/lib/interfaces";
 import { parseUnits } from "ethers/lib/utils";
 import { TransactionCommand } from "../../base";
-import { decodeEvents, getContract, getSigner, getTxUrl, normalizeHex, normalizeRecords } from "../../helpers";
+import { decodeEvents, getContract, getSigner, getTxUrl, normalizeHash, normalizeRecords } from "../../helpers";
 
 export default class ReservationCreate extends TransactionCommand {
   static description = `Reserves content nodes for a project.
@@ -29,11 +29,11 @@ export default class ReservationCreate extends TransactionCommand {
       .filter((arg) => arg.type == "arg")
       .map((arg) => arg.input)
       .slice(1) // Skip ID
-      .map((id) => normalizeHex(id));
+      .map((id) => normalizeHash(id));
 
     const signer = await getSigner(flags.network, flags.rpc, flags.address, flags.signer);
     const reservations = await getContract(flags.network, flags.abi, "ArmadaReservations", signer);
-    const projectId = normalizeHex(args.ID);
+    const projectId = normalizeHash(args.ID);
     const prices = nodeIds.map(() => parseUnits("1", 18));
     CliUx.ux.action.start("- Submitting transaction");
     const slot = { last: !!flags.spot, next: !flags.norenew };

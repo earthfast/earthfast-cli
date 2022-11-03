@@ -1,7 +1,7 @@
 import { Flags } from "@oclif/core";
 import { Result } from "ethers/lib/utils";
 import { BlockchainCommand } from "../../base";
-import { getAll, getContract, getProvider, normalizeHex, normalizeRecords } from "../../helpers";
+import { getAll, getContract, getProvider, normalizeHash, normalizeRecords } from "../../helpers";
 
 export default class NodeList extends BlockchainCommand {
   static description = "Lists content nodes on the Armada Network.";
@@ -19,7 +19,7 @@ export default class NodeList extends BlockchainCommand {
     const { flags } = await this.parse(NodeList);
     const provider = await getProvider(flags.network, flags.rpc);
     const nodes = await getContract(flags.network, flags.abi, "ArmadaNodes", provider);
-    const operatorId = normalizeHex(flags.operator);
+    const operatorId = normalizeHash(flags.operator);
     const blockTag = await provider.getBlockNumber();
     const results: Result[] = await getAll(flags.page, async (i, n) => {
       return await nodes.getNodes(operatorId, flags.topology, i, n, { blockTag });
