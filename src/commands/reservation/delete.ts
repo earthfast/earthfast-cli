@@ -8,21 +8,14 @@ export default class ReservationDelete extends TransactionCommand {
     The reservations will be deleted starting from the next epoch.`;
   static examples = ["<%= config.bin %> <%= command.id %> 0x123abc... 0x456def..."];
   static usage = "<%= command.id %> ID IDS...";
-  static strict = false;
   static args: Arg[] = [
     { name: "ID", description: "The ID of the project to release the nodes.", required: true },
-    { name: "IDS", description: "The IDs of the nodes to release from the project.", required: true },
+    { name: "IDS", description: "The comma separated IDs of the nodes to release.", required: true },
   ];
 
   public async run(): Promise<Record<string, unknown>[]> {
-    const { args, flags, raw } = await this.parse(ReservationDelete);
-    // Parse vararg IDS
-    const nodeIds = raw
-      .filter((arg) => arg.type == "arg")
-      .map((arg) => arg.input)
-      .slice(1) // Skip ID
-      .map((id) => normalizeHash(id));
-
+    const { args, flags } = await this.parse(ReservationDelete);
+    const nodeIds = args.IDS.split(",").map((id: string) => normalizeHash(id));
     const signer = await getSigner(flags.network, flags.rpc, flags.address, flags.signer);
     const reservations = await getContract(flags.network, flags.abi, "ArmadaReservations", signer);
     const projectId = normalizeHash(args.ID);

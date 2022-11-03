@@ -9,10 +9,9 @@ export default class ReservationCreate extends TransactionCommand {
     By default, new reservations begin at the start of the next epoch.`;
   static examples = ["<%= config.bin %> <%= command.id %> 0x123abc... 0x456def..."];
   static usage = "<%= command.id %> ID IDS... [--spot] [--norenew]";
-  static strict = false;
   static args: Arg[] = [
     { name: "ID", description: "The ID of the project to reserve the nodes.", required: true },
-    { name: "IDS", description: "The IDs of the nodes to reserve for the project.", required: true },
+    { name: "IDS", description: "The comma separated IDs of the nodes to reserve.", required: true },
   ];
   static flags = {
     spot: Flags.boolean({ description: "Reserve in the current epoch (can't release!)" }),
@@ -20,17 +19,12 @@ export default class ReservationCreate extends TransactionCommand {
   };
 
   public async run(): Promise<Record<string, unknown>[]> {
-    const { args, flags, raw } = await this.parse(ReservationCreate);
+    const { args, flags } = await this.parse(ReservationCreate);
     if (!flags.spot && !!flags.norenew) {
       this.error("--norenew requires --spot");
     }
-    // Parse vararg IDS
-    const nodeIds = raw
-      .filter((arg) => arg.type == "arg")
-      .map((arg) => arg.input)
-      .slice(1) // Skip ID
-      .map((id) => normalizeHash(id));
 
+    const nodeIds = args.IDS.split(",").map((id: string) => normalizeHash(id));
     const signer = await getSigner(flags.network, flags.rpc, flags.address, flags.signer);
     const reservations = await getContract(flags.network, flags.abi, "ArmadaReservations", signer);
     const projectId = normalizeHash(args.ID);
