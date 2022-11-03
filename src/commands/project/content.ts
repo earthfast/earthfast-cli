@@ -23,8 +23,8 @@ export default class ProjectContent extends TransactionCommand {
       this.error("URL and SHA must be specified");
     }
 
-    const signer = await getSigner(flags.network, flags.address, flags.signer);
-    const projects = await getContract(flags.network, "projects", signer);
+    const signer = await getSigner(flags.network, flags.rpc, flags.address, flags.signer);
+    const projects = await getContract(flags.network, flags.abi, "ArmadaProjects", signer);
     const projectId = normalizeHex(args.ID);
     const bundleSha = normalizeHex(args.SHA);
     CliUx.ux.action.start("- Submitting transaction");
@@ -35,7 +35,6 @@ export default class ProjectContent extends TransactionCommand {
     const receipt = await tx.wait();
     CliUx.ux.action.stop("done");
     const event = await decodeEvent(receipt, projects, "ProjectContentChanged");
-
     const output = normalizeRecord(event);
     if (!flags.json) console.log(output);
     return output;

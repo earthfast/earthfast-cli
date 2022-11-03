@@ -13,6 +13,16 @@ export abstract class BlockchainCommand extends Command {
       options: NetworkNames,
       default: "testnet",
     }),
+    abi: Flags.string({
+      helpGroup: "BASE",
+      description: "The ABI base directory.",
+      helpValue: "DIR",
+    }),
+    rpc: Flags.string({
+      helpGroup: "BASE",
+      description: "Ethereum node endpoint.",
+      helpValue: "URL",
+    }),
   };
 
   static enableJsonFlag = true;

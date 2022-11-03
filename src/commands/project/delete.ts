@@ -11,9 +11,8 @@ export default class ProjectDelete extends TransactionCommand {
 
   public async run(): Promise<Record<string, unknown>> {
     const { args, flags } = await this.parse(ProjectDelete);
-
-    const signer = await getSigner(flags.network, flags.address, flags.signer);
-    const projects = await getContract(flags.network, "projects", signer);
+    const signer = await getSigner(flags.network, flags.rpc, flags.address, flags.signer);
+    const projects = await getContract(flags.network, flags.abi, "ArmadaProjects", signer);
     const projectId = normalizeHex(args.ID);
     CliUx.ux.action.start("- Submitting transaction");
     const tx = await projects.deleteProject(projectId);
@@ -23,7 +22,6 @@ export default class ProjectDelete extends TransactionCommand {
     const receipt = await tx.wait();
     CliUx.ux.action.stop("done");
     const event = await decodeEvent(receipt, projects, "ProjectDeleted");
-
     const output = normalizeRecord(event);
     if (!flags.json) console.log(output);
     return output;

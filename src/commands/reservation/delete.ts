@@ -23,8 +23,8 @@ export default class ReservationDelete extends TransactionCommand {
       .slice(1) // Skip ID
       .map((id) => normalizeHex(id));
 
-    const signer = await getSigner(flags.network, flags.address, flags.signer);
-    const reservations = await getContract(flags.network, "reservations", signer);
+    const signer = await getSigner(flags.network, flags.rpc, flags.address, flags.signer);
+    const reservations = await getContract(flags.network, flags.abi, "ArmadaReservations", signer);
     const projectId = normalizeHex(args.ID);
     CliUx.ux.action.start("- Submitting transaction");
     const slot = { last: false, next: true };
@@ -35,7 +35,6 @@ export default class ReservationDelete extends TransactionCommand {
     const receipt = await tx.wait();
     CliUx.ux.action.stop("done");
     const events = await decodeEvents(receipt, reservations, "ReservationDeleted");
-
     const output = normalizeRecords(events);
     if (!flags.json) console.log(output);
     return output;

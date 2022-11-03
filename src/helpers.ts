@@ -1,11 +1,13 @@
+import path from "path";
 import type { Provider, TransactionReceipt } from "@ethersproject/abstract-provider";
 import { BigNumber, Contract, ethers, Signer, type Transaction } from "ethers";
 import { formatUnits, Result } from "ethers/lib/utils";
 import inquirer from "inquirer";
 import keytar from "keytar";
+import { ContractName, loadAbi } from "./contracts";
 import { listWallets, loadWallet } from "./keystore";
 import { LedgerSigner } from "./ledger";
-import { ContractName, Contracts, NetworkName, Networks } from "./networks";
+import { NetworkName, Networks } from "./networks";
 
 export type SignerType = "keystore" | "ledger";
 export const SignerTypes: SignerType[] = ["keystore", "ledger"];
@@ -63,18 +65,19 @@ function normalizeBigNumber(n: BigNumber): string {
   }
 }
 
-export async function getProvider(network: NetworkName): Promise<Provider> {
-  const url = Networks[network].url;
+export async function getProvider(network: NetworkName, rpcUrl: string | undefined): Promise<Provider> {
+  const url = rpcUrl ?? Networks[network].url;
   const provider = new ethers.providers.JsonRpcProvider(url);
   return provider;
 }
 
 export async function getSigner(
   network: NetworkName,
+  rpcUrl: string | undefined,
   address: string | undefined,
   signer: SignerType
 ): Promise<Signer> {
-  const url = Networks[network].url;
+  const url = rpcUrl ?? Networks[network].url;
   const provider = new ethers.providers.JsonRpcProvider(url);
 
   let wallet: Signer;
@@ -124,10 +127,13 @@ export async function getSigner(
 
 export async function getContract(
   network: NetworkName,
+  abiDir: string | undefined,
   contract: ContractName,
   signerOrProvider: Signer | ethers.providers.Provider
 ): Promise<Contract> {
-  const abi = Contracts[network][contract];
+  const dir = abiDir ?? Networks[network].abi;
+  const file = path.join(dir, network, contract + ".json");
+  const abi = await loadAbi(file);
   if (signerOrProvider instanceof Signer) {
     const signer = signerOrProvider;
     const contract = new Contract(abi.address, abi.abi, signer.provider);

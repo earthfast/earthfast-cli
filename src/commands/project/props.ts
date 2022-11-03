@@ -15,9 +15,8 @@ export default class ProjectProps extends TransactionCommand {
 
   public async run(): Promise<Record<string, unknown>> {
     const { args, flags } = await this.parse(ProjectProps);
-
-    const signer = await getSigner(flags.network, flags.address, flags.signer);
-    const projects = await getContract(flags.network, "projects", signer);
+    const signer = await getSigner(flags.network, flags.rpc, flags.address, flags.signer);
+    const projects = await getContract(flags.network, flags.abi, "ArmadaProjects", signer);
     const projectId = normalizeHex(args.ID);
     CliUx.ux.action.start("- Submitting transaction");
     const tx = await projects.setProjectProps(projectId, args.NAME, args.EMAIL);
@@ -27,7 +26,6 @@ export default class ProjectProps extends TransactionCommand {
     const receipt = await tx.wait();
     CliUx.ux.action.stop("done");
     const event = await decodeEvent(receipt, projects, "ProjectPropsChanged");
-
     const output = normalizeRecord(event);
     if (!flags.json) console.log(output);
     return output;
