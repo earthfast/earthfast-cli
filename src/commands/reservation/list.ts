@@ -15,8 +15,9 @@ export default class ReservationList extends BlockchainCommand {
     page: Flags.integer({ description: "The contract call paging size.", helpValue: "N", default: 100 }),
   };
 
-  public async run(): Promise<void> {
+  public async run(): Promise<Record<string, unknown>[]> {
     const { args, flags } = await this.parse(ReservationList);
+
     const provider = await getProvider(flags.network);
     const reservations = await getContract(flags.network, "reservations", provider);
     const projectId = normalizeHex(args.ID);
@@ -24,6 +25,9 @@ export default class ReservationList extends BlockchainCommand {
     const results: Result[] = await getAll(flags.page, async (i, n) => {
       return await reservations.getReservations(projectId, i, n, { blockTag });
     });
-    console.log(normalizeRecords(results.slice(flags.skip, flags.skip + flags.size)));
+
+    const output = normalizeRecords(results.slice(flags.skip, flags.skip + flags.size));
+    if (!flags.json) console.log(output);
+    return output;
   }
 }

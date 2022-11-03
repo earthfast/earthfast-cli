@@ -14,6 +14,8 @@ export abstract class BlockchainCommand extends Command {
       default: "testnet",
     }),
   };
+
+  static enableJsonFlag = true;
 }
 
 export abstract class TransactionCommand extends BlockchainCommand {
