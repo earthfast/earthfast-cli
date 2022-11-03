@@ -137,7 +137,7 @@ export async function getContract(
   contract: ContractName,
   signerOrProvider: Signer | ethers.providers.Provider
 ): Promise<Contract> {
-  const abi = await loadAbi(network, abiDir, contract);
+  const abi = await loadAbi(network, abiDir ?? Networks[network].abi, contract);
   if (signerOrProvider instanceof Signer) {
     const signer = signerOrProvider;
     const contract = new Contract(abi.address, abi.abi, signer.provider);

@@ -2,6 +2,7 @@ export type NetworkName = "testnet" | "staging" | "localhost";
 
 export interface NetworkInfo {
   url: string;
+  abi?: string;
 }
 
 export const Networks: Record<NetworkName, NetworkInfo> = {
@@ -13,6 +14,7 @@ export const Networks: Record<NetworkName, NetworkInfo> = {
   },
   localhost: {
     url: "http://localhost:8545",
+    abi: "../armada-contracts/deployments/localhost",
   },
 };
 
