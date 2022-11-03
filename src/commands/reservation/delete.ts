@@ -4,7 +4,7 @@ import { TransactionCommand } from "../../base";
 import { decodeEvents, getContract, getSigner, getTxUrl, normalizeHash, normalizeRecords } from "../../helpers";
 
 export default class ReservationDelete extends TransactionCommand {
-  static description = `Releases content nodes from a project.
+  static description = `Release content nodes from a project.
     The reservations will be deleted starting from the next epoch.`;
   static examples = ["<%= config.bin %> <%= command.id %> 0x123abc... 0x456def..."];
   static usage = "<%= command.id %> ID IDS...";

@@ -5,7 +5,7 @@ import tar from "tar";
 import { generateManifest } from "../../manifest";
 
 export default class BundleCreate extends Command {
-  static description = "Bundles an application for use on the Armada Network.";
+  static description = "Bundle an application for use on the Armada Network.";
   static examples = ["<%= config.bin %> <%= command.id %> my-site-v1.0.0 ./dist"];
   static usage = "<%= command.id %> NAME DIR";
   static args: Arg[] = [

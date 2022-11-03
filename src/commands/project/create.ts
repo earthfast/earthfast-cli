@@ -12,7 +12,7 @@ import {
 } from "../../helpers";
 
 export default class ProjectCreate extends TransactionCommand {
-  static description = "Registers a new project on the Armada Network.";
+  static description = "Register a new project on the Armada Network.";
   static examples = ['<%= config.bin %> <%= command.id %> "My Project" notify@myproject.com'];
   static usage = "<%= command.id %> [--owner ADDR] NAME EMAIL [URL] [SHA]";
   static args: Arg[] = [

@@ -4,7 +4,7 @@ import { TransactionCommand } from "../../base";
 import { decodeEvent, getContract, getSigner, getTxUrl, normalizeHash, normalizeRecord } from "../../helpers";
 
 export default class ProjectOwner extends TransactionCommand {
-  static description = "Transfers ownership of a project.";
+  static description = "Transfer ownership of a project.";
   static examples = ["<%= config.bin %> <%= command.id %> 0x123abc... 0x456def..."];
   static usage = "<%= command.id %> ID ADDR";
   static aliases = ["project:owner", "project:transfer"];
