@@ -15,7 +15,7 @@ npm install armada-cli
 Once a site has been built and is ready for bundling, run the following command to generate an Armada-compatible archive. This can be done manually, or by a CI system:
 
 ```sh
-npx armada bundle <name> <build-dir>
+npx armada bundle create <name> <build-dir>
 ```
 
 Example: `npx armada bundle create my-site-v1.0.0 ./dist`
@@ -25,7 +25,7 @@ Example: `npx armada bundle create my-site-v1.0.0 ./dist`
 Once the bundle has been made available on a publicly accessible URL, such as Github Releases or S3, it can be published on the Armada Network. This can be done by a DAO vote, for example through Tally, or manually like this:
 
 ```sh
-npx armada publish <project-id> <bundle-url> <bundle-sha>
+npx armada project publish <project-id> <bundle-url> <bundle-sha>
 ```
 
 Example: `npx armada project publish 0x123abc... https://.../my-site-v1.0.0.tgz 0x456def...`
