@@ -3,7 +3,7 @@ import { BlockchainCommand } from "../../base";
 import { getContract, getProvider, normalizeHash, normalizeRecord } from "../../helpers";
 
 export default class NodeShow extends BlockchainCommand {
-  static description = "Shows details of an Armada Network node.";
+  static description = "Show details of an Armada Network node.";
   static examples = ["<%= config.bin %> <%= command.id %> 0x123abc..."];
   static usage = "<%= command.id %> ID";
   static args: Arg[] = [{ name: "ID", description: "The ID of the node to show.", required: true }];

@@ -4,7 +4,7 @@ import { TransactionCommand } from "../../base";
 import { decodeEvent, getContract, getSigner, getTxUrl, normalizeHash, normalizeRecord } from "../../helpers";
 
 export default class ProjectContent extends TransactionCommand {
-  static description = "Publishes the provided bundle on the network.";
+  static description = "Publish the provided bundle on the network.";
   static examples = [
     "<%= config.bin %> <%= command.id %> 0x123abc... https://.../my-site-v1.0.0.tgz 0x456def...",
     "<%= config.bin %> <%= command.id %> 0x123abc... '' '' # Unpublishes the project content",

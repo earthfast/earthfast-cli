@@ -5,7 +5,7 @@ import { TransactionCommand } from "../../base";
 import { decodeEvents, getContract, getSigner, getTxUrl, normalizeHash, normalizeRecords } from "../../helpers";
 
 export default class ReservationCreate extends TransactionCommand {
-  static description = `Reserves content nodes for a project.
+  static description = `Reserve content nodes for a project.
     By default, new reservations begin at the start of the next epoch.`;
   static examples = ["<%= config.bin %> <%= command.id %> 0x123abc... 0x456def..."];
   static usage = "<%= command.id %> ID IDS... [--spot] [--norenew]";
