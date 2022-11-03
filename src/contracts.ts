@@ -1,5 +1,7 @@
 import fs from "fs";
+import path from "path";
 import type { ContractInterface } from "ethers";
+import { NetworkName } from "./networks";
 
 // These imports are necessary to pull these files into dist/
 import "../abi/staging/ArmadaNodes.json";
@@ -16,11 +18,14 @@ export interface ContractInfo {
   abi: ContractInterface;
 }
 
-export async function loadAbi(path: string): Promise<ContractInfo> {
-  const importPrefix = "import://";
-  if (path.startsWith(importPrefix)) {
-    return await import(path.slice(importPrefix.length));
-  } else {
-    return JSON.parse(fs.readFileSync(path).toString());
+export async function loadAbi(
+  network: NetworkName,
+  abiDir: string | undefined,
+  contract: ContractName
+): Promise<ContractInfo> {
+  const filename = contract + ".json";
+  if (abiDir) {
+    return JSON.parse(fs.readFileSync(path.join(abiDir, filename)).toString());
   }
+  return await import(path.join("../abi", network, filename));
 }

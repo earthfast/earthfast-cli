@@ -1,4 +1,3 @@
-import path from "path";
 import type { Provider, TransactionReceipt } from "@ethersproject/abstract-provider";
 import { AddressZero, HashZero } from "@ethersproject/constants";
 import { BigNumber, Contract, ethers, Signer, type Transaction } from "ethers";
@@ -138,9 +137,7 @@ export async function getContract(
   contract: ContractName,
   signerOrProvider: Signer | ethers.providers.Provider
 ): Promise<Contract> {
-  const dir = abiDir ?? Networks[network].abi;
-  const file = path.join(dir, network, contract + ".json");
-  const abi = await loadAbi(file);
+  const abi = await loadAbi(network, abiDir ?? Networks[network].abi, contract);
   if (signerOrProvider instanceof Signer) {
     const signer = signerOrProvider;
     const contract = new Contract(abi.address, abi.abi, signer.provider);
