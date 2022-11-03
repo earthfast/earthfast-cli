@@ -30,16 +30,23 @@ export function normalizeRecord(r: Record<string, unknown> | Result): Record<str
     Object.keys(r)
       .filter((k) => isNaN(Number(k)))
       .map((k) => {
-        if (r[k] instanceof BigNumber) {
-          return [k, normalizeBigNumber(r[k])];
-        }
-        return [k, r[k]];
+        return [k, normalizeRecordValue(r[k])];
       })
   );
 }
 
 export function normalizeRecords(rs: (Record<string, unknown> | Result)[]): Record<string, unknown>[] {
   return rs.map((r) => normalizeRecord(r));
+}
+
+function normalizeRecordValue(val: unknown): unknown {
+  if (Array.isArray(val)) {
+    return val.map(normalizeRecordValue);
+  }
+  if (val instanceof BigNumber) {
+    return normalizeBigNumber(val);
+  }
+  return val;
 }
 
 export function normalizeHash(s: string | undefined): string {

@@ -25,7 +25,7 @@ export default class ProjectCreate extends TransactionCommand {
     owner: Flags.string({ description: "[default: caller] The owner for the new project.", helpValue: "ADDR" }),
   };
 
-  public async run(): Promise<void> {
+  public async run(): Promise<Record<string, unknown>> {
     const { args, flags } = await this.parse(ProjectCreate);
     if (!!args.URL !== !!args.SHA) {
       this.error("URL and SHA must be specified together");
@@ -38,11 +38,13 @@ export default class ProjectCreate extends TransactionCommand {
     CliUx.ux.action.start("- Submitting transaction");
     const tx = await projects.createProject([owner, args.NAME, args.EMAIL, args.URL, bundleSha]);
     CliUx.ux.action.stop("done");
-    console.log(`> ${getTxUrl(tx)}`);
+    this.log(`> ${getTxUrl(tx)}`);
     CliUx.ux.action.start("- Processing transaction");
     const receipt = await tx.wait();
     CliUx.ux.action.stop("done");
     const event = await decodeEvent(receipt, projects, "ProjectCreated");
-    console.log(normalizeRecord(event));
+    const output = normalizeRecord(event);
+    if (!flags.json) console.log(output);
+    return output;
   }
 }

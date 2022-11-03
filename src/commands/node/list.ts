@@ -15,7 +15,7 @@ export default class NodeList extends BlockchainCommand {
     page: Flags.integer({ description: "The contract call paging size.", helpValue: "N", default: 100 }),
   };
 
-  public async run(): Promise<void> {
+  public async run(): Promise<Record<string, unknown>[]> {
     const { flags } = await this.parse(NodeList);
     const provider = await getProvider(flags.network, flags.rpc);
     const nodes = await getContract(flags.network, flags.abi, "ArmadaNodes", provider);
@@ -24,6 +24,10 @@ export default class NodeList extends BlockchainCommand {
     const results: Result[] = await getAll(flags.page, async (i, n) => {
       return await nodes.getNodes(operatorId, flags.topology, i, n, { blockTag });
     });
-    console.log(normalizeRecords(results.slice(flags.skip, flags.skip + flags.size)));
+
+    const records = results.slice(flags.skip, flags.skip + flags.size);
+    const output = normalizeRecords(records);
+    if (!flags.json) console.log(output);
+    return output;
   }
 }

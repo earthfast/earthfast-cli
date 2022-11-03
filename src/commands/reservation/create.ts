@@ -19,7 +19,7 @@ export default class ReservationCreate extends TransactionCommand {
     norenew: Flags.boolean({ description: "Don't renew these reservations in next epoch." }),
   };
 
-  public async run(): Promise<void> {
+  public async run(): Promise<Record<string, unknown>[]> {
     const { args, flags, raw } = await this.parse(ReservationCreate);
     if (!flags.spot && !!flags.norenew) {
       this.error("--norenew requires --spot");
@@ -37,14 +37,15 @@ export default class ReservationCreate extends TransactionCommand {
     const prices = nodeIds.map(() => parseUnits("1", 18));
     CliUx.ux.action.start("- Submitting transaction");
     const slot = { last: !!flags.spot, next: !flags.norenew };
-    console.log([projectId, nodeIds, prices, slot]);
     const tx = await reservations.createReservations(projectId, nodeIds, prices, slot);
     CliUx.ux.action.stop("done");
-    console.log(`> ${getTxUrl(tx)}`);
+    this.log(`> ${getTxUrl(tx)}`);
     CliUx.ux.action.start("- Processing transaction");
     const receipt = await tx.wait();
     CliUx.ux.action.stop("done");
     const events = await decodeEvents(receipt, reservations, "ReservationCreated");
-    console.log(normalizeRecords(events));
+    const output = normalizeRecords(events);
+    if (!flags.json) console.log(output);
+    return output;
   }
 }

@@ -24,6 +24,8 @@ export abstract class BlockchainCommand extends Command {
       helpValue: "URL",
     }),
   };
+
+  static enableJsonFlag = true;
 }
 
 export abstract class TransactionCommand extends BlockchainCommand {
