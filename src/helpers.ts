@@ -1,6 +1,6 @@
 import type { Provider, TransactionReceipt } from "@ethersproject/abstract-provider";
 import { AddressZero, HashZero } from "@ethersproject/constants";
-import { BigNumber, Contract, ethers, Signer, type Transaction } from "ethers";
+import { BigNumber, Contract, ethers, Signer, Wallet, type Transaction } from "ethers";
 import { formatUnits, getAddress, Result } from "ethers/lib/utils";
 import inquirer from "inquirer";
 import keytar from "keytar";
@@ -81,7 +81,8 @@ export async function getSigner(
   network: NetworkName,
   rpcUrl: string | undefined,
   address: string | undefined,
-  signer: SignerType
+  signer: SignerType,
+  privateKey: string | undefined
 ): Promise<Signer> {
   const url = rpcUrl ?? Networks[network].url;
   const provider = new ethers.providers.JsonRpcProvider(url);
@@ -92,6 +93,9 @@ export async function getSigner(
     wallet = new LedgerSigner(provider);
     const address = await wallet.getAddress();
     console.log("Using Ledger wallet. Wallet address: ", address);
+  } else if (privateKey) {
+    wallet = new Wallet(privateKey);
+    wallet = wallet.connect(provider);
   } else {
     if (!address) {
       const addresses = await listWallets();

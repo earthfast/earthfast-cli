@@ -35,12 +35,20 @@ export abstract class TransactionCommand extends BlockchainCommand {
       helpGroup: "BASE",
       description: "The account address to use.",
       helpValue: "ADDR",
+      exclusive: ["signer", "key"],
     }),
     signer: Flags.enum<SignerType>({
       helpGroup: "BASE",
       description: "The method for signing transactions.",
       options: SignerTypes,
       default: "keystore",
+      exclusive: ["address", "key"],
+    }),
+    key: Flags.string({
+      helpGroup: "BASE",
+      description: "The private key for transactions (danger).",
+      helpValue: "KEY",
+      exclusive: ["address", "signer"],
     }),
   };
 

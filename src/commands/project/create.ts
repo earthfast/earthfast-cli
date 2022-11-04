@@ -31,7 +31,7 @@ export default class ProjectCreate extends TransactionCommand {
       this.error("URL and SHA must be specified together");
     }
 
-    const signer = await getSigner(flags.network, flags.rpc, flags.address, flags.signer);
+    const signer = await getSigner(flags.network, flags.rpc, flags.address, flags.signer, flags.key);
     const projects = await getContract(flags.network, flags.abi, "ArmadaProjects", signer);
     const owner = flags.owner ? normalizeAddress(flags.owner) : await signer.getAddress();
     const bundleSha = normalizeHash(args.SHA);
