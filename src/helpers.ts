@@ -95,6 +95,7 @@ export async function getSigner(
     console.log("Using Ledger wallet. Wallet address: ", address);
   } else if (privateKey) {
     wallet = new Wallet(privateKey);
+    wallet = wallet.connect(provider);
   } else {
     if (!address) {
       const addresses = await listWallets();
