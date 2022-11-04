@@ -15,7 +15,7 @@ export default class ReservationCreate extends TransactionCommand {
   ];
   static flags = {
     spot: Flags.boolean({ description: "Reserve in the current epoch (can't release!)" }),
-    renew: Flags.boolean({ description: "Don't renew these reservations in next epoch." }),
+    renew: Flags.boolean({ description: "Reserve from the next epoch with auto-renew." }),
   };
 
   public async run(): Promise<Record<string, unknown>[]> {
