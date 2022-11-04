@@ -1,7 +1,7 @@
 import { Command } from "@oclif/core";
 import { Arg } from "@oclif/core/lib/interfaces";
 import inquirer from "inquirer";
-import { listWallets, updateWallet } from "../../keystore";
+import { listWallets, loadWallet, readWallet, updateWallet } from "../../keystore";
 
 export default class KeyEdit extends Command {
   static description = "Changes the optional key description.";
@@ -24,24 +24,25 @@ export default class KeyEdit extends Command {
         throw Error("Error: No private keys found.");
       }
 
-      const res = await inquirer.prompt([
-        {
-          name: "address",
-          message: "Pick the account to describe:",
-          type: "list",
-          choices: wallets.map((w) => ({
-            value: w.address,
-            name: w.description ? `${w.address} - ${w.description}` : w.address,
-          })),
-        },
-        {
-          name: "description",
-          message: "Enter the key description:",
-        },
-      ]);
+      const res1 = await inquirer.prompt({
+        name: "address",
+        message: "Pick the account to describe:",
+        type: "list",
+        choices: wallets.map((w) => ({
+          value: w.address,
+          name: w.description ? `${w.address} - ${w.description}` : w.address,
+        })),
+      });
 
-      args.ADDR = res.address;
-      args.DESC = res.description;
+      const json = await readWallet(res1.address);
+      const res2 = await inquirer.prompt({
+        name: "description",
+        message: "Enter the key description:",
+        default: json.description,
+      });
+
+      args.ADDR = res1.address;
+      args.DESC = res2.description;
     }
 
     const address = args.ADDR;

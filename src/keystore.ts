@@ -32,6 +32,12 @@ export async function loadWallet(address: string, password: string): Promise<Wal
   return wallet;
 }
 
+export async function readWallet(address: string): Promise<{ description: string }> {
+  const filename = `${address}.json`;
+  const text = fs.readFileSync(path.join(keyStoreFolderPath, filename), "utf8");
+  return JSON.parse(text);
+}
+
 export async function deleteWallet(address: string): Promise<void> {
   const filename = `${address}.json`;
   fs.unlinkSync(path.join(keyStoreFolderPath, filename));
