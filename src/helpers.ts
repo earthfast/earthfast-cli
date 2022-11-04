@@ -98,8 +98,8 @@ export async function getSigner(
     wallet = wallet.connect(provider);
   } else {
     if (!address) {
-      const addresses = await listWallets();
-      if (!addresses.length) {
+      const wallets = await listWallets();
+      if (!wallets.length) {
         throw Error("Error: No private keys found. Use key import command.");
       }
 
@@ -107,13 +107,16 @@ export async function getSigner(
         name: "address",
         message: "Pick the wallet to sign the transaction:",
         type: "list",
-        choices: addresses,
+        choices: wallets.map((w) => ({
+          value: w.address,
+          name: w.description ? `${w.address} - ${w.description}` : w.address,
+        })),
       });
 
       address = res.address as string;
     } else {
-      const addresses = await listWallets();
-      if (!addresses.includes(address)) {
+      const wallets = await listWallets();
+      if (!wallets.find((w) => w.address === address)) {
         throw Error(`No saved key for address ${address}`);
       }
     }
