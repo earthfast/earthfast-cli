@@ -1,6 +1,6 @@
 import type { Provider, TransactionReceipt } from "@ethersproject/abstract-provider";
 import { AddressZero, HashZero } from "@ethersproject/constants";
-import { BigNumber, Contract, ethers, Signer, Wallet, type Transaction } from "ethers";
+import { BigNumber, Contract, ethers, Signer, type TypedDataField, Wallet, type Transaction } from "ethers";
 import { formatUnits, getAddress, Result } from "ethers/lib/utils";
 import inquirer from "inquirer";
 import keytar from "keytar";
@@ -15,6 +15,16 @@ export const SignerTypes: SignerType[] = ["keystore", "ledger"];
 const Chains: Record<number, string> = {
   0: "mainnet",
   5: "goerli",
+};
+
+export const Permit: Record<string, Array<TypedDataField>> = {
+  Permit: [
+    { name: "owner", type: "address" },
+    { name: "spender", type: "address" },
+    { name: "value", type: "uint256" },
+    { name: "nonce", type: "uint256" },
+    { name: "deadline", type: "uint256" },
+  ],
 };
 
 export function getTxUrl(tx: Transaction): string {
