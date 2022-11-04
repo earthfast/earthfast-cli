@@ -16,7 +16,7 @@ export default class ReservationDelete extends TransactionCommand {
   public async run(): Promise<Record<string, unknown>[]> {
     const { args, flags } = await this.parse(ReservationDelete);
     const nodeIds = args.IDS.split(",").map((id: string) => normalizeHash(id));
-    const signer = await getSigner(flags.network, flags.rpc, flags.address, flags.signer);
+    const signer = await getSigner(flags.network, flags.rpc, flags.address, flags.signer, flags.key);
     const reservations = await getContract(flags.network, flags.abi, "ArmadaReservations", signer);
     const projectId = normalizeHash(args.ID);
     CliUx.ux.action.start("- Submitting transaction");
