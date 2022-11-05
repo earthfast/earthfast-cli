@@ -13,8 +13,8 @@ export default class KeyDelete extends Command {
   public async run(): Promise<void> {
     const { args } = await this.parse(KeyDelete);
     if (!args.ADDR) {
-      const addresses = await listWallets();
-      if (!addresses.length) {
+      const wallets = await listWallets();
+      if (!wallets.length) {
         throw Error("Error: No private keys found.");
       }
 
@@ -22,7 +22,10 @@ export default class KeyDelete extends Command {
         name: "address",
         message: "Pick the account to delete:",
         type: "list",
-        choices: addresses,
+        choices: wallets.map((w) => ({
+          value: w.address,
+          name: w.description ? `${w.address} - ${w.description}` : w.address,
+        })),
       });
 
       args.ADDR = res.address;

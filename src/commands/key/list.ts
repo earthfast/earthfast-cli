@@ -8,9 +8,10 @@ export default class KeyList extends Command {
 
   public async run(): Promise<void> {
     await this.parse(KeyList);
-    const keys = await listWallets();
-    for (let i = 0; i < keys.length; ++i) {
-      console.log(keys[i]);
+    const wallets = await listWallets();
+    for (let i = 0; i < wallets.length; ++i) {
+      const w = wallets[i];
+      console.log(w.description ? `${w.address} - ${w.description}` : w.address);
     }
   }
 }
