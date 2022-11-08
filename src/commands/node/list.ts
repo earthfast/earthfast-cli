@@ -11,7 +11,7 @@ export default class NodeList extends BlockchainCommand {
   static flags = {
     topology: Flags.boolean({ description: "List topology nodes instead." }),
     operator: Flags.string({ description: "Filter by operator ID.", helpValue: "ID" }),
-    vacant: Flags.boolean({ description: "List only vacant nodes (see --spot, --renew)." }),
+    vacant: Flags.boolean({ description: "List only vacant nodes in this or next epoch." }),
     spot: Flags.boolean({ description: "List only vacant nodes available in this epoch.", dependsOn: ["vacant"] }),
     renew: Flags.boolean({ description: "List only vacant nodes available from next epoch.", dependsOn: ["vacant"] }),
     skip: Flags.integer({ description: "The number of results to skip.", helpValue: "N", default: 0 }),
@@ -21,10 +21,6 @@ export default class NodeList extends BlockchainCommand {
 
   public async run(): Promise<Record<string, unknown>[]> {
     const { flags } = await this.parse(NodeList);
-    if (flags.vacant && !flags.spot && !flags.renew) {
-      throw Error("At least one of --spot and/or --renew must be provided.");
-    }
-
     const provider = await getProvider(flags.network, flags.rpc);
     const nodes = await getContract(flags.network, flags.abi, "ArmadaNodes", provider);
     const operatorId = normalizeHash(flags.operator);
@@ -32,10 +28,20 @@ export default class NodeList extends BlockchainCommand {
     let results: Result[] = await getAll(flags.page, async (i, n) => {
       return await nodes.getNodes(operatorId, flags.topology, i, n, { blockTag });
     });
-    results = results.filter((v) =>
-      (!flags.spot || v.projectIds[0] === HashZero) &&
-      (!flags.renew || v.projectIds[1] === HashZero)
-    ); // prettier-ignore
+    results = results.filter((v) => {
+      // List all nodes (vacant and reserved)
+      if (!flags.vacant) return true;
+      // List only nodes vacant either in this epoch or after this epoch
+      if (!flags.spot && !flags.renew) return v.projectIds[0] === HashZero || v.projectIds[1] === HashZero;
+      // List only nodes vacant both in this epoch and after this epoch
+      if (flags.spot && flags.renew) return v.projectIds[0] === HashZero && v.projectIds[1] === HashZero;
+      // List only nodes vacant after this epoch
+      if (!flags.spot && flags.renew) return v.projectIds[1] === HashZero;
+      // List only nodes vacant in this epoch
+      if (flags.spot && !flags.renew) return v.projectIds[0] === HashZero;
+      // Impossible
+      return false;
+    });
 
     const records = results.slice(flags.skip, flags.skip + flags.size);
     const output = normalizeRecords(records);

@@ -8,7 +8,7 @@ export default class EscrowWithdraw extends TransactionCommand {
   static description = "Withdraw Armada tokens from project escrow.\nThe tokens are sent to the project owner.";
   static examples = ["<%= config.bin %> <%= command.id %> 0x123abc... 1.0"];
   static usage = "<%= command.id %> ID TOKENS";
-  static aliases = ["escrow:withdraw", "project:escrow:withdraw"];
+  static aliases = ["escrow:withdraw", "project:withdraw"];
   static args: Arg[] = [
     { name: "ID", description: "The ID of the project to withdraw escrow from.", required: true },
     { name: "TOKENS", description: "The Armada token amount to withdraw (e.g. 1.0).", required: true },

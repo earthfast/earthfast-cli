@@ -19,7 +19,7 @@ export default class EscrowDeposit extends TransactionCommand {
   static description = "Deposit Armada tokens to project escrow.";
   static examples = ["<%= config.bin %> <%= command.id %> 0x123abc... 1.0"];
   static usage = "<%= command.id %> ID TOKENS";
-  static aliases = ["escrow:deposit", "project:escrow:deposit"];
+  static aliases = ["escrow:deposit", "project:deposit"];
   static args: Arg[] = [
     { name: "ID", description: "The ID of the project to deposit escrow for.", required: true },
     { name: "TOKENS", description: "The Armada token amount to deposit (e.g. 1.0).", required: true },
