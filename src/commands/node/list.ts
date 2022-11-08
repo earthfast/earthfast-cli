@@ -28,14 +28,20 @@ export default class NodeList extends BlockchainCommand {
     let results: Result[] = await getAll(flags.page, async (i, n) => {
       return await nodes.getNodes(operatorId, flags.topology, i, n, { blockTag });
     });
-    results = results.filter(
-      (v) =>
-        !flags.vacant ||
-        (((!flags.spot && !flags.renew) || v.projectIds[0] === HashZero || v.projectIds[1] === HashZero) &&
-          ((flags.spot && flags.renew) || (v.projectIds[0] === HashZero && v.projectIds[1] === HashZero)) &&
-          ((!flags.spot && flags.renew) || v.projectIds[0] === HashZero) &&
-          ((flags.spot && !flags.renew) || v.projectIds[1] === HashZero))
-    );
+    results = results.filter((v) => {
+      // List all nodes (vacant and reserved)
+      if (!flags.vacant) return true;
+      // List only nodes vacant either in this epoch or after this epoch
+      if (!flags.spot && !flags.renew) return v.projectIds[0] === HashZero || v.projectIds[1] === HashZero;
+      // List only nodes vacant both in this epoch and after this epoch
+      if (flags.spot && flags.renew) return v.projectIds[0] === HashZero && v.projectIds[1] === HashZero;
+      // List only nodes vacant after this epoch
+      if (!flags.spot && flags.renew) return v.projectIds[1] === HashZero;
+      // List only nodes vacant in this epoch
+      if (flags.spot && !flags.renew) return v.projectIds[0] === HashZero;
+      // Impossible
+      return false;
+    });
 
     const records = results.slice(flags.skip, flags.skip + flags.size);
     const output = normalizeRecords(records);
