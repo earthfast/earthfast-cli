@@ -321,7 +321,7 @@
           "type": "bytes32"
         }
       ],
-      "name": "depositProjectEscrowPermit",
+      "name": "depositProjectEscrow",
       "outputs": [],
       "stateMutability": "nonpayable",
       "type": "function"
