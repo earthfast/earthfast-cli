@@ -1,6 +1,6 @@
 {
   "name": "armada-cli",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "description": "Command line utility for the Armada Network",
   "homepage": "https://armadanetwork.com",
   "license": "MIT",
