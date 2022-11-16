@@ -46,7 +46,7 @@ export default class EscrowDeposit extends TransactionCommand {
     CliUx.ux.action.stop("done");
 
     CliUx.ux.action.start("- Submitting transaction");
-    const tx = await projects.depositProjectEscrowPermit(projectId, tokens, deadline, sig.v, sig.r, sig.s);
+    const tx = await projects.depositProjectEscrow(projectId, tokens, deadline, sig.v, sig.r, sig.s);
     CliUx.ux.action.stop("done");
     this.log(`> ${getTxUrl(tx)}`);
     CliUx.ux.action.start("- Processing transaction");
