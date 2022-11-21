@@ -60,18 +60,18 @@ export async function run(
     delete tx.from; // Raw tx must have "from" field
     const raw = ethers.utils.serializeTransaction(tx);
     return raw;
-  } else {
-    CliUx.ux.action.start("- Submitting transaction");
-    const response = await signer.sendTransaction(tx);
-    CliUx.ux.action.stop("done");
-    // Use stderr to not interfere with --json flag
-    console.warn(`> ${getTxUrl(response)}`);
-    CliUx.ux.action.start("- Processing transaction");
-    const receipt = await response.wait();
-    CliUx.ux.action.stop("done");
-    const events = await decodeEvents(receipt, contracts);
-    return events;
   }
+
+  CliUx.ux.action.start("- Submitting transaction");
+  const response = await signer.sendTransaction(tx);
+  CliUx.ux.action.stop("done");
+  // Use stderr to not interfere with --json flag
+  console.warn(`> ${getTxUrl(response)}`);
+  CliUx.ux.action.start("- Processing transaction");
+  const receipt = await response.wait();
+  CliUx.ux.action.stop("done");
+  const events = await decodeEvents(receipt, contracts);
+  return events;
 }
 
 export function getTxUrl(tx: Transaction): string {
