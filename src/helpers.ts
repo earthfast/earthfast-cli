@@ -1,3 +1,4 @@
+import { inspect } from "util";
 import type { Provider, TransactionReceipt } from "@ethersproject/abstract-provider";
 import { AddressZero, HashZero } from "@ethersproject/constants";
 import { CliUx } from "@oclif/core";
@@ -43,9 +44,8 @@ export const Permit: Record<string, Array<TypedDataField>> = {
   ],
 };
 
-// Pretty prints the value as a string with proper formatting and indentation.
 export function pretty(value: unknown): string {
-  return typeof value === "string" ? value : JSON.stringify(value, null, "  ");
+  return typeof value === "string" ? value : inspect(value);
 }
 
 // Signs and executes the transaction and returns its emitted events, if a signer is provided.
