@@ -1,15 +1,7 @@
-import { CliUx, Flags } from "@oclif/core";
+import { Flags } from "@oclif/core";
 import { Arg } from "@oclif/core/lib/interfaces";
 import { TransactionCommand } from "../../base";
-import {
-  decodeEvent,
-  getContract,
-  getSigner,
-  getTxUrl,
-  normalizeAddress,
-  normalizeHash,
-  normalizeRecord,
-} from "../../helpers";
+import { getContract, getSigner, normalizeAddress, normalizeHash, pretty, run } from "../../helpers";
 
 export default class ProjectCreate extends TransactionCommand {
   static description = "Register a new project on the Armada Network.";
@@ -25,7 +17,7 @@ export default class ProjectCreate extends TransactionCommand {
     owner: Flags.string({ description: "[default: caller] The owner for the new project.", helpValue: "ADDR" }),
   };
 
-  public async run(): Promise<Record<string, unknown>> {
+  public async run(): Promise<unknown> {
     const { args, flags } = await this.parse(ProjectCreate);
     if (!!args.URL !== !!args.SHA) {
       this.error("URL and SHA must be specified together");
@@ -35,16 +27,9 @@ export default class ProjectCreate extends TransactionCommand {
     const projects = await getContract(flags.network, flags.abi, "ArmadaProjects", signer);
     const owner = flags.owner ? normalizeAddress(flags.owner) : await signer.getAddress();
     const bundleSha = normalizeHash(args.SHA);
-    CliUx.ux.action.start("- Submitting transaction");
-    const tx = await projects.createProject([owner, args.NAME, args.EMAIL, args.URL, bundleSha]);
-    CliUx.ux.action.stop("done");
-    this.log(`> ${getTxUrl(tx)}`);
-    CliUx.ux.action.start("- Processing transaction");
-    const receipt = await tx.wait();
-    CliUx.ux.action.stop("done");
-    const event = await decodeEvent(receipt, projects, "ProjectCreated");
-    const output = normalizeRecord(event);
-    if (!flags.json) console.log(output);
+    const tx = await projects.populateTransaction.createProject([owner, args.NAME, args.EMAIL, args.URL, bundleSha]);
+    const output = await run(tx, signer, [projects]);
+    this.log(pretty(output));
     return output;
   }
 }

@@ -1,7 +1,6 @@
-import { CliUx } from "@oclif/core";
 import { Arg } from "@oclif/core/lib/interfaces";
 import { TransactionCommand } from "../../base";
-import { decodeEvents, getContract, getSigner, getTxUrl, normalizeHash, normalizeRecords } from "../../helpers";
+import { getContract, getSigner, normalizeHash, pretty, run } from "../../helpers";
 
 export default class ReservationDelete extends TransactionCommand {
   static description = `Release content nodes from a project.
@@ -13,23 +12,16 @@ export default class ReservationDelete extends TransactionCommand {
     { name: "IDS", description: "The comma separated IDs of the nodes to release.", required: true },
   ];
 
-  public async run(): Promise<Record<string, unknown>[]> {
+  public async run(): Promise<unknown> {
     const { args, flags } = await this.parse(ReservationDelete);
     const nodeIds = args.IDS.split(",").map((id: string) => normalizeHash(id));
     const signer = await getSigner(flags.network, flags.rpc, flags.address, flags.signer, flags.key);
     const reservations = await getContract(flags.network, flags.abi, "ArmadaReservations", signer);
     const projectId = normalizeHash(args.ID);
-    CliUx.ux.action.start("- Submitting transaction");
     const slot = { last: false, next: true };
-    const tx = await reservations.deleteReservations(projectId, nodeIds, slot);
-    CliUx.ux.action.stop("done");
-    this.log(`> ${getTxUrl(tx)}`);
-    CliUx.ux.action.start("- Processing transaction");
-    const receipt = await tx.wait();
-    CliUx.ux.action.stop("done");
-    const events = await decodeEvents(receipt, reservations, "ReservationDeleted");
-    const output = normalizeRecords(events);
-    if (!flags.json) console.log(output);
+    const tx = await reservations.populateTransaction.deleteReservations(projectId, nodeIds, slot);
+    const output = await run(tx, signer, [reservations]);
+    this.log(pretty(output));
     return output;
   }
 }

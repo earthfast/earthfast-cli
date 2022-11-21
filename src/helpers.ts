@@ -1,6 +1,17 @@
 import type { Provider, TransactionReceipt } from "@ethersproject/abstract-provider";
 import { AddressZero, HashZero } from "@ethersproject/constants";
-import { BigNumber, Contract, ethers, Signer, type TypedDataField, Wallet, type Transaction } from "ethers";
+import { CliUx } from "@oclif/core";
+import {
+  BigNumber,
+  Contract,
+  ethers,
+  Signer,
+  type TypedDataField,
+  Wallet,
+  type Transaction,
+  VoidSigner,
+  type PopulatedTransaction,
+} from "ethers";
 import { formatUnits, getAddress, Result } from "ethers/lib/utils";
 import inquirer from "inquirer";
 import keytar from "keytar";
@@ -9,12 +20,17 @@ import { listWallets, loadWallet } from "./keystore";
 import { LedgerSigner } from "./ledger";
 import { NetworkName, Networks } from "./networks";
 
-export type SignerType = "keystore" | "ledger";
-export const SignerTypes: SignerType[] = ["keystore", "ledger"];
+export type SignerType = "keystore" | "ledger" | "raw";
+export const SignerTypes: SignerType[] = ["keystore", "ledger", "raw"];
 
 const Chains: Record<number, string> = {
   0: "mainnet",
   5: "goerli",
+};
+
+export type TransactionLog = {
+  event: string;
+  args: Record<string, unknown>;
 };
 
 export const Permit: Record<string, Array<TypedDataField>> = {
@@ -26,6 +42,37 @@ export const Permit: Record<string, Array<TypedDataField>> = {
     { name: "deadline", type: "uint256" },
   ],
 };
+
+// Pretty prints the value as a string with proper formatting and indentation.
+export function pretty(value: unknown): string {
+  return typeof value === "string" ? value : JSON.stringify(value, null, "  ");
+}
+
+// Signs and executes the transaction and returns its emitted events, if a signer is provided.
+// Otherwise, builds and returns a raw unsigned transaction string, if VoidSigner is provided.
+// Pass contracts to search and return the corresponding events. No other events are returned.
+export async function run(
+  tx: PopulatedTransaction,
+  signer: Signer,
+  contracts: Contract[]
+): Promise<string | TransactionLog[]> {
+  if (signer instanceof VoidSigner) {
+    delete tx.from; // Raw tx must have "from" field
+    const raw = ethers.utils.serializeTransaction(tx);
+    return raw;
+  } else {
+    CliUx.ux.action.start("- Submitting transaction");
+    const response = await signer.sendTransaction(tx);
+    CliUx.ux.action.stop("done");
+    // Use stderr to not interfere with --json flag
+    console.warn(`> ${getTxUrl(response)}`);
+    CliUx.ux.action.start("- Processing transaction");
+    const receipt = await response.wait();
+    CliUx.ux.action.stop("done");
+    const events = await decodeEvents(receipt, contracts);
+    return events;
+  }
+}
 
 export function getTxUrl(tx: Transaction): string {
   const chain = Chains[tx.chainId];
@@ -98,11 +145,15 @@ export async function getSigner(
   const provider = new ethers.providers.JsonRpcProvider(url);
 
   let wallet: Signer;
-  if (signer === "ledger") {
-    console.log("Make sure the Ledger wallet is unlocked and the Ethereum application is open");
+  if (signer === "raw") {
+    wallet = new VoidSigner(AddressZero);
+  } else if (signer === "ledger") {
+    // Use stderr to not interfere with --json flag
+    console.warn("> Make sure the Ledger wallet is unlocked and the Ethereum application is open");
     wallet = new LedgerSigner(provider);
     const address = await wallet.getAddress();
-    console.log("Using Ledger wallet. Wallet address: ", address);
+    // Use stderr to not interfere with --json flag
+    console.warn(`> Using Ledger wallet ${address}`);
   } else if (privateKey) {
     wallet = new Wallet(privateKey);
     wallet = wallet.connect(provider);
@@ -167,24 +218,24 @@ export async function getContract(
   }
 }
 
-export async function decodeEvents(receipt: TransactionReceipt, contract: Contract, event: string): Promise<Result[]> {
+export async function decodeEvents(receipt: TransactionReceipt, contracts: Contract[]): Promise<TransactionLog[]> {
   const results = [];
   for (let i = 0; i < receipt.logs.length; i++) {
     const log = receipt.logs[i];
-    try {
-      const args = contract.interface.decodeEventLog(event, log.data, log.topics);
-      if (args) {
-        results.push(args);
+    for (const contract of contracts) {
+      for (const fragment of Object.keys(contract.interface.events)) {
+        const frag = contract.interface.events[fragment];
+        let args;
+        try {
+          args = contract.interface.decodeEventLog(fragment, log.data, log.topics);
+        } catch {
+          continue;
+        }
+        results.push({ event: frag.name, args: normalizeRecord(args) });
       }
-    } catch {
-      continue;
     }
   }
   return results;
-}
-
-export async function decodeEvent(receipt: TransactionReceipt, contract: Contract, event: string): Promise<Result> {
-  return (await decodeEvents(receipt, contract, event))[0];
 }
 
 // Returns all results of a paged function call (a function that accepts skip and size parameters).

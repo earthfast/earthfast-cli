@@ -1,18 +1,19 @@
 import { Command } from "@oclif/core";
 import { Arg } from "@oclif/core/lib/interfaces";
 import inquirer from "inquirer";
-import { listWallets, loadWallet, readWallet, updateWallet } from "../../keystore";
+import { listWallets, readWallet, updateWallet } from "../../keystore";
 
 export default class KeyEdit extends Command {
   static description = "Changes the optional key description.";
   static examples = ["<%= config.bin %> <%= command.id %>"];
   static usage = "<%= command.id %>";
+  static enableJsonFlag = true;
   static args: Arg[] = [
     { name: "ADDR", description: "The address of the key to describe." },
     { name: "DESC", description: "The new description for the key." },
   ];
 
-  public async run(): Promise<void> {
+  public async run(): Promise<unknown> {
     const { args } = await this.parse(KeyEdit);
     if (!!args.ADDR !== !!args.DESC) {
       this.error("ADDR and DESC must be specified together");
@@ -47,6 +48,7 @@ export default class KeyEdit extends Command {
 
     const address = args.ADDR;
     await updateWallet(address, args.DESC);
-    console.log(`Account ${address} updated`);
+    this.log(`Account ${address} updated`);
+    return address;
   }
 }

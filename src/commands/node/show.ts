@@ -1,6 +1,6 @@
 import { Arg } from "@oclif/core/lib/interfaces";
 import { BlockchainCommand } from "../../base";
-import { getContract, getProvider, normalizeHash, normalizeRecord } from "../../helpers";
+import { getContract, getProvider, normalizeHash, normalizeRecord, pretty } from "../../helpers";
 
 export default class NodeShow extends BlockchainCommand {
   static description = "Show details of an Armada Network node.";
@@ -15,7 +15,7 @@ export default class NodeShow extends BlockchainCommand {
     const nodeId = normalizeHash(args.ID);
     const record = await nodes.getNode(nodeId);
     const output = normalizeRecord(record);
-    if (!flags.json) console.log(output);
+    this.log(pretty(output));
     return output;
   }
 }

@@ -1,7 +1,6 @@
-import { CliUx } from "@oclif/core";
 import { Arg } from "@oclif/core/lib/interfaces";
 import { TransactionCommand } from "../../base";
-import { decodeEvent, getContract, getSigner, getTxUrl, normalizeHash, normalizeRecord } from "../../helpers";
+import { getContract, getSigner, normalizeHash, pretty, run } from "../../helpers";
 
 export default class ProjectOwner extends TransactionCommand {
   static description = "Transfer ownership of a project.";
@@ -13,21 +12,14 @@ export default class ProjectOwner extends TransactionCommand {
     { name: "ADDR", description: "The address of the new project owner.", required: true },
   ];
 
-  public async run(): Promise<Record<string, unknown>> {
+  public async run(): Promise<unknown> {
     const { args, flags } = await this.parse(ProjectOwner);
     const signer = await getSigner(flags.network, flags.rpc, flags.address, flags.signer, flags.key);
     const projects = await getContract(flags.network, flags.abi, "ArmadaProjects", signer);
     const projectId = normalizeHash(args.ID);
-    CliUx.ux.action.start("- Submitting transaction");
-    const tx = await projects.setProjectOwner(projectId, args.ADDR);
-    CliUx.ux.action.stop("done");
-    this.log(`> ${getTxUrl(tx)}`);
-    CliUx.ux.action.start("- Processing transaction");
-    const receipt = await tx.wait();
-    CliUx.ux.action.stop("done");
-    const event = await decodeEvent(receipt, projects, "ProjectOwnerChanged");
-    const output = normalizeRecord(event);
-    if (!flags.json) console.log(output);
+    const tx = await projects.populateTransaction.setProjectOwner(projectId, args.ADDR);
+    const output = await run(tx, signer, [projects]);
+    this.log(pretty(output));
     return output;
   }
 }

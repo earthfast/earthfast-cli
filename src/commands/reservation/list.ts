@@ -2,7 +2,7 @@ import { Flags } from "@oclif/core";
 import { Arg } from "@oclif/core/lib/interfaces";
 import { Result } from "ethers/lib/utils";
 import { BlockchainCommand } from "../../base";
-import { getAll, getContract, getProvider, normalizeHash, normalizeRecords } from "../../helpers";
+import { getAll, getContract, getProvider, normalizeHash, normalizeRecords, pretty } from "../../helpers";
 
 export default class ReservationList extends BlockchainCommand {
   static description = "List node reservations by a project.";
@@ -26,7 +26,7 @@ export default class ReservationList extends BlockchainCommand {
     });
 
     const output = normalizeRecords(results.slice(flags.skip, flags.skip + flags.size));
-    if (!flags.json) console.log(output);
+    this.log(pretty(output));
     return output;
   }
 }

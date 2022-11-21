@@ -54,7 +54,7 @@ export abstract class TransactionCommand extends BlockchainCommand {
 
   async catch(error: CommandError | TxError): Promise<void> {
     if (!process.env.DEBUG && "error" in error && "reason" in error.error) {
-      console.log(error.error.reason);
+      this.error(error.error.reason);
     } else {
       throw error;
     }

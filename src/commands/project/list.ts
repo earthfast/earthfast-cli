@@ -1,7 +1,7 @@
 import { Flags } from "@oclif/core";
 import { Result } from "ethers/lib/utils";
 import { BlockchainCommand } from "../../base";
-import { getAll, getContract, getProvider, normalizeAddress, normalizeRecords } from "../../helpers";
+import { getAll, getContract, getProvider, normalizeAddress, normalizeRecords, pretty } from "../../helpers";
 
 export default class ProjectList extends BlockchainCommand {
   static description = "List projects on the Armada Network.";
@@ -28,7 +28,7 @@ export default class ProjectList extends BlockchainCommand {
     }
 
     const output = normalizeRecords(results.slice(flags.skip, flags.skip + flags.size));
-    if (!flags.json) console.log(output);
+    this.log(pretty(output));
     return output;
   }
 }
