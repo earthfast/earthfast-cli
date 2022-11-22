@@ -1,8 +1,8 @@
-import { CliUx, Flags } from "@oclif/core";
+import { Flags } from "@oclif/core";
 import { Arg } from "@oclif/core/lib/interfaces";
 import { parseUnits } from "ethers/lib/utils";
 import { TransactionCommand } from "../../base";
-import { decodeEvents, getContract, getSigner, getTxUrl, normalizeHash, normalizeRecords } from "../../helpers";
+import { getContract, getSigner, normalizeHash, pretty, run } from "../../helpers";
 
 export default class ReservationCreate extends TransactionCommand {
   static description = `Reserve content nodes for a project.
@@ -18,7 +18,7 @@ export default class ReservationCreate extends TransactionCommand {
     renew: Flags.boolean({ description: "Reserve from the next epoch with auto-renew." }),
   };
 
-  public async run(): Promise<Record<string, unknown>[]> {
+  public async run(): Promise<unknown> {
     const { args, flags } = await this.parse(ReservationCreate);
     if (!flags.spot && !flags.renew) {
       // TODO: Fetch this from the registry
@@ -44,17 +44,10 @@ export default class ReservationCreate extends TransactionCommand {
     const reservations = await getContract(flags.network, flags.abi, "ArmadaReservations", signer);
     const projectId = normalizeHash(args.ID);
     const prices = nodeIds.map(() => parseUnits("1", 18));
-    CliUx.ux.action.start("- Submitting transaction");
     const slot = { last: !!flags.spot, next: !!flags.renew };
-    const tx = await reservations.createReservations(projectId, nodeIds, prices, slot);
-    CliUx.ux.action.stop("done");
-    this.log(`> ${getTxUrl(tx)}`);
-    CliUx.ux.action.start("- Processing transaction");
-    const receipt = await tx.wait();
-    CliUx.ux.action.stop("done");
-    const events = await decodeEvents(receipt, reservations, "ReservationCreated");
-    const output = normalizeRecords(events);
-    if (!flags.json) console.log(output);
+    const tx = await reservations.populateTransaction.createReservations(projectId, nodeIds, prices, slot);
+    const output = await run(tx, signer, [reservations]);
+    this.log(pretty(output));
     return output;
   }
 }

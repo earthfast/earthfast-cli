@@ -8,17 +8,19 @@ export default class BundleCreate extends Command {
   static description = "Bundle an application for use on the Armada Network.";
   static examples = ["<%= config.bin %> <%= command.id %> my-site-v1.0.0 ./dist"];
   static usage = "<%= command.id %> NAME DIR";
+  static enableJsonFlag = true;
   static args: Arg[] = [
     { name: "NAME", description: "The name of the bundle to create (e.g. my-site-v1.0.0).", required: true },
     { name: "DIR", description: "Relative path to the app's build directory (e.g. ./dist).", required: true },
   ];
 
-  public async run(): Promise<void> {
+  public async run(): Promise<unknown> {
     const { args } = await this.parse(BundleCreate);
     await generateManifest(args.DIR);
     const bundleName = normalizeBundleExtension(args.NAME);
     await compress(bundleName, args.DIR);
-    console.log(bundleName);
+    this.log(bundleName);
+    return bundleName;
   }
 }
 

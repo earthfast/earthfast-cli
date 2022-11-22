@@ -9,8 +9,9 @@ export default class KeyDelete extends Command {
   static examples = ["<%= config.bin %> <%= command.id %> 0x123abc..."];
   static usage = "<%= command.id %>";
   static args: Arg[] = [{ name: "ADDR", description: "The address of the key to delete." }];
+  static enableJsonFlag = true;
 
-  public async run(): Promise<void> {
+  public async run(): Promise<unknown> {
     const { args } = await this.parse(KeyDelete);
     if (!args.ADDR) {
       const wallets = await listWallets();
@@ -34,6 +35,7 @@ export default class KeyDelete extends Command {
     const address = args.ADDR;
     await deleteWallet(address);
     await keytar.deletePassword("armada-cli", address);
-    console.log(`Account ${address} deleted`);
+    this.log(`Account ${address} deleted`);
+    return address;
   }
 }

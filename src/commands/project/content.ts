@@ -1,7 +1,6 @@
-import { CliUx } from "@oclif/core";
 import { Arg } from "@oclif/core/lib/interfaces";
 import { TransactionCommand } from "../../base";
-import { decodeEvent, getContract, getSigner, getTxUrl, normalizeHash, normalizeRecord } from "../../helpers";
+import { getContract, getSigner, normalizeHash, pretty, run } from "../../helpers";
 
 export default class ProjectContent extends TransactionCommand {
   static description = "Publish the provided bundle on the network.";
@@ -17,7 +16,7 @@ export default class ProjectContent extends TransactionCommand {
     { name: "SHA", description: "The SHA-256 checksum of the bundle." },
   ];
 
-  public async run(): Promise<Record<string, unknown>> {
+  public async run(): Promise<unknown> {
     const { args, flags } = await this.parse(ProjectContent);
     if (args.URL === undefined || args.SHA === undefined) {
       this.error("URL and SHA must be specified");
@@ -27,16 +26,9 @@ export default class ProjectContent extends TransactionCommand {
     const projects = await getContract(flags.network, flags.abi, "ArmadaProjects", signer);
     const projectId = normalizeHash(args.ID);
     const bundleSha = normalizeHash(args.SHA);
-    CliUx.ux.action.start("- Submitting transaction");
-    const tx = await projects.setProjectContent(projectId, args.URL, bundleSha);
-    CliUx.ux.action.stop("done");
-    this.log(`> ${getTxUrl(tx)}`);
-    CliUx.ux.action.start("- Processing transaction");
-    const receipt = await tx.wait();
-    CliUx.ux.action.stop("done");
-    const event = await decodeEvent(receipt, projects, "ProjectContentChanged");
-    const output = normalizeRecord(event);
-    if (!flags.json) console.log(output);
+    const tx = await projects.populateTransaction.setProjectContent(projectId, args.URL, bundleSha);
+    const output = await run(tx, signer, [projects]);
+    this.log(pretty(output));
     return output;
   }
 }

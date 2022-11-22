@@ -2,7 +2,7 @@ import { HashZero } from "@ethersproject/constants";
 import { Flags } from "@oclif/core";
 import { Result } from "ethers/lib/utils";
 import { BlockchainCommand } from "../../base";
-import { getAll, getContract, getProvider, normalizeHash, normalizeRecords } from "../../helpers";
+import { getAll, getContract, getProvider, normalizeHash, normalizeRecords, pretty } from "../../helpers";
 
 export default class NodeList extends BlockchainCommand {
   static description = "List content nodes on the Armada Network.";
@@ -45,7 +45,7 @@ export default class NodeList extends BlockchainCommand {
 
     const records = results.slice(flags.skip, flags.skip + flags.size);
     const output = normalizeRecords(records);
-    if (!flags.json) console.log(output);
+    this.log(pretty(output));
     return output;
   }
 }
