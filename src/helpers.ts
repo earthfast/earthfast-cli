@@ -13,7 +13,7 @@ import {
   VoidSigner,
   type PopulatedTransaction,
 } from "ethers";
-import { formatUnits, getAddress, Result } from "ethers/lib/utils";
+import { formatUnits, FunctionFragment, getAddress, Interface, Result } from "ethers/lib/utils";
 import inquirer from "inquirer";
 import keytar from "keytar";
 import { ContractName, loadAbi } from "./contracts";
@@ -27,6 +27,13 @@ export const SignerTypes: SignerType[] = ["keystore", "ledger", "raw"];
 const Chains: Record<number, string> = {
   0: "mainnet",
   5: "goerli",
+};
+
+export type RawTransaction = {
+  to: string;
+  abi: string;
+  hex: string;
+  raw: string;
 };
 
 export type TransactionLog = {
@@ -50,16 +57,22 @@ export function pretty(value: unknown): string {
 
 // Signs and executes the transaction and returns its emitted events, if a signer is provided.
 // Otherwise, builds and returns a raw unsigned transaction string, if VoidSigner is provided.
-// Pass contracts to search and return the corresponding events. No other events are returned.
+// Pass the contracts parameter to decode the corresponding events. No other events are returned.
+// The first of the passed contracts will be used to lookup the abi used for the raw transaction.
 export async function run(
   tx: PopulatedTransaction,
   signer: Signer,
   contracts: Contract[]
-): Promise<string | TransactionLog[]> {
+): Promise<RawTransaction | TransactionLog[] | undefined> {
   if (signer instanceof VoidSigner) {
+    if (!tx.to || !tx.data) return undefined;
     delete tx.from; // Raw tx must have "from" field
+    const sighash = tx.data.slice(0, 10);
+    const fragment = getFragment(contracts[0].interface, sighash);
+    if (!fragment) return undefined;
+    const abi = `[${fragment.format("json")}]`;
     const raw = ethers.utils.serializeTransaction(tx);
-    return raw;
+    return { to: tx.to, abi, hex: tx.data, raw };
   }
 
   CliUx.ux.action.start("- Submitting transaction");
@@ -72,6 +85,14 @@ export async function run(
   CliUx.ux.action.stop("done");
   const events = await decodeEvents(receipt, contracts);
   return events;
+}
+
+export function getFragment(interface_: Interface, sighash: string): FunctionFragment | undefined {
+  for (const fragment of Object.values(interface_.functions)) {
+    if (sighash === interface_.getSighash(fragment)) {
+      return fragment;
+    }
+  }
 }
 
 export function getTxUrl(tx: Transaction): string {
