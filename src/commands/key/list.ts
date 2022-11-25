@@ -2,7 +2,7 @@ import { Command } from "@oclif/core";
 import { listWallets } from "../../keystore";
 
 export default class KeyList extends Command {
-  static description = "Lists keys saved in the encrypted keystore.";
+  static summary = "Lists keys saved in the encrypted keystore.";
   static examples = ["<%= config.bin %> <%= command.id %>"];
   static usage = "<%= command.id %>";
   static enableJsonFlag = true;

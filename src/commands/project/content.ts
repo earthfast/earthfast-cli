@@ -3,7 +3,7 @@ import { TransactionCommand } from "../../base";
 import { getContract, getSigner, normalizeHash, pretty, run } from "../../helpers";
 
 export default class ProjectContent extends TransactionCommand {
-  static description = "Publish the provided bundle on the network.";
+  static summary = "Publish the provided bundle on the network.";
   static examples = [
     "<%= config.bin %> <%= command.id %> 0x123abc... https://.../my-site-v1.0.0.tgz 0x456def...",
     "<%= config.bin %> <%= command.id %> 0x123abc... '' '' # Unpublishes the project content",
@@ -19,7 +19,7 @@ export default class ProjectContent extends TransactionCommand {
   public async run(): Promise<unknown> {
     const { args, flags } = await this.parse(ProjectContent);
     if (args.URL === undefined || args.SHA === undefined) {
-      this.error("URL and SHA must be specified");
+      this.error("Must provide both URL and SHA.");
     }
 
     const signer = await getSigner(flags.network, flags.rpc, flags.address, flags.signer, flags.key);

@@ -4,7 +4,7 @@ import inquirer from "inquirer";
 import { listWallets, readWallet, updateWallet } from "../../keystore";
 
 export default class KeyEdit extends Command {
-  static description = "Changes the optional key description.";
+  static summary = "Changes the optional key description.";
   static examples = ["<%= config.bin %> <%= command.id %>"];
   static usage = "<%= command.id %>";
   static enableJsonFlag = true;
@@ -16,7 +16,7 @@ export default class KeyEdit extends Command {
   public async run(): Promise<unknown> {
     const { args } = await this.parse(KeyEdit);
     if (!!args.ADDR !== !!args.DESC) {
-      this.error("ADDR and DESC must be specified together");
+      this.error("Can only specify ADDR and DESC together.");
     }
 
     if (!args.ADDR) {

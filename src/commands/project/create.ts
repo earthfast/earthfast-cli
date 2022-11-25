@@ -4,7 +4,7 @@ import { TransactionCommand } from "../../base";
 import { getContract, getSigner, normalizeAddress, normalizeHash, pretty, run } from "../../helpers";
 
 export default class ProjectCreate extends TransactionCommand {
-  static description = "Register a new project on the Armada Network.";
+  static summary = "Register a new project on the Armada Network.";
   static examples = ['<%= config.bin %> <%= command.id %> "My Project" notify@myproject.com'];
   static usage = "<%= command.id %> [--owner ADDR] NAME EMAIL [URL] [SHA]";
   static args: Arg[] = [
@@ -20,7 +20,7 @@ export default class ProjectCreate extends TransactionCommand {
   public async run(): Promise<unknown> {
     const { args, flags } = await this.parse(ProjectCreate);
     if (!!args.URL !== !!args.SHA) {
-      this.error("URL and SHA must be specified together");
+      this.error("Can only specify URL and SHA together.");
     }
 
     const signer = await getSigner(flags.network, flags.rpc, flags.address, flags.signer, flags.key);

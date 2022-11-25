@@ -3,13 +3,13 @@ import { TransactionCommand } from "../../base";
 import { getContract, getSigner, normalizeHash, pretty, run } from "../../helpers";
 
 export default class ReservationDelete extends TransactionCommand {
-  static description = `Release content nodes from a project.
-    The reservations will be deleted starting from the next epoch.`;
+  static summary = "Unreserve content nodes from a project.";
+  static description = "The reservations are deleted immediately, effective in the next epoch.";
   static examples = ["<%= config.bin %> <%= command.id %> 0x123abc... 0x456def..."];
   static usage = "<%= command.id %> ID IDS...";
   static args: Arg[] = [
-    { name: "ID", description: "The ID of the project to release the nodes.", required: true },
-    { name: "IDS", description: "The comma separated IDs of the nodes to release.", required: true },
+    { name: "ID", description: "The ID of the project to unreserve the nodes.", required: true },
+    { name: "IDS", description: "The comma separated IDs of the nodes to unreserve.", required: true },
   ];
 
   public async run(): Promise<unknown> {

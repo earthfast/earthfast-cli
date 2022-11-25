@@ -1,5 +1,6 @@
 import { inspect } from "util";
 import type { Provider, TransactionReceipt } from "@ethersproject/abstract-provider";
+import { type TypedDataSigner } from "@ethersproject/abstract-signer";
 import { AddressZero, HashZero } from "@ethersproject/constants";
 import { CliUx } from "@oclif/core";
 import {
@@ -12,6 +13,7 @@ import {
   type Transaction,
   VoidSigner,
   type PopulatedTransaction,
+  type Signature,
 } from "ethers";
 import { formatUnits, FunctionFragment, getAddress, Interface, Result } from "ethers/lib/utils";
 import inquirer from "inquirer";
@@ -52,7 +54,29 @@ export const Permit: Record<string, Array<TypedDataField>> = {
 };
 
 export function pretty(value: unknown): string {
-  return typeof value === "string" ? value : inspect(value);
+  return typeof value === "string" ? value : inspect(value, { depth: 10 });
+}
+
+// Signs a permit to transfer tokens.
+export async function permit(
+  signer: Signer,
+  token: Contract,
+  spender: Contract,
+  amount: BigNumber,
+  deadline: number
+): Promise<Signature> {
+  CliUx.ux.action.start("- Requesting signature");
+  const address = await signer.getAddress();
+  const provider = signer.provider;
+  if (!provider) throw Error("");
+  const chainId = (await provider.getNetwork()).chainId;
+  const nonces = await token.nonces(address);
+  const domain = { name: await token.name(), version: "1", chainId, verifyingContract: token.address };
+  const values = { owner: address, spender: spender.address, value: amount, nonce: nonces, deadline };
+  const signature = await (signer as unknown as TypedDataSigner)._signTypedData(domain, Permit, values);
+  const sig = ethers.utils.splitSignature(signature);
+  CliUx.ux.action.stop("done");
+  return sig;
 }
 
 // Signs and executes the transaction and returns its emitted events, if a signer is provided.
