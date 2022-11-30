@@ -33,7 +33,7 @@ export abstract class TransactionCommand extends BlockchainCommand {
     ...super.globalFlags,
     address: Flags.string({
       helpGroup: "BASE",
-      description: "The account address to use.",
+      description: "The account address to use (keystore only).",
       helpValue: "ADDR",
       exclusive: ["signer", "key"],
     }),

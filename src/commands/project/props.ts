@@ -3,7 +3,7 @@ import { TransactionCommand } from "../../base";
 import { getContract, getSigner, normalizeHash, pretty, run } from "../../helpers";
 
 export default class ProjectProps extends TransactionCommand {
-  static description = "Change detailed properties of a project.";
+  static summary = "Change detailed properties of a project.";
   static examples = ['<%= config.bin %> <%= command.id %> 0x123abc... "My Project" notify@myproject.com'];
   static usage = "<%= command.id %> ID NAME EMAIL";
   static args: Arg[] = [

@@ -5,7 +5,7 @@ import keytar from "keytar";
 import { deleteWallet, listWallets } from "../../keystore";
 
 export default class KeyDelete extends Command {
-  static description = "Deletes a private key from the keystore.";
+  static summary = "Deletes a private key from the keystore.";
   static examples = ["<%= config.bin %> <%= command.id %> 0x123abc..."];
   static usage = "<%= command.id %>";
   static args: Arg[] = [{ name: "ADDR", description: "The address of the key to delete." }];

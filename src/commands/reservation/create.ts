@@ -5,38 +5,27 @@ import { TransactionCommand } from "../../base";
 import { getContract, getSigner, normalizeHash, pretty, run } from "../../helpers";
 
 export default class ReservationCreate extends TransactionCommand {
-  static description = `Reserve content nodes for a project.
-    By default, new reservations begin at the start of the next epoch.`;
-  static examples = ["<%= config.bin %> <%= command.id %> 0x123abc... 0x456def..."];
+  static summary = "Reserve content nodes for a project.";
+  static description =
+    "Spot reservations are effective immediately, but expire at the end of the epoch. " +
+    "Renewal reservations are effective from the next epoch on, and will auto-renew. " +
+    "Specify both spot+renew reservation to reserve immediately and with auto-renewal. " +
+    "Spot reservations can't be unreserved until at least the end of the current epoch.";
+  static examples = ["<%= config.bin %> <%= command.id %> 0x123abc... 0x456def... --spot --renew"];
   static usage = "<%= command.id %> ID IDS... [--spot] [--renew]";
   static args: Arg[] = [
     { name: "ID", description: "The ID of the project to reserve the nodes.", required: true },
     { name: "IDS", description: "The comma separated IDs of the nodes to reserve.", required: true },
   ];
   static flags = {
-    spot: Flags.boolean({ description: "Reserve in the current epoch (can't release!)" }),
-    renew: Flags.boolean({ description: "Reserve from the next epoch with auto-renew." }),
+    spot: Flags.boolean({ description: "Reserve in the current epoch only (can't unreserve until end of the epoch!)" }),
+    renew: Flags.boolean({ description: "Reserve from the next epoch and on (can unreserve before next epoch start)" }),
   };
 
   public async run(): Promise<unknown> {
     const { args, flags } = await this.parse(ReservationCreate);
     if (!flags.spot && !flags.renew) {
-      // TODO: Fetch this from the registry
-      const date = new Date();
-      date.setUTCHours(0, 0, 0, 0);
-      date.setUTCDate(date.getUTCDate() - date.getUTCDay());
-      this.error(`At least one of --spot and/or --renew must be provided:
-
-  --spot reserves immediately, but does NOT turn on auto-renewal;
-  --renew reserves from the NEXT epoch, AND turns on auto-renewal;
-
-  Specify both flags to reserve immediately AND with auto-renewal.
-
-  NOTE: If you specify --spot, you CANNOT cancel until it expires.
-        You are committing Armada tokens until at least epoch end.
-
-  This epoch will end and the next one will begin on:
-        ${date}`);
+      this.error("Must provide at least one of --spot and/or --renew.");
     }
 
     const nodeIds = args.IDS.split(",").map((id: string) => normalizeHash(id));

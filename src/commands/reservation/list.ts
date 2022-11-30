@@ -5,7 +5,7 @@ import { BlockchainCommand } from "../../base";
 import { getAll, getContract, getProvider, normalizeHash, normalizeRecords, pretty } from "../../helpers";
 
 export default class ReservationList extends BlockchainCommand {
-  static description = "List node reservations by a project.";
+  static summary = "List node reservations by a project.";
   static examples = ["<%= config.bin %> <%= command.id %>"];
   static usage = "<%= command.id %> [--skip N] [--size N] [--page N]";
   static args: Arg[] = [{ name: "ID", description: "The ID of the project.", required: true }];

@@ -2,6 +2,294 @@
   "address": "0x0390CEa187B21Fd4188280097e27EDEE455Cbb5D",
   "abi": [
     {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "bytes32",
+          "name": "nodeId",
+          "type": "bytes32"
+        },
+        {
+          "indexed": true,
+          "internalType": "bytes32",
+          "name": "operatorId",
+          "type": "bytes32"
+        },
+        {
+          "indexed": false,
+          "internalType": "string",
+          "name": "host",
+          "type": "string"
+        },
+        {
+          "indexed": false,
+          "internalType": "string",
+          "name": "region",
+          "type": "string"
+        },
+        {
+          "indexed": false,
+          "internalType": "bool",
+          "name": "topology",
+          "type": "bool"
+        },
+        {
+          "indexed": false,
+          "internalType": "bool",
+          "name": "disabled",
+          "type": "bool"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "price",
+          "type": "uint256"
+        }
+      ],
+      "name": "NodeCreated",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "bytes32",
+          "name": "nodeId",
+          "type": "bytes32"
+        },
+        {
+          "indexed": true,
+          "internalType": "bytes32",
+          "name": "operatorId",
+          "type": "bytes32"
+        },
+        {
+          "indexed": false,
+          "internalType": "string",
+          "name": "host",
+          "type": "string"
+        },
+        {
+          "indexed": false,
+          "internalType": "string",
+          "name": "region",
+          "type": "string"
+        },
+        {
+          "indexed": false,
+          "internalType": "bool",
+          "name": "topology",
+          "type": "bool"
+        },
+        {
+          "indexed": false,
+          "internalType": "bool",
+          "name": "disabled",
+          "type": "bool"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "price",
+          "type": "uint256"
+        }
+      ],
+      "name": "NodeDeleted",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "bytes32",
+          "name": "nodeId",
+          "type": "bytes32"
+        },
+        {
+          "indexed": false,
+          "internalType": "bool",
+          "name": "oldDisabled",
+          "type": "bool"
+        },
+        {
+          "indexed": false,
+          "internalType": "bool",
+          "name": "newDisabled",
+          "type": "bool"
+        }
+      ],
+      "name": "NodeDisabledChanged",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "bytes32",
+          "name": "nodeId",
+          "type": "bytes32"
+        },
+        {
+          "indexed": false,
+          "internalType": "string",
+          "name": "oldHost",
+          "type": "string"
+        },
+        {
+          "indexed": false,
+          "internalType": "string",
+          "name": "oldRegion",
+          "type": "string"
+        },
+        {
+          "indexed": false,
+          "internalType": "string",
+          "name": "newHost",
+          "type": "string"
+        },
+        {
+          "indexed": false,
+          "internalType": "string",
+          "name": "newRegion",
+          "type": "string"
+        }
+      ],
+      "name": "NodeHostChanged",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "bytes32",
+          "name": "nodeId",
+          "type": "bytes32"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "oldLastPrice",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "oldNextPrice",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "newPrice",
+          "type": "uint256"
+        },
+        {
+          "components": [
+            {
+              "internalType": "bool",
+              "name": "last",
+              "type": "bool"
+            },
+            {
+              "internalType": "bool",
+              "name": "next",
+              "type": "bool"
+            }
+          ],
+          "indexed": false,
+          "internalType": "struct ArmadaSlot",
+          "name": "slot",
+          "type": "tuple"
+        }
+      ],
+      "name": "NodePriceChanged",
+      "type": "event"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "operatorId",
+          "type": "bytes32"
+        },
+        {
+          "internalType": "bool",
+          "name": "topology",
+          "type": "bool"
+        },
+        {
+          "components": [
+            {
+              "internalType": "string",
+              "name": "host",
+              "type": "string"
+            },
+            {
+              "internalType": "string",
+              "name": "region",
+              "type": "string"
+            },
+            {
+              "internalType": "bool",
+              "name": "topology",
+              "type": "bool"
+            },
+            {
+              "internalType": "bool",
+              "name": "disabled",
+              "type": "bool"
+            },
+            {
+              "internalType": "uint256",
+              "name": "price",
+              "type": "uint256"
+            }
+          ],
+          "internalType": "struct ArmadaCreateNodeData[]",
+          "name": "nodes",
+          "type": "tuple[]"
+        }
+      ],
+      "name": "createNodes",
+      "outputs": [
+        {
+          "internalType": "bytes32[]",
+          "name": "nodeIds",
+          "type": "bytes32[]"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "operatorId",
+          "type": "bytes32"
+        },
+        {
+          "internalType": "bool",
+          "name": "topology",
+          "type": "bool"
+        },
+        {
+          "internalType": "bytes32[]",
+          "name": "nodeIds",
+          "type": "bytes32[]"
+        }
+      ],
+      "name": "deleteNodes",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
       "inputs": [
         {
           "internalType": "bytes32",
@@ -136,6 +424,97 @@
         }
       ],
       "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "operatorId",
+          "type": "bytes32"
+        },
+        {
+          "internalType": "bytes32[]",
+          "name": "nodeIds",
+          "type": "bytes32[]"
+        },
+        {
+          "internalType": "bool[]",
+          "name": "disabled",
+          "type": "bool[]"
+        }
+      ],
+      "name": "setNodeDisabled",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "operatorId",
+          "type": "bytes32"
+        },
+        {
+          "internalType": "bytes32[]",
+          "name": "nodeIds",
+          "type": "bytes32[]"
+        },
+        {
+          "internalType": "string[]",
+          "name": "hosts",
+          "type": "string[]"
+        },
+        {
+          "internalType": "string[]",
+          "name": "regions",
+          "type": "string[]"
+        }
+      ],
+      "name": "setNodeHosts",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "operatorId",
+          "type": "bytes32"
+        },
+        {
+          "internalType": "bytes32[]",
+          "name": "nodeIds",
+          "type": "bytes32[]"
+        },
+        {
+          "internalType": "uint256[]",
+          "name": "prices",
+          "type": "uint256[]"
+        },
+        {
+          "components": [
+            {
+              "internalType": "bool",
+              "name": "last",
+              "type": "bool"
+            },
+            {
+              "internalType": "bool",
+              "name": "next",
+              "type": "bool"
+            }
+          ],
+          "internalType": "struct ArmadaSlot",
+          "name": "slot",
+          "type": "tuple"
+        }
+      ],
+      "name": "setNodePrices",
+      "outputs": [],
+      "stateMutability": "nonpayable",
       "type": "function"
     }
   ]

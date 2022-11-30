@@ -3,7 +3,7 @@ import inquirer from "inquirer";
 import { loadWallet, saveWallet } from "../../keystore";
 
 export default class KeyImport extends Command {
-  static description = "Saves a private key for signing transactions.\nThe keys are stored in an encrypted keystore.";
+  static summary = "Saves a private key for signing transactions.\nThe keys are stored in an encrypted keystore.";
   static examples = ["<%= config.bin %> <%= command.id %>"];
   static usage = "<%= command.id %>";
   static enableJsonFlag = true;
