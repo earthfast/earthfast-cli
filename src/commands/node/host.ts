@@ -4,7 +4,9 @@ import { getContract, getProvider, getSigner, normalizeHash, pretty, run } from 
 
 export default class NodeHost extends TransactionCommand {
   static summary = "Change hosts and regions of content nodes.";
-  static description = "Values can be ommitted to keep the old values.";
+  static description =
+    "Values can only be changed for currently unreserved nodes. " +
+    "Values can be partially omitted to keep the old values.";
   static examples = [
     "<%= config.bin %> <%= command.id %> 0x123...:host1.com:na,0x234...:host2.com:eu",
     "<%= config.bin %> <%= command.id %> 0x123...:host1.com,0x234...:host2.com",
@@ -15,7 +17,7 @@ export default class NodeHost extends TransactionCommand {
   static aliases = ["node:host", "node:hosts"];
   static args: Arg[] = [
     { name: "ID:HOST:REGION", description: "The comma separated values for the nodes.", required: true },
-    { name: "DEFAULT_REGION", description: "The default region, if ommitted in the values.", required: false },
+    { name: "DEFAULT_REGION", description: "The default region, if omitted in the values.", required: false },
   ];
 
   public async run(): Promise<unknown> {

@@ -19,7 +19,7 @@ export default class NodePrice extends TransactionCommand {
   static aliases = ["node:price", "node:prices"];
   static args: Arg[] = [
     { name: "ID:PRICE", description: "The comma separated price values for the nodes.", required: true },
-    { name: "DEFAULT_PRICE", description: "The default price, if ommitted in the values.", required: false },
+    { name: "DEFAULT_PRICE", description: "The default price, if omitted in the values.", required: false },
   ];
   static flags = {
     spot: Flags.boolean({ description: "Change price in the current epoch only (nodes must not be reserved)." }),

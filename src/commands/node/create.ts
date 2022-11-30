@@ -6,8 +6,8 @@ import { getContract, getSigner, normalizeHash, pretty, run } from "../../helper
 export default class NodeCreate extends TransactionCommand {
   static summary = `Register content nodes on the Armada Network.`;
   static examples = [
-    "<%= config.bin %> <%= command.id %> host1.com:na,host2.com:eu",
-    "<%= config.bin %> <%= command.id %> host1.com,host2.com na:true:1.5",
+    "<%= config.bin %> <%= command.id %> 0x123abc... host1.com:na,host2.com:eu",
+    "<%= config.bin %> <%= command.id %> 0x123abc... host1.com,host2.com na:true:1.5",
   ];
   static usage = "<%= command.id %> ID VALUES [DEFAULTS]";
   static args: Arg[] = [
@@ -19,7 +19,7 @@ export default class NodeCreate extends TransactionCommand {
     },
     {
       name: "DEFAULTS",
-      description: "The defaults, if ommitted in the values: REGION?:ENABLED?:PRICE?",
+      description: "The defaults, if omitted in the values: REGION?:ENABLED?:PRICE?",
       required: false,
     },
   ];

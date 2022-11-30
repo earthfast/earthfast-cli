@@ -3,7 +3,7 @@ import { TransactionCommand } from "../../base";
 import { getContract, getSigner, normalizeHash, pretty, run } from "../../helpers";
 
 export default class OperatorOwner extends TransactionCommand {
-  static summary = "Transfer ownership of am operator.";
+  static summary = "Transfer ownership of an operator.";
   static examples = ["<%= config.bin %> <%= command.id %> 0x123abc... 0x456def..."];
   static usage = "<%= command.id %> ID ADDR";
   static aliases = ["operator:owner", "operator:transfer"];
