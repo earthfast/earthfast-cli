@@ -44,6 +44,16 @@ export abstract class TransactionCommand extends BlockchainCommand {
       default: "keystore",
       exclusive: ["address", "key"],
     }),
+    account: Flags.string({
+      helpGroup: "BASE",
+      description: "Account derivation number if using Ledger, starts at 0.",
+      helpValue: "ACCOUNT",
+      exclusive: ["address", "key"],
+      default: "0",
+      relationships: [
+        { type: "all", flags: [{ name: "signer", when: async (flags) => flags["signer"] === "ledger" }] },
+      ],
+    }),
     key: Flags.string({
       helpGroup: "BASE",
       description: "The private key for transactions (danger).",

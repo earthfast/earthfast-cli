@@ -15,7 +15,7 @@ export default class ReservationDelete extends TransactionCommand {
   public async run(): Promise<unknown> {
     const { args, flags } = await this.parse(ReservationDelete);
     const nodeIds = args.IDS.split(",").map((id: string) => normalizeHash(id));
-    const signer = await getSigner(flags.network, flags.rpc, flags.address, flags.signer, flags.key);
+    const signer = await getSigner(flags.network, flags.rpc, flags.address, flags.signer, flags.key, flags.account);
     const reservations = await getContract(flags.network, flags.abi, "ArmadaReservations", signer);
     const projectId = normalizeHash(args.ID);
     const slot = { last: false, next: true };
