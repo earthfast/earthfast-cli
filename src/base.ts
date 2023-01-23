@@ -47,7 +47,7 @@ export abstract class TransactionCommand extends BlockchainCommand {
     account: Flags.string({
       helpGroup: "BASE",
       description: "Account derivation number if using Ledger, starts at 0.",
-      helpValue: "ACCOUNT",
+      helpValue: "N",
       exclusive: ["address", "key"],
       default: "0",
       relationships: [
