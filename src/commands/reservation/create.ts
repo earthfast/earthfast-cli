@@ -1,8 +1,7 @@
 import { Flags } from "@oclif/core";
 import { Arg } from "@oclif/core/lib/interfaces";
-import { parseUnits } from "ethers/lib/utils";
 import { TransactionCommand } from "../../base";
-import { getContract, getSigner, normalizeHash, pretty, run } from "../../helpers";
+import { getContract, getSigner, parseHash, parseUSDC, pretty, run } from "../../helpers";
 
 export default class ReservationCreate extends TransactionCommand {
   static summary = "Reserve content nodes for a project.";
@@ -28,11 +27,11 @@ export default class ReservationCreate extends TransactionCommand {
       this.error("Must provide at least one of --spot and/or --renew.");
     }
 
-    const nodeIds = args.IDS.split(",").map((id: string) => normalizeHash(id));
+    const nodeIds = args.IDS.split(",").map((id: string) => parseHash(id));
     const signer = await getSigner(flags.network, flags.rpc, flags.address, flags.signer, flags.key);
     const reservations = await getContract(flags.network, flags.abi, "ArmadaReservations", signer);
-    const projectId = normalizeHash(args.ID);
-    const prices = nodeIds.map(() => parseUnits("1", 18));
+    const projectId = parseHash(args.ID);
+    const prices = nodeIds.map(() => parseUSDC("1"));
     const slot = { last: !!flags.spot, next: !!flags.renew };
     const tx = await reservations.populateTransaction.createReservations(projectId, nodeIds, prices, slot);
     const output = await run(tx, signer, [reservations]);

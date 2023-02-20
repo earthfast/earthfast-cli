@@ -9,13 +9,23 @@ import "../abi/staging/ArmadaNodes.json";
 import "../abi/staging/ArmadaOperators.json";
 import "../abi/staging/ArmadaProjects.json";
 import "../abi/staging/ArmadaReservations.json";
+import "../abi/staging/USDC.json";
+
+// These imports are necessary to pull these files into dist/
 import "../abi/testnet/ArmadaToken.json";
 import "../abi/testnet/ArmadaNodes.json";
 import "../abi/testnet/ArmadaOperators.json";
 import "../abi/testnet/ArmadaProjects.json";
 import "../abi/testnet/ArmadaReservations.json";
+import "../abi/testnet/USDC.json";
 
-export type ContractName = "ArmadaToken" | "ArmadaNodes" | "ArmadaOperators" | "ArmadaProjects" | "ArmadaReservations";
+export type ContractName =
+  | "ArmadaToken"
+  | "ArmadaNodes"
+  | "ArmadaOperators"
+  | "ArmadaProjects"
+  | "ArmadaReservations"
+  | "USDC";
 
 export interface ContractInfo {
   address: string;

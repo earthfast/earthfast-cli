@@ -2,7 +2,7 @@ import { Flags } from "@oclif/core";
 import { Arg } from "@oclif/core/lib/interfaces";
 import { Result } from "ethers/lib/utils";
 import { BlockchainCommand } from "../../base";
-import { getAll, getContract, getProvider, normalizeHash, normalizeRecords, pretty } from "../../helpers";
+import { formatNode, getAll, getContract, getProvider, parseHash, pretty } from "../../helpers";
 
 export default class ReservationList extends BlockchainCommand {
   static summary = "List node reservations by a project.";
@@ -19,13 +19,14 @@ export default class ReservationList extends BlockchainCommand {
     const { args, flags } = await this.parse(ReservationList);
     const provider = await getProvider(flags.network, flags.rpc);
     const reservations = await getContract(flags.network, flags.abi, "ArmadaReservations", provider);
-    const projectId = normalizeHash(args.ID);
+    const projectId = parseHash(args.ID);
     const blockTag = await provider.getBlockNumber();
     const results: Result[] = await getAll(flags.page, async (i, n) => {
       return await reservations.getReservations(projectId, i, n, { blockTag });
     });
 
-    const output = normalizeRecords(results.slice(flags.skip, flags.skip + flags.size));
+    const records = results.slice(flags.skip, flags.skip + flags.size);
+    const output = records.map((r) => formatNode(r));
     this.log(pretty(output));
     return output;
   }

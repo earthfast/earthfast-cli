@@ -1,7 +1,7 @@
 import { Flags } from "@oclif/core";
 import { Result } from "ethers/lib/utils";
 import { BlockchainCommand } from "../../base";
-import { getAll, getContract, getProvider, normalizeAddress, normalizeRecords, pretty } from "../../helpers";
+import { formatProject, getAll, getContract, getProvider, parseAddress, pretty } from "../../helpers";
 
 export default class ProjectList extends BlockchainCommand {
   static summary = "List projects on the Armada Network.";
@@ -18,7 +18,7 @@ export default class ProjectList extends BlockchainCommand {
     const { flags } = await this.parse(ProjectList);
     const provider = await getProvider(flags.network, flags.rpc);
     const projects = await getContract(flags.network, flags.abi, "ArmadaProjects", provider);
-    const owner = normalizeAddress(flags.owner);
+    const owner = parseAddress(flags.owner);
     const blockTag = await provider.getBlockNumber();
     let results: Result[] = await getAll(flags.page, async (i, n) => {
       return await projects.getProjects(i, n, { blockTag });
@@ -27,7 +27,8 @@ export default class ProjectList extends BlockchainCommand {
       results = results.filter((v) => v.owner.toLowerCase() === owner.toLowerCase());
     }
 
-    const output = normalizeRecords(results.slice(flags.skip, flags.skip + flags.size));
+    const records = results.slice(flags.skip, flags.skip + flags.size);
+    const output = records.map((r) => formatProject(r));
     this.log(pretty(output));
     return output;
   }

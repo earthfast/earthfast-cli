@@ -1,6 +1,6 @@
 import { Arg } from "@oclif/core/lib/interfaces";
 import { TransactionCommand } from "../../base";
-import { getContract, getProvider, getSigner, normalizeHash, pretty, run } from "../../helpers";
+import { getContract, getProvider, getSigner, parseHash, pretty, run } from "../../helpers";
 
 export default class NodeHost extends TransactionCommand {
   static summary = "Change hosts and regions of content nodes.";
@@ -45,7 +45,7 @@ export default class NodeHost extends TransactionCommand {
         const node = fetchOldValues ? await nodesView.getNode(nodeId) : undefined;
 
         return {
-          nodeId: normalizeHash(nodeId),
+          nodeId: parseHash(nodeId),
           host: host || node.host,
           region: region || defaultRegion || node.region,
         };

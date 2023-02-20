@@ -1,7 +1,7 @@
 import { Flags } from "@oclif/core";
 import { Arg } from "@oclif/core/lib/interfaces";
 import { TransactionCommand } from "../../base";
-import { getContract, getSigner, normalizeAddress, normalizeHash, pretty, run } from "../../helpers";
+import { getContract, getSigner, parseAddress, parseHash, pretty, run } from "../../helpers";
 
 export default class ProjectCreate extends TransactionCommand {
   static summary = "Register a new project on the Armada Network.";
@@ -25,8 +25,8 @@ export default class ProjectCreate extends TransactionCommand {
 
     const signer = await getSigner(flags.network, flags.rpc, flags.address, flags.signer, flags.key);
     const projects = await getContract(flags.network, flags.abi, "ArmadaProjects", signer);
-    const owner = flags.owner ? normalizeAddress(flags.owner) : await signer.getAddress();
-    const bundleSha = normalizeHash(args.SHA);
+    const owner = flags.owner ? parseAddress(flags.owner) : await signer.getAddress();
+    const bundleSha = parseHash(args.SHA);
     const tx = await projects.populateTransaction.createProject([owner, args.NAME, args.EMAIL, args.URL, bundleSha]);
     const output = await run(tx, signer, [projects]);
     this.log(pretty(output));

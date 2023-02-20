@@ -14,8 +14,9 @@ import {
   VoidSigner,
   type PopulatedTransaction,
   type Signature,
+  type BigNumberish,
 } from "ethers";
-import { formatUnits, FunctionFragment, getAddress, Interface, Result } from "ethers/lib/utils";
+import { formatUnits, FunctionFragment, getAddress, Interface, parseUnits, Result } from "ethers/lib/utils";
 import inquirer from "inquirer";
 import keytar from "keytar";
 import { ContractName, loadAbi } from "./contracts";
@@ -57,6 +58,11 @@ export function pretty(value: unknown): string {
   return typeof value === "string" ? value : inspect(value, { depth: 10 });
 }
 
+export const parseUSDC = (value: string): BigNumber => parseUnits(value, 6);
+export const parseTokens = (value: string): BigNumber => parseUnits(value, 18);
+export const formatUSDC = (value: BigNumberish): string => `${formatUnits(value, 6)} USDC`;
+export const formatTokens = (value: BigNumberish): string => `${formatUnits(value, 18)} ARMADA`;
+
 // Signs a permit to transfer tokens.
 export async function permit(
   signer: Signer,
@@ -71,7 +77,8 @@ export async function permit(
   if (!provider) throw Error("");
   const chainId = (await provider.getNetwork()).chainId;
   const nonces = await token.nonces(address);
-  const domain = { name: await token.name(), version: "1", chainId, verifyingContract: token.address };
+  const version = token.version !== undefined ? await token.version() : "1";
+  const domain = { name: await token.name(), version, chainId, verifyingContract: token.address };
   const values = { owner: address, spender: spender.address, value: amount, nonce: nonces, deadline };
   const signature = await (signer as unknown as TypedDataSigner)._signTypedData(domain, Permit, values);
   const sig = ethers.utils.splitSignature(signature);
@@ -125,32 +132,44 @@ export function getTxUrl(tx: Transaction): string {
   return `https://${prefix}etherscan.io/tx/${tx.hash}`;
 }
 
+export function formatNode(r: Record<string, unknown> | Result): Record<string, unknown> {
+  return formatRecord({ ...r, prices: r.prices.map((p: BigNumber) => formatUSDC(p)) });
+}
+
+export function formatOperator(r: Record<string, unknown> | Result): Record<string, unknown> {
+  return formatRecord({ ...r, stake: formatTokens(r.stake), balance: formatUSDC(r.balance) });
+}
+
+export function formatProject(r: Record<string, unknown> | Result): Record<string, unknown> {
+  return formatRecord({ ...r, escrow: formatUSDC(r.escrow), reserve: formatUSDC(r.reserve) });
+}
+
+export function formatBigNumber(n: BigNumber): string {
+  return `BigNumber ${n.toString()} / ${formatUnits(n, 6)} / ${formatUnits(n, 18)}`;
+}
+
 // Converts union objects returned by ethers to plain objects.
-export function normalizeRecord(r: Record<string, unknown> | Result): Record<string, unknown> {
+export function formatRecord(r: Record<string, unknown> | Result): Record<string, unknown> {
   return Object.fromEntries(
     Object.keys(r)
       .filter((k) => isNaN(Number(k)))
       .map((k) => {
-        return [k, normalizeRecordValue(r[k])];
+        return [k, formatRecordValue(r[k])];
       })
   );
 }
 
-export function normalizeRecords(rs: (Record<string, unknown> | Result)[]): Record<string, unknown>[] {
-  return rs.map((r) => normalizeRecord(r));
-}
-
-function normalizeRecordValue(val: unknown): unknown {
+function formatRecordValue(val: unknown): unknown {
   if (Array.isArray(val)) {
-    return val.map(normalizeRecordValue);
+    return val.map(formatRecordValue);
   }
   if (val instanceof BigNumber) {
-    return normalizeBigNumber(val);
+    return formatBigNumber(val);
   }
   return val;
 }
 
-export function normalizeHash(s: string | undefined): string {
+export function parseHash(s: string | undefined): string {
   if (!s?.length) {
     return HashZero;
   }
@@ -160,17 +179,9 @@ export function normalizeHash(s: string | undefined): string {
   return s.startsWith("0x") ? s : "0x" + s;
 }
 
-export function normalizeAddress(s: string | undefined): string {
+export function parseAddress(s: string | undefined): string {
   // getAddress throws on invalid input which is what we want here
   return !s?.length ? AddressZero : getAddress(s);
-}
-
-function normalizeBigNumber(n: BigNumber): string {
-  try {
-    return n.toNumber().toString();
-  } catch {
-    return formatUnits(n, 18);
-  }
 }
 
 export async function getProvider(network: NetworkName, rpcUrl: string | undefined): Promise<Provider> {
@@ -194,7 +205,7 @@ export async function getSigner(
     wallet = new VoidSigner(AddressZero);
   } else if (signer === "ledger") {
     // Use stderr to not interfere with --json flag
-    console.warn("> Make sure the Ledger wallet is unlocked and the Ethereum application is open");
+    console.warn("> Make sure that Ledger is unlocked and the Ethereum app is open");
     wallet = new LedgerSigner(provider);
     const address = await wallet.getAddress();
     // Use stderr to not interfere with --json flag
@@ -276,7 +287,7 @@ export async function decodeEvents(receipt: TransactionReceipt, contracts: Contr
         } catch {
           continue;
         }
-        results.push({ event: frag.name, args: normalizeRecord(args) });
+        results.push({ event: frag.name, args: formatRecord(args) });
       }
     }
   }

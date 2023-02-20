@@ -1,6 +1,6 @@
 import { Arg } from "@oclif/core/lib/interfaces";
 import { TransactionCommand } from "../../base";
-import { getContract, getSigner, normalizeHash, pretty, run } from "../../helpers";
+import { getContract, getSigner, parseHash, pretty, run } from "../../helpers";
 
 export default class ProjectContent extends TransactionCommand {
   static summary = "Publish the provided bundle on the network.";
@@ -24,8 +24,8 @@ export default class ProjectContent extends TransactionCommand {
 
     const signer = await getSigner(flags.network, flags.rpc, flags.address, flags.signer, flags.key);
     const projects = await getContract(flags.network, flags.abi, "ArmadaProjects", signer);
-    const projectId = normalizeHash(args.ID);
-    const bundleSha = normalizeHash(args.SHA);
+    const projectId = parseHash(args.ID);
+    const bundleSha = parseHash(args.SHA);
     const tx = await projects.populateTransaction.setProjectContent(projectId, args.URL, bundleSha);
     const output = await run(tx, signer, [projects]);
     this.log(pretty(output));

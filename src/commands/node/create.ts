@@ -1,10 +1,10 @@
 import { Arg } from "@oclif/core/lib/interfaces";
-import { parseUnits } from "ethers/lib/utils";
 import { TransactionCommand } from "../../base";
-import { getContract, getSigner, normalizeHash, pretty, run } from "../../helpers";
+import { getContract, getSigner, parseHash, parseUSDC, pretty, run } from "../../helpers";
 
 export default class NodeCreate extends TransactionCommand {
   static summary = `Register content nodes on the Armada Network.`;
+  static description = "Node prices (PRICE) are expressed in USDC.";
   static examples = [
     "<%= config.bin %> <%= command.id %> 0x123abc... host1.com:na,host2.com:eu",
     "<%= config.bin %> <%= command.id %> 0x123abc... host1.com,host2.com na:true:1.5",
@@ -26,7 +26,7 @@ export default class NodeCreate extends TransactionCommand {
 
   public async run(): Promise<unknown> {
     const { args, flags } = await this.parse(NodeCreate);
-    const operatorId = normalizeHash(args.ID);
+    const operatorId = parseHash(args.ID);
     const values: string[] = args.VALUES.split(",");
     const defaults: string[] = (args.DEFAULTS ?? "").split(":");
     if (defaults.length > 3) {
@@ -60,7 +60,7 @@ export default class NodeCreate extends TransactionCommand {
           region: region || defaultRegion,
           topology: false,
           disabled: enabled === "false" || (!enabled && defaultEnabled !== "true"),
-          price: parseUnits(price || defaultPrice || "0", 18),
+          price: parseUSDC(price || defaultPrice || "0"),
         };
       })
     );
