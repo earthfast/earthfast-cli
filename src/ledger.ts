@@ -47,8 +47,6 @@ export const transports: { [name: string]: TransportCreator } = Object.freeze({
   default: hidWrapper,
 });
 
-const defaultPath = "m/44'/60'/0'/0/0";
-
 function waiter(duration: number): Promise<void> {
   return new Promise((resolve) => {
     setTimeout(resolve, duration);
@@ -57,18 +55,19 @@ function waiter(duration: number): Promise<void> {
 
 export class LedgerSigner extends ethers.Signer {
   readonly type: string;
-  readonly path: string;
+  readonly account: string;
 
   readonly _eth: Promise<Eth>;
 
-  constructor(provider?: ethers.providers.Provider, type?: string, path?: string) {
+  constructor(provider?: ethers.providers.Provider, type?: string, account?: string) {
     super();
-    if (path == null) {
-      path = defaultPath;
+    if (account == null) {
+      account = "0";
     }
     if (type == null) {
       type = "default";
     }
+    const path = `m/44'/60'/${account}'/0/0`;
 
     ethers.utils.defineReadOnly(this, "path", path);
     ethers.utils.defineReadOnly(this, "type", type);

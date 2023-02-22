@@ -16,7 +16,7 @@ export default class NodeDelete extends TransactionCommand {
   public async run(): Promise<unknown> {
     const { args, flags } = await this.parse(NodeDelete);
     const nodeIds = args.IDS.split(",").map((id: string) => normalizeHash(id));
-    const signer = await getSigner(flags.network, flags.rpc, flags.address, flags.signer, flags.key);
+    const signer = await getSigner(flags.network, flags.rpc, flags.address, flags.signer, flags.key, flags.account);
     const nodes = await getContract(flags.network, flags.abi, "ArmadaNodes", signer);
     const operatorId = (await nodes.getNode(nodeIds[0])).operatorId;
     const tx = await nodes.populateTransaction.deleteNodes(operatorId, false, nodeIds);

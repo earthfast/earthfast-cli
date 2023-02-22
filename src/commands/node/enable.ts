@@ -20,7 +20,7 @@ export default class NodeEnable extends TransactionCommand {
       this.error("Must provide a true or false.");
     }
 
-    const signer = await getSigner(flags.network, flags.rpc, flags.address, flags.signer, flags.key);
+    const signer = await getSigner(flags.network, flags.rpc, flags.address, flags.signer, flags.key, flags.account);
     const nodes = await getContract(flags.network, flags.abi, "ArmadaNodes", signer);
     const nodeIds = args.IDS.split(",").map((id: string) => normalizeHash(id));
     const disables = nodeIds.map(() => args.BOOL !== "true");

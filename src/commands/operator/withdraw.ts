@@ -17,7 +17,7 @@ export default class OperatorWithdraw extends TransactionCommand {
 
   public async run(): Promise<unknown> {
     const { args, flags } = await this.parse(OperatorWithdraw);
-    const signer = await getSigner(flags.network, flags.rpc, flags.address, flags.signer, flags.key);
+    const signer = await getSigner(flags.network, flags.rpc, flags.address, flags.signer, flags.key, flags.account);
     const token = await getContract(flags.network, flags.abi, "ArmadaToken", signer);
     const operators = await getContract(flags.network, flags.abi, "ArmadaOperators", signer);
     const address = await signer.getAddress();
