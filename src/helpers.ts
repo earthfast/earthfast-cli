@@ -195,7 +195,8 @@ export async function getSigner(
   rpcUrl: string | undefined,
   address: string | undefined,
   signer: SignerType,
-  privateKey: string | undefined
+  privateKey: string | undefined,
+  account: string | undefined
 ): Promise<Signer> {
   const url = rpcUrl ?? Networks[network].url;
   const provider = new ethers.providers.JsonRpcProvider(url);
@@ -206,7 +207,7 @@ export async function getSigner(
   } else if (signer === "ledger") {
     // Use stderr to not interfere with --json flag
     console.warn("> Make sure that Ledger is unlocked and the Ethereum app is open");
-    wallet = new LedgerSigner(provider);
+    wallet = new LedgerSigner(provider, "default", account ?? "0");
     const address = await wallet.getAddress();
     // Use stderr to not interfere with --json flag
     console.warn(`> Using Ledger wallet ${address}`);

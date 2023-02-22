@@ -14,7 +14,7 @@ export default class OperatorProps extends TransactionCommand {
 
   public async run(): Promise<unknown> {
     const { args, flags } = await this.parse(OperatorProps);
-    const signer = await getSigner(flags.network, flags.rpc, flags.address, flags.signer, flags.key);
+    const signer = await getSigner(flags.network, flags.rpc, flags.address, flags.signer, flags.key, flags.account);
     const operators = await getContract(flags.network, flags.abi, "ArmadaOperators", signer);
     const operatorId = parseHash(args.ID);
     const tx = await operators.populateTransaction.setOperatorProps(operatorId, args.NAME, args.EMAIL);

@@ -14,7 +14,7 @@ export default class ProjectOwner extends TransactionCommand {
 
   public async run(): Promise<unknown> {
     const { args, flags } = await this.parse(ProjectOwner);
-    const signer = await getSigner(flags.network, flags.rpc, flags.address, flags.signer, flags.key);
+    const signer = await getSigner(flags.network, flags.rpc, flags.address, flags.signer, flags.key, flags.account);
     const projects = await getContract(flags.network, flags.abi, "ArmadaProjects", signer);
     const projectId = parseHash(args.ID);
     const tx = await projects.populateTransaction.setProjectOwner(projectId, args.ADDR);

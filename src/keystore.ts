@@ -17,7 +17,7 @@ export async function saveWallet(privateKey: string, password: string, descripti
   const json = { ...JSON.parse(text), description };
   const filename = `${address}.json`;
   if (!fs.existsSync(keyStoreFolderPath)) {
-    fs.mkdirSync(keyStoreFolderPath);
+    fs.mkdirSync(keyStoreFolderPath, { recursive: true });
   }
 
   fs.writeFileSync(path.join(keyStoreFolderPath, filename), JSON.stringify(json, null, "  "));

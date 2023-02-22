@@ -23,7 +23,7 @@ export default class OperatorDeposit extends TransactionCommand {
 
   public async run(): Promise<unknown> {
     const { args, flags } = await this.parse(OperatorDeposit);
-    const signer = await getSigner(flags.network, flags.rpc, flags.address, flags.signer, flags.key);
+    const signer = await getSigner(flags.network, flags.rpc, flags.address, flags.signer, flags.key, flags.account);
     const usdc = await getContract(flags.network, flags.abi, "USDC", signer);
     const operators = await getContract(flags.network, flags.abi, "ArmadaOperators", signer);
     const address = await signer.getAddress();

@@ -28,7 +28,7 @@ export default class ReservationCreate extends TransactionCommand {
     }
 
     const nodeIds = args.IDS.split(",").map((id: string) => parseHash(id));
-    const signer = await getSigner(flags.network, flags.rpc, flags.address, flags.signer, flags.key);
+    const signer = await getSigner(flags.network, flags.rpc, flags.address, flags.signer, flags.key, flags.account);
     const reservations = await getContract(flags.network, flags.abi, "ArmadaReservations", signer);
     const projectId = parseHash(args.ID);
     const prices = nodeIds.map(() => parseUSDC("1"));

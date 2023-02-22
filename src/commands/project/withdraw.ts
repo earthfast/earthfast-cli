@@ -16,7 +16,7 @@ export default class ProjectWithdraw extends TransactionCommand {
 
   public async run(): Promise<unknown> {
     const { args, flags } = await this.parse(ProjectWithdraw);
-    const signer = await getSigner(flags.network, flags.rpc, flags.address, flags.signer, flags.key);
+    const signer = await getSigner(flags.network, flags.rpc, flags.address, flags.signer, flags.key, flags.account);
     const usdc = await getContract(flags.network, flags.abi, "USDC", signer);
     const projects = await getContract(flags.network, flags.abi, "ArmadaProjects", signer);
     const address = await signer.getAddress();
