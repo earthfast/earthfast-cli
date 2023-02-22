@@ -4,13 +4,13 @@ import path from "path";
 import { encryptKeystore } from "@ethersproject/json-wallets";
 import { Wallet } from "ethers";
 import keytar from "keytar";
-import { normalizeHash } from "./helpers";
+import { parseHash } from "./helpers";
 
 const homedir = os.homedir();
 const keyStoreFolderPath = path.join(homedir, ".armada/keystore");
 
 export async function saveWallet(privateKey: string, password: string, description: string): Promise<string> {
-  privateKey = normalizeHash(privateKey);
+  privateKey = parseHash(privateKey);
   const wallet = new Wallet(privateKey);
   const address = wallet.address;
   const text = await encryptKeystore({ address, privateKey }, password);

@@ -1,6 +1,6 @@
 import { Arg } from "@oclif/core/lib/interfaces";
 import { TransactionCommand } from "../../base";
-import { getContract, getSigner, normalizeHash, pretty, run } from "../../helpers";
+import { getContract, getSigner, parseHash, pretty, run } from "../../helpers";
 
 export default class ReservationDelete extends TransactionCommand {
   static summary = "Unreserve content nodes from a project.";
@@ -14,10 +14,10 @@ export default class ReservationDelete extends TransactionCommand {
 
   public async run(): Promise<unknown> {
     const { args, flags } = await this.parse(ReservationDelete);
-    const nodeIds = args.IDS.split(",").map((id: string) => normalizeHash(id));
+    const nodeIds = args.IDS.split(",").map((id: string) => parseHash(id));
     const signer = await getSigner(flags.network, flags.rpc, flags.address, flags.signer, flags.key, flags.account);
     const reservations = await getContract(flags.network, flags.abi, "ArmadaReservations", signer);
-    const projectId = normalizeHash(args.ID);
+    const projectId = parseHash(args.ID);
     const slot = { last: false, next: true };
     const tx = await reservations.populateTransaction.deleteReservations(projectId, nodeIds, slot);
     const output = await run(tx, signer, [reservations]);

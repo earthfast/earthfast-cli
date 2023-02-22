@@ -2,7 +2,7 @@ import { HashZero } from "@ethersproject/constants";
 import { Flags } from "@oclif/core";
 import { Result } from "ethers/lib/utils";
 import { BlockchainCommand } from "../../base";
-import { getAll, getContract, getProvider, normalizeHash, normalizeRecords, pretty } from "../../helpers";
+import { formatNode, getAll, getContract, getProvider, parseHash, pretty } from "../../helpers";
 
 export default class NodeList extends BlockchainCommand {
   static summary = "List content nodes on the Armada Network.";
@@ -23,7 +23,7 @@ export default class NodeList extends BlockchainCommand {
     const { flags } = await this.parse(NodeList);
     const provider = await getProvider(flags.network, flags.rpc);
     const nodes = await getContract(flags.network, flags.abi, "ArmadaNodes", provider);
-    const operatorId = normalizeHash(flags.operator);
+    const operatorId = parseHash(flags.operator);
     const blockTag = await provider.getBlockNumber();
     let results: Result[] = await getAll(flags.page, async (i, n) => {
       return await nodes.getNodes(operatorId, flags.topology, i, n, { blockTag });
@@ -44,7 +44,7 @@ export default class NodeList extends BlockchainCommand {
     });
 
     const records = results.slice(flags.skip, flags.skip + flags.size);
-    const output = normalizeRecords(records);
+    const output = records.map((r) => formatNode(r));
     this.log(pretty(output));
     return output;
   }

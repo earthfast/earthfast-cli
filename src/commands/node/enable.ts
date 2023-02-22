@@ -1,6 +1,6 @@
 import { Arg } from "@oclif/core/lib/interfaces";
 import { TransactionCommand } from "../../base";
-import { getContract, getSigner, normalizeHash, pretty, run } from "../../helpers";
+import { getContract, getSigner, parseHash, pretty, run } from "../../helpers";
 
 export default class NodeEnable extends TransactionCommand {
   static summary = "Change enabled state of content nodes.";
@@ -22,7 +22,7 @@ export default class NodeEnable extends TransactionCommand {
 
     const signer = await getSigner(flags.network, flags.rpc, flags.address, flags.signer, flags.key, flags.account);
     const nodes = await getContract(flags.network, flags.abi, "ArmadaNodes", signer);
-    const nodeIds = args.IDS.split(",").map((id: string) => normalizeHash(id));
+    const nodeIds = args.IDS.split(",").map((id: string) => parseHash(id));
     const disables = nodeIds.map(() => args.BOOL !== "true");
     const operatorId = (await nodes.getNode(nodeIds[0])).operatorId;
     const tx = await nodes.populateTransaction.setNodeDisabled(operatorId, nodeIds, disables);

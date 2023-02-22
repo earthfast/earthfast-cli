@@ -1,8 +1,7 @@
 import { Flags } from "@oclif/core";
 import { Arg } from "@oclif/core/lib/interfaces";
-import { parseUnits } from "ethers/lib/utils";
 import { TransactionCommand } from "../../base";
-import { getContract, getSigner, normalizeHash, pretty, run } from "../../helpers";
+import { getContract, getSigner, parseHash, parseUSDC, pretty, run } from "../../helpers";
 
 export default class NodePrice extends TransactionCommand {
   static summary = "Change prices of content nodes.";
@@ -18,8 +17,8 @@ export default class NodePrice extends TransactionCommand {
   static usage = "<%= command.id %> ID[:PRICE?],... [DEFAULT_PRICE] [--spot] [--renew]";
   static aliases = ["node:price", "node:prices"];
   static args: Arg[] = [
-    { name: "ID:PRICE", description: "The comma separated price values for the nodes.", required: true },
-    { name: "DEFAULT_PRICE", description: "The default price, if omitted in the values.", required: false },
+    { name: "ID:PRICE", description: "The comma separated USDC price values for the nodes.", required: true },
+    { name: "DEFAULT_PRICE", description: "The default USDC price, if omitted in the values.", required: false },
   ];
   static flags = {
     spot: Flags.boolean({ description: "Change price in the current epoch only (nodes must not be reserved)." }),
@@ -50,8 +49,8 @@ export default class NodePrice extends TransactionCommand {
         }
 
         return {
-          nodeId: normalizeHash(nodeId),
-          price: parseUnits(price || defaultPrice, 18),
+          nodeId: parseHash(nodeId),
+          price: parseUSDC(price || defaultPrice),
         };
       })
     );

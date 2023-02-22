@@ -1,7 +1,7 @@
 import { Flags } from "@oclif/core";
 import { Result } from "ethers/lib/utils";
 import { BlockchainCommand } from "../../base";
-import { getAll, getContract, getProvider, normalizeRecords, pretty } from "../../helpers";
+import { formatOperator, getAll, getContract, getProvider, pretty } from "../../helpers";
 
 export default class OperatorList extends BlockchainCommand {
   static summary = "List operators on the Armada Network.";
@@ -22,7 +22,8 @@ export default class OperatorList extends BlockchainCommand {
       return await operators.getOperators(i, n, { blockTag });
     });
 
-    const output = normalizeRecords(results.slice(flags.skip, flags.skip + flags.size));
+    const records = results.slice(flags.skip, flags.skip + flags.size);
+    const output = records.map((r) => formatOperator(r));
     this.log(pretty(output));
     return output;
   }
