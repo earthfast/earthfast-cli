@@ -24,7 +24,7 @@ export default class ReservationCreate extends TransactionCommand {
   public async run(): Promise<unknown> {
     const { args, flags } = await this.parse(ReservationCreate);
     if (!flags.spot && !flags.renew) {
-      this.error("Must provide at least one of --spot and/or --renew.");
+      this.error("Must specify at least one of --spot and/or --renew.");
     }
 
     const nodeIds = args.IDS.split(",").map((id: string) => parseHash(id));

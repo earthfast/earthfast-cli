@@ -46,10 +46,10 @@ export default class NodeCreate extends TransactionCommand {
 
         const [host, region, enabled, price] = fields;
         if (!host) {
-          this.error(`Must provide node host: ${input}.`);
+          this.error(`Must specify node host: ${input}.`);
         }
         if (!region && !defaultRegion) {
-          this.error(`Must provide region: ${input}.`);
+          this.error(`Must specify region: ${input}.`);
         }
         if (enabled && !["true", "false"].includes(enabled)) {
           this.error(`Must specify true, false, or empty: ${input}.`);

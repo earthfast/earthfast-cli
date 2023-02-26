@@ -35,10 +35,10 @@ export default class NodeHost extends TransactionCommand {
 
         const [nodeId, host, region] = fields;
         if (!nodeId) {
-          this.error(`Must provide node ID: ${input}.`);
+          this.error(`Must specify node ID: ${input}.`);
         }
         if (!host && !region && !defaultRegion) {
-          this.error(`Must provide host or region: ${input}.`);
+          this.error(`Must specify host or region: ${input}.`);
         }
 
         const fetchOldValues = !host || (!region && !defaultRegion);

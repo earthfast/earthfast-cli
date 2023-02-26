@@ -19,7 +19,7 @@ export default class ProjectContent extends TransactionCommand {
   public async run(): Promise<unknown> {
     const { args, flags } = await this.parse(ProjectContent);
     if (args.URL === undefined || args.SHA === undefined) {
-      this.error("Must provide both URL and SHA.");
+      this.error("Must specify both URL and SHA.");
     }
 
     const signer = await getSigner(flags.network, flags.rpc, flags.address, flags.signer, flags.key, flags.account);

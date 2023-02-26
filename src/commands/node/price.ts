@@ -28,7 +28,7 @@ export default class NodePrice extends TransactionCommand {
   public async run(): Promise<unknown> {
     const { args, flags } = await this.parse(NodePrice);
     if (!flags.spot && !flags.renew) {
-      this.error("Must provide at least one of --spot and/or --renew.");
+      this.error("Must specify at least one of --spot and/or --renew.");
     }
 
     const values: string[] = args["ID:PRICE"].split(",");
@@ -42,10 +42,10 @@ export default class NodePrice extends TransactionCommand {
 
         const [nodeId, price] = fields;
         if (!nodeId) {
-          this.error(`Must provide node ID: ${input}.`);
+          this.error(`Must specify node ID: ${input}.`);
         }
         if (!price && !defaultPrice) {
-          this.error(`Must provide price: ${input}.`);
+          this.error(`Must specify price: ${input}.`);
         }
 
         return {

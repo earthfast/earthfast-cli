@@ -17,7 +17,7 @@ export default class NodeEnable extends TransactionCommand {
   public async run(): Promise<unknown> {
     const { args, flags } = await this.parse(NodeEnable);
     if (!["true", "false"].includes(args.BOOL)) {
-      this.error("Must provide a true or false.");
+      this.error("Must specify a true or false.");
     }
 
     const signer = await getSigner(flags.network, flags.rpc, flags.address, flags.signer, flags.key, flags.account);
