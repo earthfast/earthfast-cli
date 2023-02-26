@@ -1,16 +1,6 @@
 import { Arg } from "@oclif/core/lib/interfaces";
 import { TransactionCommand } from "../../base";
-import {
-  formatRecord,
-  formatUSDC,
-  getContract,
-  getSigner,
-  parseHash,
-  parseUSDC,
-  permit,
-  pretty,
-  run,
-} from "../../helpers";
+import { approve, getContract, getSigner, parseHash, parseUSDC, permit, pretty, run } from "../../helpers";
 
 export default class ProjectDeposit extends TransactionCommand {
   static summary = "Deposit Armada tokens to project escrow.";
@@ -26,17 +16,15 @@ export default class ProjectDeposit extends TransactionCommand {
     const signer = await getSigner(flags.network, flags.rpc, flags.address, flags.signer, flags.key, flags.account);
     const usdc = await getContract(flags.network, flags.abi, "USDC", signer);
     const projects = await getContract(flags.network, flags.abi, "ArmadaProjects", signer);
-    const address = await signer.getAddress();
     const id = parseHash(args.ID);
     const amount = parseUSDC(args.USDC);
-    const deadline = Math.floor(Date.now() / 1000) + 3600;
-    const sig = await permit(signer, usdc, projects, amount, deadline);
-    const oldBalance = await usdc.balanceOf(address);
+
+    const output = [];
+    const { tx: approveTx, deadline, sig } = await approve(signer, usdc, projects, amount);
+    if (approveTx) output.push(await run(approveTx, signer, [usdc]));
     const tx = await projects.populateTransaction.depositProjectEscrow(id, amount, deadline, sig.v, sig.r, sig.s);
-    const output = await run(tx, signer, [projects]);
-    const newBalance = await usdc.balanceOf(address);
+    output.push(await run(tx, signer, [projects]));
     this.log(pretty(output));
-    this.log(pretty(formatRecord({ address, oldBalance: formatUSDC(oldBalance), newBalance: formatUSDC(newBalance) })));
     return output;
   }
 }
