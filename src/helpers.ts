@@ -44,6 +44,16 @@ export type TransactionLog = {
   args: Record<string, unknown>;
 };
 
+const EmptySignature: Signature = {
+  r: HashZero,
+  s: HashZero,
+  v: 0,
+  _vs: "",
+  recoveryParam: 0,
+  yParityAndS: "",
+  compact: "",
+};
+
 export const Permit: Record<string, Array<TypedDataField>> = {
   Permit: [
     { name: "owner", type: "address" },
@@ -62,6 +72,26 @@ export const parseUSDC = (value: string): BigNumber => parseUnits(value, 6);
 export const parseTokens = (value: string): BigNumber => parseUnits(value, 18);
 export const formatUSDC = (value: BigNumberish): string => `${formatUnits(value, 6)} USDC`;
 export const formatTokens = (value: BigNumberish): string => `${formatUnits(value, 18)} ARMADA`;
+
+// Creates token transfer allowance.
+// Returns either a token approve transaction (tx), or a gassless permit (deadline+sig) if the signer supports it.
+export async function approve(
+  signer: Signer,
+  token: Contract,
+  spender: Contract,
+  amount: BigNumber
+): Promise<{ tx: PopulatedTransaction | undefined; deadline: number; sig: Signature }> {
+  let tx = undefined;
+  let deadline = 0;
+  let sig = EmptySignature;
+  if (signer instanceof VoidSigner || signer instanceof LedgerSigner) {
+    tx = await token.populateTransaction.approve(spender.address, amount);
+  } else {
+    deadline = Math.floor(Date.now() / 1000) + 3600;
+    sig = await permit(signer, token, spender, amount, deadline);
+  }
+  return { tx, deadline, sig };
+}
 
 // Signs a permit to transfer tokens.
 export async function permit(
@@ -89,7 +119,6 @@ export async function permit(
 // Signs and executes the transaction and returns its emitted events, if a signer is provided.
 // Otherwise, builds and returns a raw unsigned transaction string, if VoidSigner is provided.
 // Pass the contracts parameter to decode the corresponding events. No other events are returned.
-// The first of the passed contracts will be used to lookup the abi used for the raw transaction.
 export async function run(
   tx: PopulatedTransaction,
   signer: Signer,
@@ -97,9 +126,10 @@ export async function run(
 ): Promise<RawTransaction | TransactionLog[] | undefined> {
   if (signer instanceof VoidSigner) {
     if (!tx.to || !tx.data) return undefined;
-    delete tx.from; // Raw tx must have "from" field
+    delete tx.from; // Raw tx must not have "from" field
     const sighash = tx.data.slice(0, 10);
-    const fragment = getFragment(contracts[0].interface, sighash);
+    const interfaces = contracts.map((c) => c.interface);
+    const fragment = getFragment(interfaces, sighash);
     if (!fragment) return undefined;
     const abi = `[${fragment.format("json")}]`;
     const raw = ethers.utils.serializeTransaction(tx);
@@ -118,10 +148,12 @@ export async function run(
   return events;
 }
 
-export function getFragment(interface_: Interface, sighash: string): FunctionFragment | undefined {
-  for (const fragment of Object.values(interface_.functions)) {
-    if (sighash === interface_.getSighash(fragment)) {
-      return fragment;
+export function getFragment(interfaces: Interface[], sighash: string): FunctionFragment | undefined {
+  for (const interface_ of interfaces) {
+    for (const fragment of Object.values(interface_.functions)) {
+      if (sighash === interface_.getSighash(fragment)) {
+        return fragment;
+      }
     }
   }
 }
@@ -203,7 +235,7 @@ export async function getSigner(
 
   let wallet: Signer;
   if (signer === "raw") {
-    wallet = new VoidSigner(AddressZero);
+    wallet = new VoidSigner(AddressZero, provider);
   } else if (signer === "ledger") {
     // Use stderr to not interfere with --json flag
     console.warn("> Make sure that Ledger is unlocked and the Ethereum app is open");

@@ -1,3 +1,4 @@
+import { AddressZero } from "@ethersproject/constants";
 import { Flags } from "@oclif/core";
 import { Arg } from "@oclif/core/lib/interfaces";
 import { TransactionCommand } from "../../base";
@@ -21,6 +22,9 @@ export default class ProjectCreate extends TransactionCommand {
     const { args, flags } = await this.parse(ProjectCreate);
     if (!!args.URL !== !!args.SHA) {
       this.error("Can only specify URL and SHA together.");
+    }
+    if (flags.signer === "raw" && parseAddress(flags.owner) === AddressZero) {
+      this.error("Must specify --owner when using raw signer.");
     }
 
     const signer = await getSigner(flags.network, flags.rpc, flags.address, flags.signer, flags.key, flags.account);
