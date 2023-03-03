@@ -1,5 +1,6 @@
 import { Command, Flags } from "@oclif/core";
 import { CommandError, FlagOutput, Input, ParserOutput } from "@oclif/core/lib/interfaces";
+import { version } from "../package.json";
 import { getContract, getProvider, SignerType, SignerTypes } from "./helpers";
 import { NetworkName, NetworkNames } from "./networks";
 
@@ -36,7 +37,7 @@ export abstract class BlockchainCommand extends Command {
     const registry = await getContract(flags.network, flags.abi, "ArmadaRegistry", provider);
     const netVersion = await registry.getVersion();
     const netVersionStar = netVersion.split(".", 2).join(".") + ".*";
-    const cliVersion = process.env.npm_package_version ?? "";
+    const cliVersion = version;
     const cliVersionStar = cliVersion.split(".", 2).join(".") + ".*";
     if (netVersionStar !== cliVersionStar) {
       this.error(`Please use CLI version "${netVersionStar}"`);
