@@ -11,6 +11,31 @@
           "type": "bytes32"
         },
         {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "oldBalance",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "newBalance",
+          "type": "uint256"
+        }
+      ],
+      "name": "OperatorBalanceChanged",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "bytes32",
+          "name": "operatorId",
+          "type": "bytes32"
+        },
+        {
           "indexed": true,
           "internalType": "address",
           "name": "oldOwner",
