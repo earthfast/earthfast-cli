@@ -2,17 +2,7 @@ import { AddressZero } from "@ethersproject/constants";
 import { Flags } from "@oclif/core";
 import { Arg } from "@oclif/core/lib/interfaces";
 import { TransactionCommand } from "../../base";
-import {
-  formatRecord,
-  formatUSDC,
-  getContract,
-  getSigner,
-  parseAddress,
-  parseHash,
-  parseTokens,
-  pretty,
-  run,
-} from "../../helpers";
+import { getContract, getSigner, parseAddress, parseHash, parseTokens, pretty, run } from "../../helpers";
 
 export default class OperatorWithdraw extends TransactionCommand {
   static summary = "Withdraw USDC from operator earned balance.";
@@ -34,20 +24,14 @@ export default class OperatorWithdraw extends TransactionCommand {
     }
 
     const signer = await getSigner(flags.network, flags.rpc, flags.address, flags.signer, flags.key, flags.account);
-    const usdc = await getContract(flags.network, flags.abi, "USDC", signer);
     const operators = await getContract(flags.network, flags.abi, "ArmadaOperators", signer);
     const recipient = flags.recipient ? parseAddress(flags.recipient) : await signer.getAddress();
     const operatorId = parseHash(args.ID);
     const amount = parseTokens(args.USDC);
     if (amount.lte(0)) this.error("A positive amount required.");
-    const oldBalance = await usdc.balanceOf(recipient);
     const tx = await operators.populateTransaction.withdrawOperatorBalance(operatorId, amount, recipient);
     const output = await run(tx, signer, [operators]);
-    const newBalance = await usdc.balanceOf(recipient);
     this.log(pretty(output));
-    this.log(
-      pretty(formatRecord({ recipient, oldBalance: formatUSDC(oldBalance), newBalance: formatUSDC(newBalance) }))
-    );
     return output;
   }
 }

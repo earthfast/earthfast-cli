@@ -70,6 +70,7 @@ export function pretty(value: unknown): string {
 
 export const parseUSDC = (value: string): BigNumber => parseUnits(value, 6);
 export const parseTokens = (value: string): BigNumber => parseUnits(value, 18);
+export const formatETH = (value: BigNumberish): string => `${formatUnits(value, 18)} ETH`;
 export const formatUSDC = (value: BigNumberish): string => `${formatUnits(value, 6)} USDC`;
 export const formatTokens = (value: BigNumberish): string => `${formatUnits(value, 18)} ARMADA`;
 
