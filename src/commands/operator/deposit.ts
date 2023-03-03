@@ -1,6 +1,6 @@
 import { Arg } from "@oclif/core/lib/interfaces";
 import { TransactionCommand } from "../../base";
-import { approve, getContract, getSigner, parseHash, parseTokens, permit, pretty, run } from "../../helpers";
+import { approve, getContract, getSigner, parseHash, parseUSDC, pretty, run } from "../../helpers";
 
 export default class OperatorDeposit extends TransactionCommand {
   static summary = "Deposit USDC to operator earned balance.";
@@ -17,7 +17,7 @@ export default class OperatorDeposit extends TransactionCommand {
     const usdc = await getContract(flags.network, flags.abi, "USDC", signer);
     const operators = await getContract(flags.network, flags.abi, "ArmadaOperators", signer);
     const id = parseHash(args.ID);
-    const amount = parseTokens(args.USDC);
+    const amount = parseUSDC(args.USDC);
 
     const output = [];
     const { tx: approveTx, deadline, sig } = await approve(signer, usdc, operators, amount);
