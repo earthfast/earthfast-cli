@@ -1,11 +1,13 @@
 import { Command, Flags } from "@oclif/core";
-import { CommandError } from "@oclif/core/lib/interfaces";
-import { SignerType, SignerTypes } from "./helpers";
+import { CommandError, FlagOutput, Input, ParserOutput } from "@oclif/core/lib/interfaces";
+import { getContract, getProvider, SignerType, SignerTypes } from "./helpers";
 import { NetworkName, NetworkNames } from "./networks";
 
 type TxError = { error: { reason: string } };
 
 export abstract class BlockchainCommand extends Command {
+  static enableJsonFlag = true;
+
   static globalFlags = {
     network: Flags.enum<NetworkName>({
       helpGroup: "BASE",
@@ -25,7 +27,31 @@ export abstract class BlockchainCommand extends Command {
     }),
   };
 
-  static enableJsonFlag = true;
+  public async checkVersion(flags: {
+    network: NetworkName;
+    abi: string | undefined;
+    rpc: string | undefined;
+  }): Promise<void> {
+    const provider = await getProvider(flags.network, flags.rpc);
+    const registry = await getContract(flags.network, flags.abi, "ArmadaRegistry", provider);
+    const netVersion = await registry.getVersion();
+    const netVersionStar = netVersion.split(".", 2).join(".") + ".*";
+    const cliVersion = process.env.npm_package_version ?? "";
+    const cliVersionStar = cliVersion.split(".", 2).join(".") + ".*";
+    if (netVersionStar !== cliVersionStar) {
+      this.error(`Please use CLI version "${netVersionStar}"`);
+    }
+  }
+
+  protected async parse<
+    F extends FlagOutput,
+    G extends FlagOutput,
+    A extends { [name: string]: any } // eslint-disable-line @typescript-eslint/no-explicit-any
+  >(options?: Input<F, G>, argv?: string[]): Promise<ParserOutput<F, G, A>> {
+    const parsed = await super.parse(options, argv);
+    this.checkVersion(parsed.flags as never);
+    return parsed as ParserOutput<F, G, A>;
+  }
 }
 
 export abstract class TransactionCommand extends BlockchainCommand {
