@@ -2,17 +2,7 @@ import { AddressZero } from "@ethersproject/constants";
 import { Flags } from "@oclif/core";
 import { Arg } from "@oclif/core/lib/interfaces";
 import { TransactionCommand } from "../../base";
-import {
-  formatRecord,
-  formatUSDC,
-  getContract,
-  getSigner,
-  parseAddress,
-  parseHash,
-  parseUSDC,
-  pretty,
-  run,
-} from "../../helpers";
+import { getContract, getSigner, parseAddress, parseHash, parseUSDC, pretty, run } from "../../helpers";
 
 export default class ProjectWithdraw extends TransactionCommand {
   static summary = "Withdraw USDC from project escrow.";
@@ -36,18 +26,14 @@ export default class ProjectWithdraw extends TransactionCommand {
     }
 
     const signer = await getSigner(flags.network, flags.rpc, flags.address, flags.signer, flags.key, flags.account);
-    const usdc = await getContract(flags.network, flags.abi, "USDC", signer);
     const projects = await getContract(flags.network, flags.abi, "ArmadaProjects", signer);
     const recipient = flags.recipient ? parseAddress(flags.recipient) : await signer.getAddress();
     const projectId = parseHash(args.ID);
     const amount = parseUSDC(args.USDC);
     if (amount.lte(0)) this.error("A positive amount required.");
-    const oldEscrow = await usdc.balanceOf(recipient);
     const tx = await projects.populateTransaction.withdrawProjectEscrow(projectId, amount, recipient);
     const output = await run(tx, signer, [projects]);
-    const newEscrow = await usdc.balanceOf(recipient);
     this.log(pretty(output));
-    this.log(pretty(formatRecord({ recipient, oldEscrow: formatUSDC(oldEscrow), newEscrow: formatUSDC(newEscrow) })));
     return output;
   }
 }
