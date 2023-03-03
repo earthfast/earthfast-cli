@@ -1,3 +1,4 @@
+import { version } from "../../package.json";
 import { BlockchainCommand } from "../base";
 import { getContract, getProvider, pretty } from "../helpers";
 
@@ -12,7 +13,7 @@ export default class Status extends BlockchainCommand {
     const provider = await getProvider(flags.network, flags.rpc);
     const registry = await getContract(flags.network, flags.abi, "ArmadaRegistry", provider);
     const netVersion = await registry.getVersion();
-    const cliVersion = process.env.npm_package_version ?? "";
+    const cliVersion = version;
 
     const lastEpochStart = new Date();
     lastEpochStart.setUTCHours(0, 0, 0, 0);

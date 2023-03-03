@@ -8,8 +8,8 @@
     "run": "npm run build && ./bin/run",
     "dev": "npm run build && ./bin/dev",
     "debug": "DEBUG=1 npm run build && ./bin/dev",
-    "build": "rm -rf dist && tsc",
-    "clean": "rm -rf dist",
+    "build": "rm -rf ./dist && tsc",
+    "clean": "rm -rf ./dist",
     "postpack": "rm -f oclif.manifest.json",
     "prepack": "npm run build && oclif manifest"
   },
