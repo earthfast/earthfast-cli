@@ -1,14 +1,18 @@
-import { Command } from "@oclif/core";
-import { pretty } from "../helpers";
+import { BlockchainCommand } from "../base";
+import { getContract, getProvider, pretty } from "../helpers";
 
-export default class Status extends Command {
+export default class Status extends BlockchainCommand {
   static summary = "Shows the current epoch status.";
   static examples = ["<%= config.bin %> <%= command.id %>"];
   static usage = "<%= command.id %>";
   static enableJsonFlag = true;
 
   public async run(): Promise<unknown> {
-    await this.parse(Status);
+    const { flags } = await this.parse(Status);
+    const provider = await getProvider(flags.network, flags.rpc);
+    const registry = await getContract(flags.network, flags.abi, "ArmadaRegistry", provider);
+    const netVersion = await registry.getVersion();
+    const cliVersion = process.env.npm_package_version ?? "";
 
     const lastEpochStart = new Date();
     lastEpochStart.setUTCHours(0, 0, 0, 0);
@@ -18,6 +22,8 @@ export default class Status extends Command {
     nextEpochStart.setUTCDate(nextEpochStart.getUTCDate() + 7);
 
     const output = {
+      netVersion,
+      cliVersion,
       epochDuration: "7 days",
       lastEpochStart: `${lastEpochStart}`,
       nextEpochStart: `${nextEpochStart}`,
