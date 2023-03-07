@@ -36,6 +36,11 @@ export abstract class BlockchainCommand extends Command {
     const provider = await getProvider(flags.network, flags.rpc);
     const registry = await getContract(flags.network, flags.abi, "ArmadaRegistry", provider);
     const netVersion = await registry.getVersion();
+    if (!netVersion) {
+      // Use stderr to not interfere with --json flag
+      console.warn("> Skipping CLI version check");
+      return;
+    }
     const netVersionStar = netVersion.split(".", 2).join(".") + ".*";
     const cliVersion = version;
     const cliVersionStar = cliVersion.split(".", 2).join(".") + ".*";
