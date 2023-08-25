@@ -239,6 +239,11 @@
               "internalType": "bytes32",
               "name": "checksum",
               "type": "bytes32"
+            },
+            {
+              "internalType": "string",
+              "name": "metadata",
+              "type": "string"
             }
           ],
           "internalType": "struct ArmadaCreateProjectData",
@@ -339,6 +344,24 @@
           "type": "bytes32"
         },
         {
+          "internalType": "string",
+          "name": "metadata",
+          "type": "string"
+        }
+      ],
+      "name": "setProjectMetadata",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "projectId",
+          "type": "bytes32"
+        },
+        {
           "internalType": "address",
           "name": "owner",
           "type": "address"
@@ -423,6 +446,11 @@
               "internalType": "bytes32",
               "name": "checksum",
               "type": "bytes32"
+            },
+            {
+              "internalType": "string",
+              "name": "metadata",
+              "type": "string"
             }
           ],
           "internalType": "struct ArmadaProject",
@@ -489,6 +517,11 @@
               "internalType": "bytes32",
               "name": "checksum",
               "type": "bytes32"
+            },
+            {
+              "internalType": "string",
+              "name": "metadata",
+              "type": "string"
             }
           ],
           "internalType": "struct ArmadaProject[]",
