@@ -7,12 +7,13 @@ import { getContract, getSigner, parseAddress, parseHash, pretty, run } from "..
 export default class ProjectCreate extends TransactionCommand {
   static summary = "Register a new project on the Armada Network.";
   static examples = ['<%= config.bin %> <%= command.id %> "My Project" notify@myproject.com'];
-  static usage = "<%= command.id %> [--owner ADDR] NAME EMAIL [URL] [SHA]";
+  static usage = "<%= command.id %> [--owner ADDR] NAME EMAIL [URL] [SHA] [METADATA]";
   static args: Arg[] = [
     { name: "NAME", description: "The human readable name of the new project.", required: true },
     { name: "EMAIL", description: "The project email for admin notifications.", required: true },
     { name: "URL", description: "The public URL to fetch the content bundle.", default: "" },
     { name: "SHA", description: "The SHA-256 checksum of the content bundle.", default: "" },
+    { name: "METADATA", description: "Optional JSON.stringified metadata to attach to this project.", default: "" },
   ];
   static flags = {
     owner: Flags.string({ description: "[default: caller] The owner for the new project.", helpValue: "ADDR" }),
@@ -31,7 +32,14 @@ export default class ProjectCreate extends TransactionCommand {
     const projects = await getContract(flags.network, flags.abi, "ArmadaProjects", signer);
     const owner = flags.owner ? parseAddress(flags.owner) : await signer.getAddress();
     const bundleSha = parseHash(args.SHA);
-    const tx = await projects.populateTransaction.createProject([owner, args.NAME, args.EMAIL, args.URL, bundleSha]);
+    const tx = await projects.populateTransaction.createProject([
+      owner,
+      args.NAME,
+      args.EMAIL,
+      args.URL,
+      bundleSha,
+      args.METADATA,
+    ]);
     const output = await run(tx, signer, [projects]);
     this.log(pretty(output));
     return output;
