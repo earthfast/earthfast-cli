@@ -10,7 +10,7 @@ export default class ProjectMetadata extends TransactionCommand {
     { name: "ID", description: "The ID of the project to change metadata.", required: true },
     {
       name: "METADATA",
-      description: "Optional JSON.stringified metadata to attach to this project.",
+      description: "New JSON metadata to attach to the project. Previous metadata will be overwritten.",
       required: true,
     },
   ];

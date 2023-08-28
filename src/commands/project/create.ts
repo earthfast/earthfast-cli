@@ -13,7 +13,7 @@ export default class ProjectCreate extends TransactionCommand {
     { name: "EMAIL", description: "The project email for admin notifications.", required: true },
     { name: "URL", description: "The public URL to fetch the content bundle.", default: "" },
     { name: "SHA", description: "The SHA-256 checksum of the content bundle.", default: "" },
-    { name: "METADATA", description: "Optional JSON.stringified metadata to attach to this project.", default: "" },
+    { name: "METADATA", description: "JSON metadata to attach to this project.", default: "" },
   ];
   static flags = {
     owner: Flags.string({ description: "[default: caller] The owner for the new project.", helpValue: "ADDR" }),
