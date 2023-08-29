@@ -4,7 +4,7 @@ import { getContract, getSigner, parseHash, pretty, run } from "../../helpers";
 
 export default class ProjectMetadata extends TransactionCommand {
   static summary = "Set metadata property on a project.";
-  static examples = ['<%= config.bin %> <%= command.id %> \'{"property": "value"}\''];
+  static examples = ['<%= config.bin %> <%= command.id %> 0x123abc... \'{"property": "value"}\''];
   static usage = "<%= command.id %> ID METADATA";
   static args: Arg[] = [
     { name: "ID", description: "The ID of the project to change metadata.", required: true },
