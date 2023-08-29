@@ -13,7 +13,7 @@ export default class ProjectCreate extends TransactionCommand {
     { name: "EMAIL", description: "The project email for admin notifications.", required: true },
     { name: "URL", description: "The public URL to fetch the content bundle.", default: "" },
     { name: "SHA", description: "The SHA-256 checksum of the content bundle.", default: "" },
-    { name: "METADATA", description: "JSON metadata to attach to this project.", default: "" },
+    { name: "METADATA", description: "JSON metadata string to attach to this project.", default: "" },
   ];
   static flags = {
     owner: Flags.string({ description: "[default: caller] The owner for the new project.", helpValue: "ADDR" }),
@@ -32,6 +32,13 @@ export default class ProjectCreate extends TransactionCommand {
     const projects = await getContract(flags.network, flags.abi, "ArmadaProjects", signer);
     const owner = flags.owner ? parseAddress(flags.owner) : await signer.getAddress();
     const bundleSha = parseHash(args.SHA);
+    if (args.METADATA !== "") {
+      try {
+        JSON.parse(args.METADATA);
+      } catch (e) {
+        this.error("METADATA must be valid JSON.");
+      }
+    }
     const tx = await projects.populateTransaction.createProject([
       owner,
       args.NAME,

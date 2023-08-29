@@ -10,7 +10,7 @@ export default class ProjectMetadata extends TransactionCommand {
     { name: "ID", description: "The ID of the project to change metadata.", required: true },
     {
       name: "METADATA",
-      description: "New JSON metadata to attach to the project. Previous metadata will be overwritten.",
+      description: "New JSON metadata string to attach to the project. Previous metadata will be overwritten.",
       required: true,
     },
   ];
@@ -20,6 +20,12 @@ export default class ProjectMetadata extends TransactionCommand {
     const signer = await getSigner(flags.network, flags.rpc, flags.address, flags.signer, flags.key, flags.account);
     const projects = await getContract(flags.network, flags.abi, "ArmadaProjects", signer);
     const projectId = parseHash(args.ID);
+
+    try {
+      JSON.parse(args.METADATA);
+    } catch (e) {
+      this.error("METADATA must be valid JSON.");
+    }
     const tx = await projects.populateTransaction.setProjectMetadata(projectId, args.METADATA);
     const output = await run(tx, signer, [projects]);
     this.log(pretty(output));
