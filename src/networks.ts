@@ -1,4 +1,4 @@
-export type NetworkName = "testnet" | "staging" | "localhost";
+export type NetworkName = "testnet" | "testnet-sepolia" | "staging" | "localhost";
 
 export interface NetworkInfo {
   url: string;
@@ -8,6 +8,9 @@ export interface NetworkInfo {
 export const Networks: Record<NetworkName, NetworkInfo> = {
   testnet: {
     url: "https://rpc.ankr.com/eth_goerli",
+  },
+  "testnet-sepolia": {
+    url: "https://rpc.ankr.com/eth_sepolia",
   },
   staging: {
     url: "https://rpc.ankr.com/eth_goerli",
