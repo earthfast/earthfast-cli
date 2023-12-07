@@ -18,7 +18,6 @@ import {
 } from "ethers";
 import { formatUnits, FunctionFragment, getAddress, Interface, parseUnits, Result } from "ethers/lib/utils";
 import inquirer from "inquirer";
-import keytar from "keytar";
 import { ContractName, loadAbi } from "./contracts";
 import { listWallets, loadWallet } from "./keystore";
 import { LedgerSigner } from "./ledger";
@@ -272,6 +271,9 @@ export async function getSigner(
       }
     }
 
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    const { keytar } = import("keytar");
     let password = await keytar.getPassword("armada-cli", address);
     if (!password) {
       const res = await inquirer.prompt({
