@@ -1,7 +1,6 @@
 import { Command } from "@oclif/core";
 import { Arg } from "@oclif/core/lib/interfaces";
 import inquirer from "inquirer";
-import keytar from "keytar";
 import { deleteWallet, listWallets } from "../../keystore";
 
 export default class KeyDelete extends Command {
@@ -34,6 +33,9 @@ export default class KeyDelete extends Command {
 
     const address = args.ADDR;
     await deleteWallet(address);
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    const { keytar } = import("keytar");
     await keytar.deletePassword("armada-cli", address);
     this.log(`Account ${address} deleted`);
     return address;

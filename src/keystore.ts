@@ -3,7 +3,6 @@ import os from "os";
 import path from "path";
 import { encryptKeystore } from "@ethersproject/json-wallets";
 import { Wallet } from "ethers";
-import keytar from "keytar";
 import { parseHash } from "./helpers";
 
 const homedir = os.homedir();
@@ -21,6 +20,9 @@ export async function saveWallet(privateKey: string, password: string, descripti
   }
 
   fs.writeFileSync(path.join(keyStoreFolderPath, filename), JSON.stringify(json, null, "  "));
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  const { keytar } = import("keytar");
   keytar.setPassword("armada-cli", address, password);
   return address;
 }
