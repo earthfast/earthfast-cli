@@ -4,6 +4,7 @@ import path from "path";
 import { encryptKeystore } from "@ethersproject/json-wallets";
 import { Wallet } from "ethers";
 import { parseHash } from "./helpers";
+import KeytarClient from "./keytarClient";
 
 const homedir = os.homedir();
 const keyStoreFolderPath = path.join(homedir, ".armada/keystore");
@@ -21,9 +22,7 @@ export async function saveWallet(privateKey: string, password: string, descripti
 
   fs.writeFileSync(path.join(keyStoreFolderPath, filename), JSON.stringify(json, null, "  "));
 
-  // dynamically import keytar, otherwise it fails if libsecret is not installed
-  // for all signer types
-  const keytar = await import("keytar");
+  const keytar = await KeytarClient.getKeytar();
   const setPassword = keytar.setPassword;
   setPassword("armada-cli", address, password);
   return address;

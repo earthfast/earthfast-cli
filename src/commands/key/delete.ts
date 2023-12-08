@@ -2,6 +2,8 @@ import { Command } from "@oclif/core";
 import { Arg } from "@oclif/core/lib/interfaces";
 import inquirer from "inquirer";
 import { deleteWallet, listWallets } from "../../keystore";
+import KeytarClient from "../../keytarClient";
+
 
 export default class KeyDelete extends Command {
   static summary = "Deletes a private key from the keystore.";
@@ -34,9 +36,7 @@ export default class KeyDelete extends Command {
     const address = args.ADDR;
     await deleteWallet(address);
 
-    // dynamically import keytar, otherwise it fails if libsecret is not installed
-    // for all signer types
-    const keytar = await import("keytar");
+    const keytar = await KeytarClient.getKeytar();
     const deletePassword = keytar.deletePassword;
     await deletePassword("armada-cli", address);
     this.log(`Account ${address} deleted`);

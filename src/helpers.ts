@@ -20,6 +20,7 @@ import { formatUnits, FunctionFragment, getAddress, Interface, parseUnits, Resul
 import inquirer from "inquirer";
 import { ContractName, loadAbi } from "./contracts";
 import { listWallets, loadWallet } from "./keystore";
+import KeytarClient from "./keytarClient";
 import { LedgerSigner } from "./ledger";
 import { NetworkName, Networks } from "./networks";
 
@@ -271,10 +272,8 @@ export async function getSigner(
       }
     }
 
-    // dynamically import keytar, otherwise it fails if libsecret is not installed
-    // for all signer types
-    const obj = await import("keytar");
-    const getPassword = obj.getPassword;
+    const keytar = await KeytarClient.getKeytar();
+    const getPassword = keytar.getPassword;
     let password = await getPassword("armada-cli", address);
     if (!password) {
       const res = await inquirer.prompt({
