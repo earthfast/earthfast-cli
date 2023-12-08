@@ -271,10 +271,11 @@ export async function getSigner(
       }
     }
 
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    const { keytar } = import("keytar");
-    let password = await keytar.getPassword("armada-cli", address);
+    // dynamically import keytar, otherwise it fails if libsecret is not installed
+    // for all signer types
+    const obj = await import("keytar");
+    const getPassword = obj.getPassword;
+    let password = await getPassword("armada-cli", address);
     if (!password) {
       const res = await inquirer.prompt({
         name: "password",

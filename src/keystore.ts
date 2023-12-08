@@ -20,10 +20,12 @@ export async function saveWallet(privateKey: string, password: string, descripti
   }
 
   fs.writeFileSync(path.join(keyStoreFolderPath, filename), JSON.stringify(json, null, "  "));
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore
-  const { keytar } = import("keytar");
-  keytar.setPassword("armada-cli", address, password);
+
+  // dynamically import keytar, otherwise it fails if libsecret is not installed
+  // for all signer types
+  const keytar = await import("keytar");
+  const setPassword = keytar.setPassword;
+  setPassword("armada-cli", address, password);
   return address;
 }
 
