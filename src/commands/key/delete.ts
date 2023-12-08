@@ -33,10 +33,12 @@ export default class KeyDelete extends Command {
 
     const address = args.ADDR;
     await deleteWallet(address);
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    const { keytar } = import("keytar");
-    await keytar.deletePassword("armada-cli", address);
+
+    // dynamically import keytar, otherwise it fails if libsecret is not installed
+    // for all signer types
+    const keytar = await import("keytar");
+    const deletePassword = keytar.deletePassword;
+    await deletePassword("armada-cli", address);
     this.log(`Account ${address} deleted`);
     return address;
   }
