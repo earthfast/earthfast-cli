@@ -14,7 +14,7 @@ export abstract class BlockchainCommand extends Command {
       helpGroup: "BASE",
       description: "The network to use.",
       options: NetworkNames,
-      default: "testnet",
+      default: "testnet-sepolia",
     }),
     abi: Flags.string({
       helpGroup: "BASE",
