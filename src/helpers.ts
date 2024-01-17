@@ -30,6 +30,7 @@ export const SignerTypes: SignerType[] = ["keystore", "ledger", "raw"];
 const Chains: Record<number, string> = {
   0: "mainnet",
   5: "goerli",
+  11155111: "sepolia",
 };
 
 export type RawTransaction = {
