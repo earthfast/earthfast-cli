@@ -3,6 +3,7 @@ import type { Provider, TransactionReceipt } from "@ethersproject/abstract-provi
 import { type TypedDataSigner } from "@ethersproject/abstract-signer";
 import { AddressZero, HashZero } from "@ethersproject/constants";
 import { CliUx } from "@oclif/core";
+import { VoidSigner } from "armada-sdk/node_modules/ethers";
 import {
   BigNumber,
   Contract,
@@ -11,7 +12,6 @@ import {
   type TypedDataField,
   Wallet,
   type Transaction,
-  VoidSigner,
   type PopulatedTransaction,
   type Signature,
   type BigNumberish,

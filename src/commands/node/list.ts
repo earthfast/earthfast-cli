@@ -1,8 +1,6 @@
-import { HashZero } from "@ethersproject/constants";
 import { Flags } from "@oclif/core";
-import { Result } from "ethers/lib/utils";
 import { BlockchainCommand } from "../../base";
-import { formatNode, getAll, getContract, getProvider, parseHash, pretty } from "../../helpers";
+import { getProvider, parseHash, pretty } from "../../helpers";
 
 export default class NodeList extends BlockchainCommand {
   static summary = "List content nodes on the Armada Network.";
@@ -21,30 +19,20 @@ export default class NodeList extends BlockchainCommand {
 
   public async run(): Promise<Record<string, unknown>[]> {
     const { flags } = await this.parse(NodeList);
+    const sdk = await this.initializeSDK(flags.network);
     const provider = await getProvider(flags.network, flags.rpc);
-    const nodes = await getContract(flags.network, flags.abi, "ArmadaNodes", provider);
+
     const operatorId = parseHash(flags.operator);
-    const blockTag = await provider.getBlockNumber();
-    let results: Result[] = await getAll(flags.page, async (i, n) => {
-      return await nodes.getNodes(operatorId, flags.topology, i, n, { blockTag });
-    });
-    results = results.filter((v) => {
-      // List all nodes (vacant and reserved)
-      if (!flags.vacant) return true;
-      // List only nodes vacant either in this epoch or after this epoch
-      if (!flags.spot && !flags.renew) return v.projectIds[0] === HashZero || v.projectIds[1] === HashZero;
-      // List only nodes vacant both in this epoch and after this epoch
-      if (flags.spot && flags.renew) return v.projectIds[0] === HashZero && v.projectIds[1] === HashZero;
-      // List only nodes vacant after this epoch
-      if (!flags.spot && flags.renew) return v.projectIds[1] === HashZero;
-      // List only nodes vacant in this epoch
-      if (flags.spot && !flags.renew) return v.projectIds[0] === HashZero;
-      // Impossible
-      return false;
+    const output = await sdk.node.list(provider, operatorId, {
+      topology: flags.topology,
+      vacant: flags.vacant,
+      spot: flags.spot,
+      renew: flags.renew,
+      skip: flags.skip,
+      size: flags.size,
+      page: flags.page,
     });
 
-    const records = results.slice(flags.skip, flags.skip + flags.size);
-    const output = records.map((r) => formatNode(r));
     this.log(pretty(output));
     return output;
   }

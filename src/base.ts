@@ -1,5 +1,6 @@
 import { Command, Flags } from "@oclif/core";
 import { CommandError, FlagOutput, Input, ParserOutput } from "@oclif/core/lib/interfaces";
+import ArmadaSDK from "armada-sdk";
 import { version } from "../package.json";
 import { getContract, getProvider, SignerType, SignerTypes } from "./helpers";
 import { NetworkName, NetworkNames } from "./networks";
@@ -57,6 +58,11 @@ export abstract class BlockchainCommand extends Command {
     const parsed = await super.parse(options, argv);
     this.checkVersion(parsed.flags as never);
     return parsed as ParserOutput<F, G, A>;
+  }
+
+  public async initializeSDK(network: NetworkName): Promise<ArmadaSDK> {
+    const sdk = new ArmadaSDK(network);
+    return sdk;
   }
 }
 

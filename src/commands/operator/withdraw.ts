@@ -2,7 +2,7 @@ import { AddressZero } from "@ethersproject/constants";
 import { Flags } from "@oclif/core";
 import { Arg } from "@oclif/core/lib/interfaces";
 import { TransactionCommand } from "../../base";
-import { getContract, getSigner, parseAddress, parseHash, parseUSDC, pretty, run } from "../../helpers";
+import { getSigner, parseAddress, pretty } from "../../helpers";
 
 export default class OperatorWithdraw extends TransactionCommand {
   static summary = "Withdraw USDC from operator earned balance.";
@@ -24,13 +24,9 @@ export default class OperatorWithdraw extends TransactionCommand {
     }
 
     const signer = await getSigner(flags.network, flags.rpc, flags.address, flags.signer, flags.key, flags.account);
-    const operators = await getContract(flags.network, flags.abi, "ArmadaOperators", signer);
     const recipient = flags.recipient ? parseAddress(flags.recipient) : await signer.getAddress();
-    const operatorId = parseHash(args.ID);
-    const amount = parseUSDC(args.USDC);
-    if (amount.lte(0)) this.error("A positive amount required.");
-    const tx = await operators.populateTransaction.withdrawOperatorBalance(operatorId, amount, recipient);
-    const output = await run(tx, signer, [operators]);
+    const sdk = await this.initializeSDK(flags.network);
+    const output = await sdk.operator.withdraw(signer, args.ID, args.USDC, recipient);
     this.log(pretty(output));
     return output;
   }
