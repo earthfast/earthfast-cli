@@ -2,7 +2,7 @@ import fs from "fs";
 import os from "os";
 import path from "path";
 import { encryptKeystore } from "@ethersproject/json-wallets";
-import { Wallet } from "ethers";
+import { Wallet } from "./ethers";
 import { parseHash } from "./helpers";
 import KeytarClient from "./keytarClient";
 

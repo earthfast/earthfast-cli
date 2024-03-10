@@ -1,6 +1,6 @@
 import fs from "fs";
 import path from "path";
-import type { ContractInterface } from "ethers";
+import type { ContractInterface } from "./ethers";
 import { NetworkName } from "./networks";
 
 // These imports are necessary to pull these files into dist/
