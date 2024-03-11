@@ -1,6 +1,6 @@
 import { Arg } from "@oclif/core/lib/interfaces";
 import { TransactionCommand } from "../../base";
-import { getContract, getSigner, parseHash, pretty, run } from "../../helpers";
+import { getSigner, parseHash, pretty } from "../../helpers";
 
 export default class NodeDelete extends TransactionCommand {
   static summary = "Delete content nodes from the Armada Network.";
@@ -17,10 +17,8 @@ export default class NodeDelete extends TransactionCommand {
     const { args, flags } = await this.parse(NodeDelete);
     const nodeIds = args.IDS.split(",").map((id: string) => parseHash(id));
     const signer = await getSigner(flags.network, flags.rpc, flags.address, flags.signer, flags.key, flags.account);
-    const nodes = await getContract(flags.network, flags.abi, "ArmadaNodes", signer);
-    const operatorId = (await nodes.getNode(nodeIds[0])).operatorId;
-    const tx = await nodes.populateTransaction.deleteNodes(operatorId, false, nodeIds);
-    const output = await run(tx, signer, [nodes]);
+    const sdk = await this.initializeSDK(flags.network);
+    const output = await sdk.node.delete(signer, nodeIds);
     this.log(pretty(output));
     return output;
   }
