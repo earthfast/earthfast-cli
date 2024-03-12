@@ -1,7 +1,35 @@
 import { AddressZero } from "@ethersproject/constants";
 import { ledger } from "armada-sdk";
-import { ethers, Signer, VoidSigner, Wallet } from "./ethers";
+import {
+  Chains,
+  EmptySignature,
+  Permit,
+  parseUSDC,
+  parseTokens,
+  formatETH,
+  formatUSDC,
+  formatTokens,
+  type RawTransaction,
+  pretty,
+  approve,
+  permit,
+  run,
+  getFragment,
+  getTxUrl,
+  formatNode,
+  formatOperator,
+  formatProject,
+  formatBigNumber,
+  formatRecord,
+  parseHash,
+  parseAddress,
+  getProvider,
+  getContract,
+  decodeEvents,
+  getAll,
+} from "armada-sdk/dist/src/helpers";
 import inquirer from "inquirer";
+import { ethers, Signer, VoidSigner, Wallet } from "./ethers";
 import { listWallets, loadWallet } from "./keystore";
 import KeytarClient from "./keytarClient";
 import { NetworkName, Networks } from "./networks";
@@ -12,7 +40,34 @@ const { LedgerSigner } = ledger;
 // so it can be used natively in armada-cli
 // can't export * from an object, needs to be a file that's why
 // we have to directly export src/helpers
-export * from "armada-sdk/dist/src/helpers";
+export {
+  Chains,
+  EmptySignature,
+  Permit,
+  parseUSDC,
+  parseTokens,
+  formatETH,
+  formatUSDC,
+  formatTokens,
+  type RawTransaction,
+  pretty,
+  approve,
+  permit,
+  run,
+  getFragment,
+  getTxUrl,
+  formatNode,
+  formatOperator,
+  formatProject,
+  formatBigNumber,
+  formatRecord,
+  parseHash,
+  parseAddress,
+  getProvider,
+  getContract,
+  decodeEvents,
+  getAll,
+};
 
 export type SignerType = "keystore" | "ledger" | "raw";
 export const SignerTypes: SignerType[] = ["keystore", "ledger", "raw"];
