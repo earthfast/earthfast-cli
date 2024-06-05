@@ -30,6 +30,15 @@ import "../abi/testnet-sepolia/ArmadaProjects.json";
 import "../abi/testnet-sepolia/ArmadaReservations.json";
 import "../abi/testnet-sepolia/USDC.json";
 
+// These imports are necessary to pull these files into dist/
+import "../abi/testnet-sepolia-staging/ArmadaToken.json";
+import "../abi/testnet-sepolia-staging/ArmadaRegistry.json";
+import "../abi/testnet-sepolia-staging/ArmadaNodes.json";
+import "../abi/testnet-sepolia-staging/ArmadaOperators.json";
+import "../abi/testnet-sepolia-staging/ArmadaProjects.json";
+import "../abi/testnet-sepolia-staging/ArmadaReservations.json";
+import "../abi/testnet-sepolia-staging/USDC.json";
+
 export type ContractName =
   | "ArmadaToken"
   | "ArmadaRegistry"
