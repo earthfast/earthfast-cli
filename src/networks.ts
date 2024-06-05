@@ -1,4 +1,4 @@
-export type NetworkName = "testnet" | "testnet-sepolia" | "staging" | "localhost";
+export type NetworkName = "testnet" | "testnet-sepolia" | "testnet-sepolia-staging" | "staging" | "localhost";
 
 export interface NetworkInfo {
   url: string;
@@ -10,6 +10,9 @@ export const Networks: Record<NetworkName, NetworkInfo> = {
     url: "https://rpc.ankr.com/eth_goerli",
   },
   "testnet-sepolia": {
+    url: "https://rpc.ankr.com/eth_sepolia",
+  },
+  "testnet-sepolia-staging": {
     url: "https://rpc.ankr.com/eth_sepolia",
   },
   staging: {
