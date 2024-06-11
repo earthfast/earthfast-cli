@@ -37,6 +37,9 @@
     ],
     "topicSeparator": " ",
     "topics": {
+      "admin": {
+        "description": "Perform admin functions such as granting roles."
+      },
       "bundle": {
         "description": "Build Armada Network content bundles."
       },
