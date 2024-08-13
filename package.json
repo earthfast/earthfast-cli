@@ -1,8 +1,8 @@
 {
-  "name": "armada-cli",
+  "name": "earthfast-cli",
   "version": "0.5.1",
-  "description": "Command line utility for the Armada Network",
-  "homepage": "https://armadanetwork.com",
+  "description": "Command line utility for EarthFast",
+  "homepage": "https://earthfast.com",
   "license": "MIT",
   "scripts": {
     "run": "npm run build && ./bin/run",
@@ -14,7 +14,7 @@
     "prepack": "npm run build && oclif manifest"
   },
   "bin": {
-    "armada": "./bin/run"
+    "earthfast": "./bin/run"
   },
   "files": [
     "/bin",
@@ -23,14 +23,14 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/armada-network/armada-cli"
+    "url": "https://github.com/earthfast/earthfast-cli"
   },
   "engines": {
     "node": ">=16.0.0"
   },
   "oclif": {
-    "bin": "armada",
-    "dirname": "armada",
+    "bin": "earthfast",
+    "dirname": "earthfast",
     "commands": "./dist/src/commands",
     "plugins": [
       "@oclif/plugin-help"
@@ -41,19 +41,22 @@
         "description": "Perform admin functions such as granting roles."
       },
       "bundle": {
-        "description": "Build Armada Network content bundles."
+        "description": "Build EarthFast content bundles."
       },
       "key": {
         "description": "Manage keys for signing transactions."
       },
       "escrow": {
-        "description": "Manage the Armada project escrows."
+        "description": "Manage project escrows."
       },
       "node": {
-        "description": "Work with nodes on the Armada Network."
+        "description": "Create and manage nodes."
+      },
+      "operator": {
+        "description": "Create and manage operators."
       },
       "project": {
-        "description": "Work with projects on the Armada Network."
+        "description": "Create and manage projects."
       }
     }
   },
