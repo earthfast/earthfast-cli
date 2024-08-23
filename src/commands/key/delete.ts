@@ -4,7 +4,6 @@ import inquirer from "inquirer";
 import { deleteWallet, listWallets } from "../../keystore";
 import KeytarClient from "../../keytarClient";
 
-
 export default class KeyDelete extends Command {
   static summary = "Deletes a private key from the keystore.";
   static examples = ["<%= config.bin %> <%= command.id %> 0x123abc..."];
@@ -38,7 +37,7 @@ export default class KeyDelete extends Command {
 
     const keytar = await KeytarClient.getKeytar();
     const deletePassword = keytar.deletePassword;
-    await deletePassword("armada-cli", address);
+    await deletePassword("earthfast-cli", address);
     this.log(`Account ${address} deleted`);
     return address;
   }

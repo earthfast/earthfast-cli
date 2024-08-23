@@ -3,7 +3,7 @@ import { BlockchainCommand } from "../../base";
 import { formatProject, getContract, getProvider, parseHash, pretty } from "../../helpers";
 
 export default class ProjectShow extends BlockchainCommand {
-  static summary = "Show details of an Armada Network project.";
+  static summary = "Show details of an EarthFast Network project.";
   static examples = ["<%= config.bin %> <%= command.id %> 0x123abc..."];
   static usage = "<%= command.id %> ID";
   static args: Arg[] = [{ name: "ID", description: "The ID of the project to show.", required: true }];

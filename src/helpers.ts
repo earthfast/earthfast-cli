@@ -275,7 +275,7 @@ export async function getSigner(
 
     const keytar = await KeytarClient.getKeytar();
     const getPassword = keytar.getPassword;
-    let password = await getPassword("armada-cli", address);
+    let password = await getPassword("earthfast-cli", address);
     if (!password) {
       const res = await inquirer.prompt({
         name: "password",

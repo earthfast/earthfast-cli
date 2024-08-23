@@ -3,7 +3,7 @@ import { TransactionCommand } from "../../base";
 import { getContract, getSigner, parseHash, parseUSDC, pretty, run } from "../../helpers";
 
 export default class NodeCreate extends TransactionCommand {
-  static summary = `Register content nodes on the Armada Network.`;
+  static summary = `Register content nodes on the EarthFast Network.`;
   static description = "Node prices (PRICE) are expressed in USDC.";
   static examples = [
     "<%= config.bin %> <%= command.id %> 0x123abc... host1.com:na,host2.com:eu",

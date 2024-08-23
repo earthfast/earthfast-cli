@@ -4,7 +4,7 @@ import { BlockchainCommand } from "../../base";
 import { formatOperator, getAll, getContract, getProvider, pretty } from "../../helpers";
 
 export default class OperatorList extends BlockchainCommand {
-  static summary = "List operators on the Armada Network.";
+  static summary = "List operators on the EarthFast Network.";
   static examples = ["<%= config.bin %> <%= command.id %>"];
   static usage = "<%= command.id %> [--skip N] [--size N] [--page N]";
   static flags = {

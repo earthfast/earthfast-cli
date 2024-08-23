@@ -7,7 +7,7 @@ import { getSigner, parseAddress, pretty, run } from "../../helpers";
 const DEFAULT_ADMIN_ROLE = "DEFAULT_ADMIN_ROLE";
 
 export default class GrantRole extends TransactionCommand {
-  static summary = "Grant a role to an account on the Armada Network.";
+  static summary = "Grant a role to an account on the EarthFast Network.";
   static examples = [
     "<%= config.bin %> <%= command.id %> RECONCILER_ROLE 0x0000000000000000000000000000000000000000 0xContractAddress",
   ];

@@ -5,7 +5,7 @@ import { TransactionCommand } from "../../base";
 import { getContract, getSigner, parseAddress, parseHash, pretty, run } from "../../helpers";
 
 export default class ProjectCreate extends TransactionCommand {
-  static summary = "Register a new project on the Armada Network.";
+  static summary = "Register a new project on the EarthFast Network.";
   static examples = ['<%= config.bin %> <%= command.id %> "My Project" notify@myproject.com'];
   static usage = "<%= command.id %> [--owner ADDR] NAME EMAIL [URL] [SHA] [METADATA]";
   static args: Arg[] = [

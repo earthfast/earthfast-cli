@@ -3,7 +3,7 @@ import { TransactionCommand } from "../../base";
 import { getContract, getSigner, parseHash, pretty, run } from "../../helpers";
 
 export default class ProjectDelete extends TransactionCommand {
-  static summary = "Delete a project from the Armada Network.";
+  static summary = "Delete a project from the EarthFast Network.";
   static examples = ["<%= config.bin %> <%= command.id %> 0x123abc..."];
   static usage = "<%= command.id %> ID";
   static args: Arg[] = [{ name: "ID", description: "The ID of the project to delete.", required: true }];

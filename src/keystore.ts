@@ -7,7 +7,7 @@ import { parseHash } from "./helpers";
 import KeytarClient from "./keytarClient";
 
 const homedir = os.homedir();
-const keyStoreFolderPath = path.join(homedir, ".armada/keystore");
+const keyStoreFolderPath = path.join(homedir, ".earthfast/keystore");
 
 export async function saveWallet(privateKey: string, password: string, description: string): Promise<string> {
   privateKey = parseHash(privateKey);
@@ -24,7 +24,7 @@ export async function saveWallet(privateKey: string, password: string, descripti
 
   const keytar = await KeytarClient.getKeytar();
   const setPassword = keytar.setPassword;
-  setPassword("armada-cli", address, password);
+  setPassword("earthfast-cli", address, password);
   return address;
 }
 
