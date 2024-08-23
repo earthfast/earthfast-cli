@@ -1,7 +1,7 @@
 import { sha256File } from "./checksum";
 import { NodeFilesystem } from "./filesystem";
 
-const MANIFEST_FILENAME = "armada.json";
+const MANIFEST_FILENAME = "earthfast.json";
 const MANIFEST_PATH = "/" + MANIFEST_FILENAME;
 
 interface AssetGroupConfig {

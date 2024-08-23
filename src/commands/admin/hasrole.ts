@@ -7,7 +7,7 @@ import { getProvider, parseAddress } from "../../helpers";
 const DEFAULT_ADMIN_ROLE = "DEFAULT_ADMIN_ROLE";
 
 export default class HasRole extends TransactionCommand {
-  static summary = "Grant a role to an account on the Armada Network.";
+  static summary = "Grant a role to an account on the EarthFast Network.";
   static examples = [
     "<%= config.bin %> <%= command.id %> RECONCILER_ROLE 0x0000000000000000000000000000000000000000 0xContractAddress",
   ];

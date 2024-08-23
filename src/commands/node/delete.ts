@@ -3,7 +3,7 @@ import { TransactionCommand } from "../../base";
 import { getContract, getSigner, parseHash, pretty, run } from "../../helpers";
 
 export default class NodeDelete extends TransactionCommand {
-  static summary = "Delete content nodes from the Armada Network.";
+  static summary = "Delete content nodes from the EarthFast Network.";
   static description =
     "Only unreserved nodes can be deleted. To force unreserve " +
     "nodes, disable them and wait for the current epoch to end.";

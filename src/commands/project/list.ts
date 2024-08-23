@@ -4,7 +4,7 @@ import { BlockchainCommand } from "../../base";
 import { formatProject, getAll, getContract, getProvider, parseAddress, pretty } from "../../helpers";
 
 export default class ProjectList extends BlockchainCommand {
-  static summary = "List projects on the Armada Network.";
+  static summary = "List projects on the EarthFast Network.";
   static examples = ["<%= config.bin %> <%= command.id %>"];
   static usage = "<%= command.id %> [--owner ADDR] [--skip N] [--size N] [--page N]";
   static flags = {

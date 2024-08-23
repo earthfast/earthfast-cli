@@ -5,7 +5,7 @@ import { BlockchainCommand } from "../../base";
 import { formatNode, getAll, getContract, getProvider, parseHash, pretty } from "../../helpers";
 
 export default class NodeList extends BlockchainCommand {
-  static summary = "List content nodes on the Armada Network.";
+  static summary = "List content nodes on the EarthFast Network.";
   static examples = ["<%= config.bin %> <%= command.id %>"];
   static usage = "<%= command.id %> [--topology] [--operator ID] [--skip N] [--size N] [--page N]";
   static flags = {
