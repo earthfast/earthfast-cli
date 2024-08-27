@@ -66,6 +66,7 @@
     "@ledgerhq/hw-transport-node-hid": "^6.27.6",
     "@oclif/core": "^1.20.2",
     "@oclif/plugin-help": "^5.1.17",
+    "earthfast-cli": "^0.6.0",
     "ethers": "^5.7.1",
     "inquirer": "^7.1.4",
     "keytar": "^7.9.0",
