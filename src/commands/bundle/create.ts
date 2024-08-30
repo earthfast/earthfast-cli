@@ -16,6 +16,13 @@ export default class BundleCreate extends Command {
 
   public async run(): Promise<unknown> {
     const { args } = await this.parse(BundleCreate);
+
+    const resolvedDir = path.resolve(args.DIR);
+    const cwd = process.cwd();
+    if (resolvedDir === cwd || !resolvedDir.startsWith(cwd)) {
+      this.error("Error: Output directory must be a subdirectory of the current working directory");
+    }
+
     await generateManifest(args.DIR);
     const bundleName = normalizeBundleExtension(args.NAME);
     await compress(bundleName, args.DIR);
