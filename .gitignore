@@ -2,3 +2,4 @@
 dist
 node_modules
 oclif.manifest.json
+.earthfast/rpc_api_key
