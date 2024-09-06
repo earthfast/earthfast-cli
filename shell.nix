@@ -1,7 +1,7 @@
 with (import <nixpkgs> {});
 mkShell {
   buildInputs = [
-    nodejs-16_x
+    nodejs-20_x
   ] ++ lib.optionals stdenv.isDarwin (with darwin.apple_sdk.frameworks; [
     IOKit
   ]);
