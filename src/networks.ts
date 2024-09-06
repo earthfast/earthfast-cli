@@ -1,22 +1,17 @@
-export type NetworkName = "testnet" | "testnet-sepolia" | "testnet-sepolia-staging" | "staging" | "localhost";
+export type NetworkName = "testnet-sepolia" | "testnet-sepolia-staging" | "localhost";
 
 export interface NetworkInfo {
   url: string;
   abi?: string;
 }
 
+const rpcUrl = process.env.RPC_URL || "https://rpc.ankr.com/eth_sepolia";
 export const Networks: Record<NetworkName, NetworkInfo> = {
-  testnet: {
-    url: "https://rpc.ankr.com/eth_goerli",
-  },
   "testnet-sepolia": {
-    url: "https://rpc.ankr.com/eth_sepolia",
+    url: rpcUrl,
   },
   "testnet-sepolia-staging": {
-    url: "https://rpc.ankr.com/eth_sepolia",
-  },
-  staging: {
-    url: "https://rpc.ankr.com/eth_goerli",
+    url: rpcUrl,
   },
   localhost: {
     url: "http://localhost:8545",

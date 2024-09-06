@@ -1,3 +1,8 @@
+// eslint-disable-next-line import/order
+import dotenv from "dotenv";
+
+dotenv.config();
+
 import { Command, Flags } from "@oclif/core";
 import { CommandError, FlagOutput, Input, ParserOutput } from "@oclif/core/lib/interfaces";
 import { version } from "../package.json";
