@@ -1,7 +1,9 @@
-// eslint-disable-next-line import/order
 import dotenv from "dotenv";
+import path from "path";
 
-dotenv.config();
+// need to check both the ../ and ../../ for .env file
+// this is because src/base.ts is one level below .env and dist/src/base.js is two levels below .env
+dotenv.config({ path: [path.resolve(__dirname, "..", ".env"), path.resolve(__dirname, "../../", ".env")] });
 
 import { Command, Flags } from "@oclif/core";
 import { CommandError, FlagOutput, Input, ParserOutput } from "@oclif/core/lib/interfaces";
