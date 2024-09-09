@@ -15,10 +15,18 @@ jobs:
           node-version: '20.x'
           registry-url: 'https://registry.npmjs.org'
 
-      - run: |
+      - name: Create/update .env file
+        env:
+          RPC_URL: ${{ secrets.RPC_URL }}
+        run: |
+          echo "RPC_URL=${RPC_URL}" > .env
+
+      - name: Install dependencies and build
+        run: |
           npm ci
           npm run build
 
-      - run: npm publish
+      - name: Publish
+        run: npm publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN_EARTHFAST_CLI_RENAME }}

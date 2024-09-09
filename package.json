@@ -19,7 +19,8 @@
   "files": [
     "/bin",
     "/dist",
-    "/oclif.manifest.json"
+    "/oclif.manifest.json",
+    ".env"
   ],
   "repository": {
     "type": "git",
@@ -66,6 +67,7 @@
     "@ledgerhq/hw-transport-node-hid": "^6.27.6",
     "@oclif/core": "^1.20.2",
     "@oclif/plugin-help": "^5.1.17",
+    "dotenv": "^16.4.5",
     "ethers": "^5.7.1",
     "inquirer": "^7.1.4",
     "keytar": "^7.9.0",
