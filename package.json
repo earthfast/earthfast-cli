@@ -1,6 +1,6 @@
 {
   "name": "earthfast-cli",
-  "version": "0.7.2-beta.1",
+  "version": "0.7.2",
   "description": "Command line utility for EarthFast",
   "homepage": "https://earthfast.com",
   "license": "MIT",
