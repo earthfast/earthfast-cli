@@ -11,7 +11,7 @@ export default class NodeShow extends BlockchainCommand {
   public async run(): Promise<Record<string, unknown>> {
     const { args, flags } = await this.parse(NodeShow);
     const provider = await getProvider(flags.network, flags.rpc);
-    const nodes = await getContract(flags.network, flags.abi, "ArmadaNodes", provider);
+    const nodes = await getContract(flags.network, flags.abi, "EarthfastNodes", provider);
     const nodeId = parseHash(args.ID);
     const record = await nodes.getNode(nodeId);
     const output = formatNode(record);

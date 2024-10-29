@@ -18,7 +18,7 @@ export default class ProjectMetadata extends TransactionCommand {
   public async run(): Promise<unknown> {
     const { args, flags } = await this.parse(ProjectMetadata);
     const signer = await getSigner(flags.network, flags.rpc, flags.address, flags.signer, flags.key, flags.account);
-    const projects = await getContract(flags.network, flags.abi, "ArmadaProjects", signer);
+    const projects = await getContract(flags.network, flags.abi, "EarthfastProjects", signer);
     const projectId = parseHash(args.ID);
 
     try {
