@@ -11,7 +11,7 @@ export default class ProjectShow extends BlockchainCommand {
   public async run(): Promise<Record<string, unknown>> {
     const { args, flags } = await this.parse(ProjectShow);
     const provider = await getProvider(flags.network, flags.rpc);
-    const projects = await getContract(flags.network, flags.abi, "ArmadaProjects", provider);
+    const projects = await getContract(flags.network, flags.abi, "EarthfastProjects", provider);
     const projectId = parseHash(args.ID);
     const record = await projects.getProject(projectId);
     const output = formatProject(record);

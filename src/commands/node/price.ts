@@ -56,7 +56,7 @@ export default class NodePrice extends TransactionCommand {
     );
 
     const signer = await getSigner(flags.network, flags.rpc, flags.address, flags.signer, flags.key, flags.account);
-    const nodes = await getContract(flags.network, flags.abi, "ArmadaNodes", signer);
+    const nodes = await getContract(flags.network, flags.abi, "EarthfastNodes", signer);
     const nodeIds = records.map((r) => r.nodeId);
     const prices = records.map((r) => r.price);
     const operatorId = (await nodes.getNode(nodeIds[0])).operatorId;

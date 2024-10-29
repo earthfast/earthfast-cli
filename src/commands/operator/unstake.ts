@@ -5,7 +5,7 @@ import { TransactionCommand } from "../../base";
 import { getContract, getSigner, parseAddress, parseHash, parseTokens, pretty, run } from "../../helpers";
 
 export default class OperatorUnstake extends TransactionCommand {
-  static summary = "Withdraw Armada tokens from operator stake.";
+  static summary = "Withdraw Earthfast tokens from operator stake.";
   static description =
     "The tokens are sent to the operator owner. Only the part of tokens not needed to " +
     "stake the nodes can be withdrawn. In order to withdraw more, nodes can be deleted.";
@@ -13,7 +13,7 @@ export default class OperatorUnstake extends TransactionCommand {
   static usage = "<%= command.id %> ID TOKENS";
   static args: Arg[] = [
     { name: "ID", description: "The ID of the operator to withdraw stake from.", required: true },
-    { name: "TOKENS", description: "The Armada token amount to withdraw (e.g. 1.0).", required: true },
+    { name: "TOKENS", description: "The Earthfast token amount to withdraw (e.g. 1.0).", required: true },
   ];
   static flags = {
     recipient: Flags.string({ description: "[default: caller] The recipient address for tokens.", helpValue: "ADDR" }),
@@ -26,7 +26,7 @@ export default class OperatorUnstake extends TransactionCommand {
     }
 
     const signer = await getSigner(flags.network, flags.rpc, flags.address, flags.signer, flags.key, flags.account);
-    const operators = await getContract(flags.network, flags.abi, "ArmadaOperators", signer);
+    const operators = await getContract(flags.network, flags.abi, "EarthfastOperators", signer);
     const recipient = flags.recipient ? parseAddress(flags.recipient) : await signer.getAddress();
     const operatorId = parseHash(args.ID);
     const amount = parseTokens(args.TOKENS);

@@ -11,7 +11,7 @@ export default class Status extends BlockchainCommand {
   public async run(): Promise<unknown> {
     const { flags } = await this.parse(Status);
     const provider = await getProvider(flags.network, flags.rpc);
-    const registry = await getContract(flags.network, flags.abi, "ArmadaRegistry", provider);
+    const registry = await getContract(flags.network, flags.abi, "EarthfastRegistry", provider);
     const netVersion = await registry.getVersion();
     const cliVersion = version;
 
