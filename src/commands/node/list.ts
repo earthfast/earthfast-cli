@@ -7,7 +7,7 @@ import { formatNode, getAll, getContract, getProvider, parseHash, pretty } from 
 export default class NodeList extends BlockchainCommand {
   static summary = "List content nodes on the EarthFast Network.";
   static examples = ["<%= config.bin %> <%= command.id %>"];
-  static usage = "<%= command.id %> [--topology] [--operator ID] [--skip N] [--size N] [--page N] [--enabled-only]";
+  static usage = "<%= command.id %> [--topology] [--operator ID] [--skip N] [--size N] [--page N] [--enabled]";
   static flags = {
     topology: Flags.boolean({ description: "List topology nodes instead." }),
     operator: Flags.string({ description: "Filter by operator ID.", helpValue: "ID" }),
