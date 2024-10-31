@@ -46,6 +46,12 @@ export type ContractName =
   | "ArmadaOperators"
   | "ArmadaProjects"
   | "ArmadaReservations"
+  | "EarthfastToken"
+  | "EarthfastRegistry"
+  | "EarthfastNodes"
+  | "EarthfastOperators"
+  | "EarthfastProjects"
+  | "EarthfastReservations"
   | "USDC";
 
 export interface ContractInfo {

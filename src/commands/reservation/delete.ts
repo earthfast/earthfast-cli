@@ -28,7 +28,7 @@ export default class ReservationDelete extends TransactionCommand {
     const { args, flags } = await this.parse(ReservationDelete);
     const nodeIds = args.IDS.split(",").map((id: string) => parseHash(id));
     const signer = await getSigner(flags.network, flags.rpc, flags.address, flags.signer, flags.key, flags.account);
-    const reservations = await getContract(flags.network, flags.abi, "ArmadaReservations", signer);
+    const reservations = await getContract(flags.network, flags.abi, "EarthfastReservations", signer);
     const projectId = parseHash(args.ID);
     const slot = { last: flags.lastSlot, next: !flags.nextSlotFalse };
     const tx = await reservations.populateTransaction.deleteReservations(projectId, nodeIds, slot);

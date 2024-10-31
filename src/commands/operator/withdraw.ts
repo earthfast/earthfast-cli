@@ -24,7 +24,7 @@ export default class OperatorWithdraw extends TransactionCommand {
     }
 
     const signer = await getSigner(flags.network, flags.rpc, flags.address, flags.signer, flags.key, flags.account);
-    const operators = await getContract(flags.network, flags.abi, "ArmadaOperators", signer);
+    const operators = await getContract(flags.network, flags.abi, "EarthfastOperators", signer);
     const recipient = flags.recipient ? parseAddress(flags.recipient) : await signer.getAddress();
     const operatorId = parseHash(args.ID);
     const amount = parseUSDC(args.USDC);

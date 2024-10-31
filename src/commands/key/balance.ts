@@ -34,11 +34,11 @@ export default class KeyBalance extends BlockchainCommand {
     const address = args.ADDR;
     const provider = await getProvider(flags.network, flags.rpc);
     const usdc = await getContract(flags.network, flags.abi, "USDC", provider);
-    const token = await getContract(flags.network, flags.abi, "ArmadaToken", provider);
+    const token = await getContract(flags.network, flags.abi, "EarthfastToken", provider);
     const ETH = await provider.getBalance(address);
     const USDC = await usdc.balanceOf(address);
-    const ARMADA = await token.balanceOf(address);
-    const output = { ETH: formatETH(ETH), USDC: formatUSDC(USDC), ARMADA: formatTokens(ARMADA) };
+    const EARTHFAST = await token.balanceOf(address);
+    const output = { ETH: formatETH(ETH), USDC: formatUSDC(USDC), EARTHFAST: formatTokens(EARTHFAST) };
     this.log(pretty(output));
     return output;
   }

@@ -9,7 +9,7 @@ const DEFAULT_ADMIN_ROLE = "DEFAULT_ADMIN_ROLE";
 export default class GrantRole extends TransactionCommand {
   static summary = "Grant a role to an account on the EarthFast Network.";
   static examples = [
-    "<%= config.bin %> <%= command.id %> RECONCILER_ROLE 0x0000000000000000000000000000000000000000 0xContractAddress",
+    "<%= config.bin %> <%= command.id %> RECONCILER_ROLE 0x0000000000000000000000000000000000000000 0xEarthfastContractAddress",
   ];
   static usage = "<%= command.id %> ROLE ACCOUNT CONTRACT_ADDRESS";
   static args: Arg[] = [

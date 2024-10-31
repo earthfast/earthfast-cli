@@ -23,7 +23,7 @@ export default class NodeHost extends TransactionCommand {
   public async run(): Promise<unknown> {
     const { args, flags } = await this.parse(NodeHost);
     const provider = await getProvider(flags.network, flags.rpc);
-    const nodesView = await getContract(flags.network, flags.abi, "ArmadaNodes", provider);
+    const nodesView = await getContract(flags.network, flags.abi, "EarthfastNodes", provider);
     const values: string[] = args["ID:HOST:REGION"].split(",");
     const defaultRegion: string = args["DEFAULT_REGION"];
     const records = await Promise.all(
@@ -53,7 +53,7 @@ export default class NodeHost extends TransactionCommand {
     );
 
     const signer = await getSigner(flags.network, flags.rpc, flags.address, flags.signer, flags.key, flags.account);
-    const nodes = await getContract(flags.network, flags.abi, "ArmadaNodes", signer);
+    const nodes = await getContract(flags.network, flags.abi, "EarthfastNodes", signer);
     const nodeIds = records.map((r) => r.nodeId);
     const hosts = records.map((r) => r.host);
     const regions = records.map((r) => r.region);

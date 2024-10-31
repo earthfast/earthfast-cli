@@ -41,7 +41,7 @@ export abstract class BlockchainCommand extends Command {
     rpc: string | undefined;
   }): Promise<void> {
     const provider = await getProvider(flags.network, flags.rpc);
-    const registry = await getContract(flags.network, flags.abi, "ArmadaRegistry", provider);
+    const registry = await getContract(flags.network, flags.abi, "EarthfastRegistry", provider);
     const netVersion = await registry.getVersion();
     if (!netVersion) {
       // Use stderr to not interfere with --json flag
