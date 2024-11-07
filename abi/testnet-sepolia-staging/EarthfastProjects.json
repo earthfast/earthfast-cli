@@ -1,5 +1,5 @@
 {
-  "address": "0x2278c5FD6572383FB7267939Ae5625e94dA77a8E",
+  "address": "0x1b68de1cAF955CA08fA289dB2Feb3fDe121e57D0",
   "abi": [
     {
       "anonymous": false,
@@ -50,25 +50,13 @@
       "anonymous": false,
       "inputs": [
         {
-          "indexed": true,
-          "internalType": "bytes32",
-          "name": "operatorId",
-          "type": "bytes32"
-        },
-        {
           "indexed": false,
-          "internalType": "uint256",
-          "name": "oldBalance",
-          "type": "uint256"
-        },
-        {
-          "indexed": false,
-          "internalType": "uint256",
-          "name": "newBalance",
-          "type": "uint256"
+          "internalType": "address",
+          "name": "account",
+          "type": "address"
         }
       ],
-      "name": "OperatorBalanceChanged",
+      "name": "Paused",
       "type": "event"
     },
     {
@@ -77,7 +65,44 @@
         {
           "indexed": true,
           "internalType": "bytes32",
-          "name": "operatorId",
+          "name": "projectId",
+          "type": "bytes32"
+        },
+        {
+          "indexed": false,
+          "internalType": "string",
+          "name": "oldContent",
+          "type": "string"
+        },
+        {
+          "indexed": false,
+          "internalType": "bytes32",
+          "name": "oldChecksum",
+          "type": "bytes32"
+        },
+        {
+          "indexed": false,
+          "internalType": "string",
+          "name": "newContent",
+          "type": "string"
+        },
+        {
+          "indexed": false,
+          "internalType": "bytes32",
+          "name": "newChecksum",
+          "type": "bytes32"
+        }
+      ],
+      "name": "ProjectContentChanged",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "bytes32",
+          "name": "projectId",
           "type": "bytes32"
         },
         {
@@ -97,9 +122,27 @@
           "internalType": "string",
           "name": "email",
           "type": "string"
+        },
+        {
+          "indexed": false,
+          "internalType": "string",
+          "name": "content",
+          "type": "string"
+        },
+        {
+          "indexed": false,
+          "internalType": "bytes32",
+          "name": "checksum",
+          "type": "bytes32"
+        },
+        {
+          "indexed": false,
+          "internalType": "string",
+          "name": "metadata",
+          "type": "string"
         }
       ],
-      "name": "OperatorCreated",
+      "name": "ProjectCreated",
       "type": "event"
     },
     {
@@ -108,7 +151,7 @@
         {
           "indexed": true,
           "internalType": "bytes32",
-          "name": "operatorId",
+          "name": "projectId",
           "type": "bytes32"
         },
         {
@@ -128,9 +171,27 @@
           "internalType": "string",
           "name": "email",
           "type": "string"
+        },
+        {
+          "indexed": false,
+          "internalType": "string",
+          "name": "content",
+          "type": "string"
+        },
+        {
+          "indexed": false,
+          "internalType": "bytes32",
+          "name": "checksum",
+          "type": "bytes32"
+        },
+        {
+          "indexed": false,
+          "internalType": "string",
+          "name": "metadata",
+          "type": "string"
         }
       ],
-      "name": "OperatorDeleted",
+      "name": "ProjectDeleted",
       "type": "event"
     },
     {
@@ -139,7 +200,57 @@
         {
           "indexed": true,
           "internalType": "bytes32",
-          "name": "operatorId",
+          "name": "projectId",
+          "type": "bytes32"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "oldEscrow",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "newEscrow",
+          "type": "uint256"
+        }
+      ],
+      "name": "ProjectEscrowChanged",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "bytes32",
+          "name": "projectId",
+          "type": "bytes32"
+        },
+        {
+          "indexed": false,
+          "internalType": "string",
+          "name": "oldMetadata",
+          "type": "string"
+        },
+        {
+          "indexed": false,
+          "internalType": "string",
+          "name": "newMetadata",
+          "type": "string"
+        }
+      ],
+      "name": "ProjectMetadataChanged",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "bytes32",
+          "name": "projectId",
           "type": "bytes32"
         },
         {
@@ -155,7 +266,7 @@
           "type": "address"
         }
       ],
-      "name": "OperatorOwnerChanged",
+      "name": "ProjectOwnerChanged",
       "type": "event"
     },
     {
@@ -164,7 +275,7 @@
         {
           "indexed": true,
           "internalType": "bytes32",
-          "name": "operatorId",
+          "name": "projectId",
           "type": "bytes32"
         },
         {
@@ -192,45 +303,7 @@
           "type": "string"
         }
       ],
-      "name": "OperatorPropsChanged",
-      "type": "event"
-    },
-    {
-      "anonymous": false,
-      "inputs": [
-        {
-          "indexed": true,
-          "internalType": "bytes32",
-          "name": "operatorId",
-          "type": "bytes32"
-        },
-        {
-          "indexed": false,
-          "internalType": "uint256",
-          "name": "oldStake",
-          "type": "uint256"
-        },
-        {
-          "indexed": false,
-          "internalType": "uint256",
-          "name": "newStake",
-          "type": "uint256"
-        }
-      ],
-      "name": "OperatorStakeChanged",
-      "type": "event"
-    },
-    {
-      "anonymous": false,
-      "inputs": [
-        {
-          "indexed": false,
-          "internalType": "address",
-          "name": "account",
-          "type": "address"
-        }
-      ],
-      "name": "Paused",
+      "name": "ProjectPropsChanged",
       "type": "event"
     },
     {
@@ -361,28 +434,63 @@
       "type": "function"
     },
     {
-      "inputs": [
-        {
-          "internalType": "address",
-          "name": "owner",
-          "type": "address"
-        },
-        {
-          "internalType": "string",
-          "name": "name",
-          "type": "string"
-        },
-        {
-          "internalType": "string",
-          "name": "email",
-          "type": "string"
-        }
-      ],
-      "name": "createOperator",
+      "inputs": [],
+      "name": "PROJECT_CREATOR_ROLE",
       "outputs": [
         {
           "internalType": "bytes32",
-          "name": "operatorId",
+          "name": "",
+          "type": "bytes32"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "components": [
+            {
+              "internalType": "address",
+              "name": "owner",
+              "type": "address"
+            },
+            {
+              "internalType": "string",
+              "name": "name",
+              "type": "string"
+            },
+            {
+              "internalType": "string",
+              "name": "email",
+              "type": "string"
+            },
+            {
+              "internalType": "string",
+              "name": "content",
+              "type": "string"
+            },
+            {
+              "internalType": "bytes32",
+              "name": "checksum",
+              "type": "bytes32"
+            },
+            {
+              "internalType": "string",
+              "name": "metadata",
+              "type": "string"
+            }
+          ],
+          "internalType": "struct EarthfastCreateProjectData",
+          "name": "project",
+          "type": "tuple"
+        }
+      ],
+      "name": "createProject",
+      "outputs": [
+        {
+          "internalType": "bytes32",
+          "name": "projectId",
           "type": "bytes32"
         }
       ],
@@ -393,11 +501,11 @@
       "inputs": [
         {
           "internalType": "bytes32",
-          "name": "operatorId",
+          "name": "projectId",
           "type": "bytes32"
         }
       ],
-      "name": "deleteOperator",
+      "name": "deleteProject",
       "outputs": [],
       "stateMutability": "nonpayable",
       "type": "function"
@@ -406,7 +514,7 @@
       "inputs": [
         {
           "internalType": "bytes32",
-          "name": "operatorId",
+          "name": "projectId",
           "type": "bytes32"
         },
         {
@@ -435,7 +543,7 @@
           "type": "bytes32"
         }
       ],
-      "name": "depositOperatorBalance",
+      "name": "depositProjectEscrow",
       "outputs": [],
       "stateMutability": "nonpayable",
       "type": "function"
@@ -444,49 +552,11 @@
       "inputs": [
         {
           "internalType": "bytes32",
-          "name": "operatorId",
-          "type": "bytes32"
-        },
-        {
-          "internalType": "uint256",
-          "name": "amount",
-          "type": "uint256"
-        },
-        {
-          "internalType": "uint256",
-          "name": "deadline",
-          "type": "uint256"
-        },
-        {
-          "internalType": "uint8",
-          "name": "v",
-          "type": "uint8"
-        },
-        {
-          "internalType": "bytes32",
-          "name": "r",
-          "type": "bytes32"
-        },
-        {
-          "internalType": "bytes32",
-          "name": "s",
+          "name": "projectId",
           "type": "bytes32"
         }
       ],
-      "name": "depositOperatorStake",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "bytes32",
-          "name": "operatorId",
-          "type": "bytes32"
-        }
-      ],
-      "name": "getOperator",
+      "name": "getProject",
       "outputs": [
         {
           "components": [
@@ -512,16 +582,31 @@
             },
             {
               "internalType": "uint256",
-              "name": "stake",
+              "name": "escrow",
               "type": "uint256"
             },
             {
               "internalType": "uint256",
-              "name": "balance",
+              "name": "reserve",
               "type": "uint256"
+            },
+            {
+              "internalType": "string",
+              "name": "content",
+              "type": "string"
+            },
+            {
+              "internalType": "bytes32",
+              "name": "checksum",
+              "type": "bytes32"
+            },
+            {
+              "internalType": "string",
+              "name": "metadata",
+              "type": "string"
             }
           ],
-          "internalType": "struct ArmadaOperator",
+          "internalType": "struct EarthfastProject",
           "name": "",
           "type": "tuple"
         }
@@ -531,7 +616,7 @@
     },
     {
       "inputs": [],
-      "name": "getOperatorCount",
+      "name": "getProjectCount",
       "outputs": [
         {
           "internalType": "uint256",
@@ -555,7 +640,7 @@
           "type": "uint256"
         }
       ],
-      "name": "getOperators",
+      "name": "getProjects",
       "outputs": [
         {
           "components": [
@@ -581,16 +666,31 @@
             },
             {
               "internalType": "uint256",
-              "name": "stake",
+              "name": "escrow",
               "type": "uint256"
             },
             {
               "internalType": "uint256",
-              "name": "balance",
+              "name": "reserve",
               "type": "uint256"
+            },
+            {
+              "internalType": "string",
+              "name": "content",
+              "type": "string"
+            },
+            {
+              "internalType": "bytes32",
+              "name": "checksum",
+              "type": "bytes32"
+            },
+            {
+              "internalType": "string",
+              "name": "metadata",
+              "type": "string"
             }
           ],
-          "internalType": "struct ArmadaOperator[]",
+          "internalType": "struct EarthfastProject[]",
           "name": "values",
           "type": "tuple[]"
         }
@@ -603,7 +703,7 @@
       "name": "getRegistry",
       "outputs": [
         {
-          "internalType": "contract ArmadaRegistry",
+          "internalType": "contract EarthfastRegistry",
           "name": "",
           "type": "address"
         }
@@ -625,19 +725,6 @@
           "internalType": "bytes32",
           "name": "",
           "type": "bytes32"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [],
-      "name": "getStakePerNode",
-      "outputs": [
-        {
-          "internalType": "uint256",
-          "name": "",
-          "type": "uint256"
         }
       ],
       "stateMutability": "view",
@@ -693,14 +780,9 @@
           "type": "address[]"
         },
         {
-          "internalType": "contract ArmadaRegistry",
+          "internalType": "contract EarthfastRegistry",
           "name": "registry",
           "type": "address"
-        },
-        {
-          "internalType": "uint256",
-          "name": "stakePerNode",
-          "type": "uint256"
         },
         {
           "internalType": "bool",
@@ -768,24 +850,6 @@
       "inputs": [
         {
           "internalType": "bytes32",
-          "name": "nodeId",
-          "type": "bytes32"
-        },
-        {
-          "internalType": "address",
-          "name": "sender",
-          "type": "address"
-        }
-      ],
-      "name": "requireTopologyNode",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "bytes32",
           "name": "role",
           "type": "bytes32"
         },
@@ -804,7 +868,30 @@
       "inputs": [
         {
           "internalType": "bytes32",
-          "name": "operatorId",
+          "name": "projectId",
+          "type": "bytes32"
+        },
+        {
+          "internalType": "string",
+          "name": "content",
+          "type": "string"
+        },
+        {
+          "internalType": "bytes32",
+          "name": "checksum",
+          "type": "bytes32"
+        }
+      ],
+      "name": "setProjectContent",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "projectId",
           "type": "bytes32"
         },
         {
@@ -818,7 +905,7 @@
           "type": "uint256"
         }
       ],
-      "name": "setOperatorBalanceImpl",
+      "name": "setProjectEscrowImpl",
       "outputs": [],
       "stateMutability": "nonpayable",
       "type": "function"
@@ -827,7 +914,25 @@
       "inputs": [
         {
           "internalType": "bytes32",
-          "name": "operatorId",
+          "name": "projectId",
+          "type": "bytes32"
+        },
+        {
+          "internalType": "string",
+          "name": "metadata",
+          "type": "string"
+        }
+      ],
+      "name": "setProjectMetadata",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "projectId",
           "type": "bytes32"
         },
         {
@@ -836,7 +941,7 @@
           "type": "address"
         }
       ],
-      "name": "setOperatorOwner",
+      "name": "setProjectOwner",
       "outputs": [],
       "stateMutability": "nonpayable",
       "type": "function"
@@ -845,7 +950,7 @@
       "inputs": [
         {
           "internalType": "bytes32",
-          "name": "operatorId",
+          "name": "projectId",
           "type": "bytes32"
         },
         {
@@ -859,7 +964,7 @@
           "type": "string"
         }
       ],
-      "name": "setOperatorProps",
+      "name": "setProjectProps",
       "outputs": [],
       "stateMutability": "nonpayable",
       "type": "function"
@@ -867,12 +972,22 @@
     {
       "inputs": [
         {
+          "internalType": "bytes32",
+          "name": "projectId",
+          "type": "bytes32"
+        },
+        {
           "internalType": "uint256",
-          "name": "stake",
+          "name": "decrease",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "increase",
           "type": "uint256"
         }
       ],
-      "name": "setStakePerNode",
+      "name": "setProjectReserveImpl",
       "outputs": [],
       "stateMutability": "nonpayable",
       "type": "function"
@@ -929,18 +1044,38 @@
             },
             {
               "internalType": "uint256",
-              "name": "stake",
+              "name": "escrow",
               "type": "uint256"
             },
             {
               "internalType": "uint256",
-              "name": "balance",
+              "name": "reserve",
               "type": "uint256"
+            },
+            {
+              "internalType": "string",
+              "name": "content",
+              "type": "string"
+            },
+            {
+              "internalType": "bytes32",
+              "name": "checksum",
+              "type": "bytes32"
+            },
+            {
+              "internalType": "string",
+              "name": "metadata",
+              "type": "string"
             }
           ],
-          "internalType": "struct ArmadaOperator[]",
-          "name": "operators",
+          "internalType": "struct EarthfastProject[]",
+          "name": "projects",
           "type": "tuple[]"
+        },
+        {
+          "internalType": "address[]",
+          "name": "creators",
+          "type": "address[]"
         },
         {
           "internalType": "bool",
@@ -976,7 +1111,7 @@
           "type": "uint256"
         }
       ],
-      "name": "unsafeSetBalances",
+      "name": "unsafeSetEscrows",
       "outputs": [],
       "stateMutability": "nonpayable",
       "type": "function"
@@ -984,7 +1119,7 @@
     {
       "inputs": [
         {
-          "internalType": "contract ArmadaRegistry",
+          "internalType": "contract EarthfastRegistry",
           "name": "registry",
           "type": "address"
         }
@@ -1029,7 +1164,7 @@
       "inputs": [
         {
           "internalType": "bytes32",
-          "name": "operatorId",
+          "name": "projectId",
           "type": "bytes32"
         },
         {
@@ -1043,30 +1178,7 @@
           "type": "address"
         }
       ],
-      "name": "withdrawOperatorBalance",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "bytes32",
-          "name": "operatorId",
-          "type": "bytes32"
-        },
-        {
-          "internalType": "uint256",
-          "name": "amount",
-          "type": "uint256"
-        },
-        {
-          "internalType": "address",
-          "name": "to",
-          "type": "address"
-        }
-      ],
-      "name": "withdrawOperatorStake",
+      "name": "withdrawProjectEscrow",
       "outputs": [],
       "stateMutability": "nonpayable",
       "type": "function"
