@@ -26,7 +26,7 @@ export default class ProjectWithdraw extends TransactionCommand {
     }
 
     const signer = await getSigner(flags.network, flags.rpc, flags.address, flags.signer, flags.key, flags.account);
-    const projects = await getContract(flags.network, flags.abi, "ArmadaProjects", signer);
+    const projects = await getContract(flags.network, flags.abi, "EarthfastProjects", signer);
     const recipient = flags.recipient ? parseAddress(flags.recipient) : await signer.getAddress();
     const projectId = parseHash(args.ID);
     const amount = parseUSDC(args.USDC);

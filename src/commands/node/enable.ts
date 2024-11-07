@@ -21,7 +21,7 @@ export default class NodeEnable extends TransactionCommand {
     }
 
     const signer = await getSigner(flags.network, flags.rpc, flags.address, flags.signer, flags.key, flags.account);
-    const nodes = await getContract(flags.network, flags.abi, "ArmadaNodes", signer);
+    const nodes = await getContract(flags.network, flags.abi, "EarthfastNodes", signer);
     const nodeIds = args.IDS.split(",").map((id: string) => parseHash(id));
     const disables = nodeIds.map(() => args.BOOL !== "true");
     const operatorId = (await nodes.getNode(nodeIds[0])).operatorId;

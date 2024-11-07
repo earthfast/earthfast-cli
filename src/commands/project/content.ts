@@ -23,7 +23,7 @@ export default class ProjectContent extends TransactionCommand {
     }
 
     const signer = await getSigner(flags.network, flags.rpc, flags.address, flags.signer, flags.key, flags.account);
-    const projects = await getContract(flags.network, flags.abi, "ArmadaProjects", signer);
+    const projects = await getContract(flags.network, flags.abi, "EarthfastProjects", signer);
     const projectId = parseHash(args.ID);
     const bundleSha = parseHash(args.SHA);
     const tx = await projects.populateTransaction.setProjectContent(projectId, args.URL, bundleSha);

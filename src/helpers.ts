@@ -73,7 +73,7 @@ export const parseUSDC = (value: string): BigNumber => parseUnits(value, 6);
 export const parseTokens = (value: string): BigNumber => parseUnits(value, 18);
 export const formatETH = (value: BigNumberish): string => `${formatUnits(value, 18)} ETH`;
 export const formatUSDC = (value: BigNumberish): string => `${formatUnits(value, 6)} USDC`;
-export const formatTokens = (value: BigNumberish): string => `${formatUnits(value, 18)} ARMADA`;
+export const formatTokens = (value: BigNumberish): string => `${formatUnits(value, 18)} EARTHFAST`;
 
 // Creates token transfer allowance.
 // Returns either a token approve transaction (tx), or a gassless permit (deadline+sig) if the signer supports it.

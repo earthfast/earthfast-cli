@@ -4,48 +4,30 @@ import type { ContractInterface } from "ethers";
 import { NetworkName } from "./networks";
 
 // These imports are necessary to pull these files into dist/
-import "../abi/staging/ArmadaToken.json";
-import "../abi/staging/ArmadaRegistry.json";
-import "../abi/staging/ArmadaNodes.json";
-import "../abi/staging/ArmadaOperators.json";
-import "../abi/staging/ArmadaProjects.json";
-import "../abi/staging/ArmadaReservations.json";
-import "../abi/staging/USDC.json";
-
-// These imports are necessary to pull these files into dist/
-import "../abi/testnet/ArmadaToken.json";
-import "../abi/testnet/ArmadaRegistry.json";
-import "../abi/testnet/ArmadaNodes.json";
-import "../abi/testnet/ArmadaOperators.json";
-import "../abi/testnet/ArmadaProjects.json";
-import "../abi/testnet/ArmadaReservations.json";
-import "../abi/testnet/USDC.json";
-
-// These imports are necessary to pull these files into dist/
-import "../abi/testnet-sepolia/ArmadaToken.json";
-import "../abi/testnet-sepolia/ArmadaRegistry.json";
-import "../abi/testnet-sepolia/ArmadaNodes.json";
-import "../abi/testnet-sepolia/ArmadaOperators.json";
-import "../abi/testnet-sepolia/ArmadaProjects.json";
-import "../abi/testnet-sepolia/ArmadaReservations.json";
 import "../abi/testnet-sepolia/USDC.json";
+import "../abi/testnet-sepolia/EarthfastToken.json";
+import "../abi/testnet-sepolia/EarthfastRegistry.json";
+import "../abi/testnet-sepolia/EarthfastNodes.json";
+import "../abi/testnet-sepolia/EarthfastOperators.json";
+import "../abi/testnet-sepolia/EarthfastProjects.json";
+import "../abi/testnet-sepolia/EarthfastReservations.json";
 
 // These imports are necessary to pull these files into dist/
-import "../abi/testnet-sepolia-staging/ArmadaToken.json";
-import "../abi/testnet-sepolia-staging/ArmadaRegistry.json";
-import "../abi/testnet-sepolia-staging/ArmadaNodes.json";
-import "../abi/testnet-sepolia-staging/ArmadaOperators.json";
-import "../abi/testnet-sepolia-staging/ArmadaProjects.json";
-import "../abi/testnet-sepolia-staging/ArmadaReservations.json";
 import "../abi/testnet-sepolia-staging/USDC.json";
+import "../abi/testnet-sepolia-staging/EarthfastToken.json";
+import "../abi/testnet-sepolia-staging/EarthfastRegistry.json";
+import "../abi/testnet-sepolia-staging/EarthfastNodes.json";
+import "../abi/testnet-sepolia-staging/EarthfastOperators.json";
+import "../abi/testnet-sepolia-staging/EarthfastProjects.json";
+import "../abi/testnet-sepolia-staging/EarthfastReservations.json";
 
 export type ContractName =
-  | "ArmadaToken"
-  | "ArmadaRegistry"
-  | "ArmadaNodes"
-  | "ArmadaOperators"
-  | "ArmadaProjects"
-  | "ArmadaReservations"
+  | "EarthfastToken"
+  | "EarthfastRegistry"
+  | "EarthfastNodes"
+  | "EarthfastOperators"
+  | "EarthfastProjects"
+  | "EarthfastReservations"
   | "USDC";
 
 export interface ContractInfo {

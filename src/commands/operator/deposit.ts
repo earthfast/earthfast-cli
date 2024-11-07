@@ -15,7 +15,7 @@ export default class OperatorDeposit extends TransactionCommand {
     const { args, flags } = await this.parse(OperatorDeposit);
     const signer = await getSigner(flags.network, flags.rpc, flags.address, flags.signer, flags.key, flags.account);
     const usdc = await getContract(flags.network, flags.abi, "USDC", signer);
-    const operators = await getContract(flags.network, flags.abi, "ArmadaOperators", signer);
+    const operators = await getContract(flags.network, flags.abi, "EarthfastOperators", signer);
     const id = parseHash(args.ID);
     const amount = parseUSDC(args.USDC);
 

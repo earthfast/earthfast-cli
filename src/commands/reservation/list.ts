@@ -18,7 +18,7 @@ export default class ReservationList extends BlockchainCommand {
   public async run(): Promise<Record<string, unknown>[]> {
     const { args, flags } = await this.parse(ReservationList);
     const provider = await getProvider(flags.network, flags.rpc);
-    const reservations = await getContract(flags.network, flags.abi, "ArmadaReservations", provider);
+    const reservations = await getContract(flags.network, flags.abi, "EarthfastReservations", provider);
     const projectId = parseHash(args.ID);
     const blockTag = await provider.getBlockNumber();
     const results: Result[] = await getAll(flags.page, async (i, n) => {
