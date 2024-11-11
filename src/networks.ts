@@ -15,7 +15,7 @@ export const Networks: Record<NetworkName, NetworkInfo> = {
   },
   localhost: {
     url: "http://localhost:8545",
-    abi: "../armada-contracts/deployments/localhost",
+    abi: "../earthfast-contracts/deployments/localhost",
   },
 };
 
