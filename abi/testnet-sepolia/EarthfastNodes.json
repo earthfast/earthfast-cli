@@ -1,5 +1,5 @@
 {
-  "address": "0x3e8cc40A3EF74B7eb09D8B4747a307a020E1C71c",
+  "address": "0x8B1737f02acC78F5f84a59cDB789ff0e6d3974c5",
   "abi": [
     {
       "anonymous": false,
@@ -76,12 +76,6 @@
         {
           "indexed": false,
           "internalType": "bool",
-          "name": "topology",
-          "type": "bool"
-        },
-        {
-          "indexed": false,
-          "internalType": "bool",
           "name": "disabled",
           "type": "bool"
         },
@@ -121,12 +115,6 @@
           "internalType": "string",
           "name": "region",
           "type": "string"
-        },
-        {
-          "indexed": false,
-          "internalType": "bool",
-          "name": "topology",
-          "type": "bool"
         },
         {
           "indexed": false,
@@ -396,19 +384,6 @@
       "type": "function"
     },
     {
-      "inputs": [],
-      "name": "TOPOLOGY_CREATOR_ROLE",
-      "outputs": [
-        {
-          "internalType": "bytes32",
-          "name": "",
-          "type": "bytes32"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
       "inputs": [
         {
           "internalType": "bytes32",
@@ -429,11 +404,6 @@
           "type": "bytes32"
         },
         {
-          "internalType": "bool",
-          "name": "topology",
-          "type": "bool"
-        },
-        {
           "components": [
             {
               "internalType": "string",
@@ -444,11 +414,6 @@
               "internalType": "string",
               "name": "region",
               "type": "string"
-            },
-            {
-              "internalType": "bool",
-              "name": "topology",
-              "type": "bool"
             },
             {
               "internalType": "bool",
@@ -483,11 +448,6 @@
           "internalType": "bytes32",
           "name": "operatorId",
           "type": "bytes32"
-        },
-        {
-          "internalType": "bool",
-          "name": "topology",
-          "type": "bool"
         },
         {
           "internalType": "bytes32[]",
@@ -534,11 +494,6 @@
             },
             {
               "internalType": "bool",
-              "name": "topology",
-              "type": "bool"
-            },
-            {
-              "internalType": "bool",
               "name": "disabled",
               "type": "bool"
             },
@@ -567,11 +522,6 @@
           "internalType": "bytes32",
           "name": "operatorIdOrZero",
           "type": "bytes32"
-        },
-        {
-          "internalType": "bool",
-          "name": "topology",
-          "type": "bool"
         }
       ],
       "name": "getNodeCount",
@@ -591,11 +541,6 @@
           "internalType": "bytes32",
           "name": "operatorIdOrZero",
           "type": "bytes32"
-        },
-        {
-          "internalType": "bool",
-          "name": "topology",
-          "type": "bool"
         },
         {
           "internalType": "uint256",
@@ -631,11 +576,6 @@
               "internalType": "string",
               "name": "region",
               "type": "string"
-            },
-            {
-              "internalType": "bool",
-              "name": "topology",
-              "type": "bool"
             },
             {
               "internalType": "bool",
@@ -1016,11 +956,6 @@
             },
             {
               "internalType": "bool",
-              "name": "topology",
-              "type": "bool"
-            },
-            {
-              "internalType": "bool",
               "name": "disabled",
               "type": "bool"
             },
@@ -1038,11 +973,6 @@
           "internalType": "struct EarthfastNode[]",
           "name": "nodes",
           "type": "tuple[]"
-        },
-        {
-          "internalType": "address[]",
-          "name": "topologyCreators",
-          "type": "address[]"
         },
         {
           "internalType": "bool",

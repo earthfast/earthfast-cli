@@ -15,9 +15,14 @@ export default class Status extends BlockchainCommand {
     const netVersion = await registry.getVersion();
     const cliVersion = version;
 
+    // Round epoch start to Wednesday at 16:00 UTC
     const lastEpochStart = new Date();
-    lastEpochStart.setUTCHours(0, 0, 0, 0);
-    lastEpochStart.setUTCDate(lastEpochStart.getUTCDate() - lastEpochStart.getUTCDay());
+    lastEpochStart.setUTCHours(16, 0, 0, 0);
+    // Get current day (0 = Sunday, 3 = Wednesday)
+    const currentDay = lastEpochStart.getUTCDay();
+    // Calculate days to subtract to reach previous Wednesday
+    const daysToSubtract = (currentDay - 3 + 7) % 7 || 7; // If result is 0, subtract 7 days
+    lastEpochStart.setUTCDate(lastEpochStart.getUTCDate() - daysToSubtract);
 
     const nextEpochStart = new Date(lastEpochStart);
     nextEpochStart.setUTCDate(nextEpochStart.getUTCDate() + 7);

@@ -1,5 +1,5 @@
 {
-  "address": "0x6cE7EB36BC101459B09F13AfB13FD8ccf3BC1c8C",
+  "address": "0x496e5Ba816f4C593c3b31fa78279dfB57DAaad26",
   "abi": [
     {
       "anonymous": false,
@@ -492,11 +492,6 @@
             },
             {
               "internalType": "bool",
-              "name": "topology",
-              "type": "bool"
-            },
-            {
-              "internalType": "bool",
               "name": "disabled",
               "type": "bool"
             },
@@ -745,11 +740,6 @@
               "internalType": "string",
               "name": "region",
               "type": "string"
-            },
-            {
-              "internalType": "bool",
-              "name": "topology",
-              "type": "bool"
             },
             {
               "internalType": "bool",

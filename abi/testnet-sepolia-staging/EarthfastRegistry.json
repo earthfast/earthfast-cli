@@ -1,5 +1,5 @@
 {
-  "address": "0xA73F1bd17a7F60374A6d4c511fBaebfDb3Bf774a",
+  "address": "0x69e4aa095489E8613B4C4d396DD916e66D66aE23",
   "abi": [
     {
       "anonymous": false,
@@ -188,25 +188,6 @@
     },
     {
       "inputs": [],
-      "name": "RECONCILER_ROLE",
-      "outputs": [
-        {
-          "internalType": "bytes32",
-          "name": "",
-          "type": "bytes32"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "bytes32",
-          "name": "topologyNodeId",
-          "type": "bytes32"
-        }
-      ],
       "name": "advanceEpoch",
       "outputs": [],
       "stateMutability": "nonpayable",
