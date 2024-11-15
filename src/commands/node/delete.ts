@@ -19,7 +19,7 @@ export default class NodeDelete extends TransactionCommand {
     const signer = await getSigner(flags.network, flags.rpc, flags.address, flags.signer, flags.key, flags.account);
     const nodes = await getContract(flags.network, flags.abi, "EarthfastNodes", signer);
     const operatorId = (await nodes.getNode(nodeIds[0])).operatorId;
-    const tx = await nodes.populateTransaction.deleteNodes(operatorId, false, nodeIds);
+    const tx = await nodes.populateTransaction.deleteNodes(operatorId, nodeIds);
     const output = await run(tx, signer, [nodes]);
     this.log(pretty(output));
     return output;
