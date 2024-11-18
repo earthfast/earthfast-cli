@@ -1,5 +1,5 @@
 {
-  "address": "0x7a46dB5858ce16612C3e7ec53e5db2d36BAe46D9",
+  "address": "0x99bA34ab1e5c153ff972531A2cC5cD85083E6f93",
   "abi": [
     {
       "anonymous": false,
@@ -760,24 +760,6 @@
         }
       ],
       "name": "renounceRole",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "bytes32",
-          "name": "nodeId",
-          "type": "bytes32"
-        },
-        {
-          "internalType": "address",
-          "name": "sender",
-          "type": "address"
-        }
-      ],
-      "name": "requireTopologyNode",
       "outputs": [],
       "stateMutability": "nonpayable",
       "type": "function"

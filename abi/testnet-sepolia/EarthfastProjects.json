@@ -1,5 +1,5 @@
 {
-  "address": "0xB292CC65a8394403E588267D80ca5Ee52d00bd65",
+  "address": "0xF98A8a84B1de0C35004EA22Dc1f71130284fAD1c",
   "abi": [
     {
       "anonymous": false,
@@ -423,19 +423,6 @@
     {
       "inputs": [],
       "name": "IMPORTER_ROLE",
-      "outputs": [
-        {
-          "internalType": "bytes32",
-          "name": "",
-          "type": "bytes32"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [],
-      "name": "PROJECT_CREATOR_ROLE",
       "outputs": [
         {
           "internalType": "bytes32",
@@ -1071,11 +1058,6 @@
           "internalType": "struct EarthfastProject[]",
           "name": "projects",
           "type": "tuple[]"
-        },
-        {
-          "internalType": "address[]",
-          "name": "creators",
-          "type": "address[]"
         },
         {
           "internalType": "bool",

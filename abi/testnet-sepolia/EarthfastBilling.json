@@ -1,5 +1,5 @@
 {
-  "address": "0x178E1c93C92b780126b6dfb4bAe14A87E03dBe6C",
+  "address": "0xfCeAF96975C2c5144279491c08cc927C5702D5Cd",
   "abi": [
     {
       "anonymous": false,
@@ -255,19 +255,6 @@
     },
     {
       "inputs": [],
-      "name": "RECONCILER_ROLE",
-      "outputs": [
-        {
-          "internalType": "bytes32",
-          "name": "",
-          "type": "bytes32"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [],
       "name": "getBillingNodeIndex",
       "outputs": [
         {
@@ -407,11 +394,6 @@
     {
       "inputs": [
         {
-          "internalType": "bytes32",
-          "name": "topologyNodeId",
-          "type": "bytes32"
-        },
-        {
           "internalType": "bytes32[]",
           "name": "nodeIds",
           "type": "bytes32[]"
@@ -429,11 +411,6 @@
     },
     {
       "inputs": [
-        {
-          "internalType": "bytes32",
-          "name": "topologyNodeId",
-          "type": "bytes32"
-        },
         {
           "internalType": "bytes32[]",
           "name": "nodeIds",
