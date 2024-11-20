@@ -1,8 +1,9 @@
-import { Command } from "@oclif/core";
 import axios, { AxiosError } from "axios";
 import { isAddress } from "ethers/lib/utils";
+import { BlockchainCommand } from "../../base";
+import { Networks } from "../../networks";
 
-export default class OperatorFaucet extends Command {
+export default class OperatorFaucet extends BlockchainCommand {
   static description = "Request test tokens for node operator (0.2 Sepolia ETH and 100 EARTHFAST tokens)";
 
   static args = [
@@ -14,8 +15,13 @@ export default class OperatorFaucet extends Command {
   ];
 
   async run(): Promise<void> {
-    const { args } = await this.parse(OperatorFaucet);
+    const { args, flags } = await this.parse(OperatorFaucet);
     const { address } = args;
+    const { network } = flags;
+
+    if (!Networks[network].funderURL) {
+      this.error(`No funder URL configured for network ${network}`);
+    }
 
     // Validate ethereum address
     if (!isAddress(address)) {
@@ -25,7 +31,7 @@ export default class OperatorFaucet extends Command {
     try {
       this.log(`Sending request to faucet for address: ${address}`);
 
-      const response = await axios.post(`https://jorge-server.earthfast-dev.com/operator-faucet`, {
+      const response = await axios.post(`${Networks[network].funderURL}/operator-faucet`, {
         operatorAddress: address,
       });
 

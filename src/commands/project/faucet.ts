@@ -1,8 +1,9 @@
-import { Command } from "@oclif/core";
 import axios, { AxiosError } from "axios";
 import { isAddress } from "ethers/lib/utils";
+import { BlockchainCommand } from "../../base";
+import { Networks } from "../../networks";
 
-export default class ProjectFaucet extends Command {
+export default class ProjectFaucet extends BlockchainCommand {
   static description = "Request test tokens for project (0.2 Sepolia ETH and 10 USDC)";
 
   static args = [
@@ -14,8 +15,13 @@ export default class ProjectFaucet extends Command {
   ];
 
   async run(): Promise<void> {
-    const { args } = await this.parse(ProjectFaucet);
+    const { args, flags } = await this.parse(ProjectFaucet);
     const { address } = args;
+    const { network } = flags;
+
+    if (!Networks[network].funderURL) {
+      this.error(`No funder URL configured for network ${network}`);
+    }
 
     // Validate ethereum address
     if (!isAddress(address)) {
@@ -23,7 +29,7 @@ export default class ProjectFaucet extends Command {
     }
 
     try {
-      const response = await axios.post(`https://jorge-server.earthfast-dev.com/project-faucet`, {
+      const response = await axios.post(`${Networks[network].funderURL}/project-faucet`, {
         projectId: address,
       });
 
