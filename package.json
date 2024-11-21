@@ -5,7 +5,7 @@
   "homepage": "https://earthfast.com",
   "license": "MIT",
   "scripts": {
-    "run": "export NODE_NO_WARNINGS=1 && npm run build && ./bin/run",
+    "run": "export NODE_NO_WARNINGS=1 && ./bin/run",
     "dev": "export NODE_NO_WARNINGS=1 && npm run build && ./bin/dev",
     "debug": "DEBUG=1 npm run build && ./bin/dev",
     "build": "rm -rf ./dist && tsc",

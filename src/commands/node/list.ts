@@ -9,11 +9,12 @@ export default class NodeList extends BlockchainCommand {
   static examples = ["<%= config.bin %> <%= command.id %>"];
   static usage = "<%= command.id %> [--operator ID] [--skip N] [--size N] [--page N] [--enabled]";
   static flags = {
+    topology: Flags.boolean({ description: "[DEPRECATED]List topology nodes instead.", default: false, hidden: true }),
     operator: Flags.string({ description: "Filter by operator ID.", helpValue: "ID" }),
-    vacant: Flags.boolean({ description: "List only vacant nodes in this or next epoch." }),
-    spot: Flags.boolean({ description: "List only vacant nodes available in this epoch.", dependsOn: ["vacant"] }),
+    onlyEnabled: Flags.boolean({ description: "Show only enabled nodes (disabled = false).", default: false }),
+    vacant: Flags.boolean({ description: "List only nodes that have vacancy in current or next epoch." }),
+    spot: Flags.boolean({ description: "List only vacant nodes available in current epoch.", dependsOn: ["vacant"] }),
     renew: Flags.boolean({ description: "List only vacant nodes available from next epoch.", dependsOn: ["vacant"] }),
-    enabled: Flags.boolean({ description: "Show only enabled nodes.", default: false }),
     skip: Flags.integer({ description: "The number of results to skip.", helpValue: "N", default: 0 }),
     size: Flags.integer({ description: "The number of results to list.", helpValue: "N", default: 100 }),
     page: Flags.integer({ description: "The contract call paging size.", helpValue: "N", default: 100 }),
@@ -29,20 +30,24 @@ export default class NodeList extends BlockchainCommand {
       return await nodes.getNodes(operatorId, i, n, { blockTag });
     });
     results = results.filter((v) => {
-      // Filter out disabled nodes if enabledOnly flag is true
-      if (flags.enabled && v.disabled) return false;
+      // Filter out disabled nodes if onlyEnabled flag is true
+      if (flags.onlyEnabled && v.disabled) return false;
+
+      if (flags.vacant) {
+        const vacantCurrentEpoch = v.projectIds[0] === HashZero;
+        const vacantNextEpoch = v.projectIds[1] === HashZero;
+
+        // List only nodes vacant either in this epoch or after this epoch
+        if (!flags.spot && !flags.renew) return vacantCurrentEpoch || vacantNextEpoch;
+        // List only nodes vacant both in this epoch and after this epoch
+        if (flags.spot && flags.renew) return vacantCurrentEpoch && vacantNextEpoch;
+        // List only nodes vacant after this epoch
+        if (!flags.spot && flags.renew) return vacantNextEpoch;
+        // List only nodes vacant in this epoch
+        if (flags.spot && !flags.renew) return vacantCurrentEpoch;
+      }
       // List all nodes (vacant and reserved)
-      if (!flags.vacant) return true;
-      // List only nodes vacant either in this epoch or after this epoch
-      if (!flags.spot && !flags.renew) return v.projectIds[0] === HashZero || v.projectIds[1] === HashZero;
-      // List only nodes vacant both in this epoch and after this epoch
-      if (flags.spot && flags.renew) return v.projectIds[0] === HashZero && v.projectIds[1] === HashZero;
-      // List only nodes vacant after this epoch
-      if (!flags.spot && flags.renew) return v.projectIds[1] === HashZero;
-      // List only nodes vacant in this epoch
-      if (flags.spot && !flags.renew) return v.projectIds[0] === HashZero;
-      // Impossible
-      return false;
+      return true;
     });
 
     const records = results.slice(flags.skip, flags.skip + flags.size);

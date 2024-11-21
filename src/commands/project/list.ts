@@ -6,9 +6,10 @@ import { formatProject, getAll, getContract, getProvider, parseAddress, pretty }
 export default class ProjectList extends BlockchainCommand {
   static summary = "List projects on the EarthFast Network.";
   static examples = ["<%= config.bin %> <%= command.id %>"];
-  static usage = "<%= command.id %> [--owner ADDR] [--skip N] [--size N] [--page N]";
+  static usage = "<%= command.id %> [--owner ADDR] [--name NAME] [--skip N] [--size N] [--page N]";
   static flags = {
     owner: Flags.string({ description: "Filter by owner address.", helpValue: "ADDR" }),
+    name: Flags.string({ description: "Filter by name substring.", helpValue: "NAME" }),
     skip: Flags.integer({ description: "The number of results to skip.", helpValue: "N", default: 0 }),
     size: Flags.integer({ description: "The number of results to list.", helpValue: "N", default: 100 }),
     page: Flags.integer({ description: "The contract call paging size.", helpValue: "N", default: 100 }),
@@ -25,6 +26,10 @@ export default class ProjectList extends BlockchainCommand {
     });
     if (flags.owner) {
       results = results.filter((v) => v.owner.toLowerCase() === owner.toLowerCase());
+    }
+    if (flags.name) {
+      const nameSubstring = flags.name.toLowerCase();
+      results = results.filter((v) => v.name.toLowerCase().includes(nameSubstring));
     }
 
     const records = results.slice(flags.skip, flags.skip + flags.size);
