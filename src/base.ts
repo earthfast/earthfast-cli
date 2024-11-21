@@ -66,7 +66,7 @@ export abstract class BlockchainCommand extends Command {
     A extends { [name: string]: any } // eslint-disable-line @typescript-eslint/no-explicit-any
   >(options?: Input<F, G>, argv?: string[]): Promise<ParserOutput<F, G, A>> {
     const parsed = await super.parse(options, argv);
-    printCurrentNetwork(parsed.flags.network);
+    // printCurrentNetwork(parsed.flags.network);
     this.checkVersion(parsed.flags as never);
     return parsed as ParserOutput<F, G, A>;
   }
