@@ -58,7 +58,6 @@ export default class NodeCreate extends TransactionCommand {
         return {
           host,
           region: region || defaultRegion,
-          topology: false,
           disabled: enabled === "false" || (!enabled && defaultEnabled !== "true"),
           price: parseUSDC(price || defaultPrice || "0"),
         };
@@ -67,7 +66,7 @@ export default class NodeCreate extends TransactionCommand {
 
     const signer = await getSigner(flags.network, flags.rpc, flags.address, flags.signer, flags.key, flags.account);
     const nodes = await getContract(flags.network, flags.abi, "EarthfastNodes", signer);
-    const tx = await nodes.populateTransaction.createNodes(operatorId, false, records);
+    const tx = await nodes.populateTransaction.createNodes(operatorId, records);
     const output = await run(tx, signer, [nodes]);
     this.log(pretty(output));
     return output;

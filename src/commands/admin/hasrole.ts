@@ -7,14 +7,14 @@ import { getProvider, parseAddress } from "../../helpers";
 const DEFAULT_ADMIN_ROLE = "DEFAULT_ADMIN_ROLE";
 
 export default class HasRole extends TransactionCommand {
-  static summary = "Grant a role to an account on the EarthFast Network.";
+  static summary = "Check if an account has a role on the EarthFast Network.";
   static examples = [
-    "<%= config.bin %> <%= command.id %> RECONCILER_ROLE 0x0000000000000000000000000000000000000000 0xEarthfastContractAddress",
+    "<%= config.bin %> <%= command.id %> DEFAULT_ADMIN_ROLE 0x0000000000000000000000000000000000000000 0xEarthfastContractAddress",
   ];
   static usage = "<%= command.id %> ROLE ACCOUNT CONTRACT_ADDRESS";
   static args: Arg[] = [
-    { name: "ROLE", description: "The role to grant.", required: true },
-    { name: "ACCOUNT", description: "The address to grant the role to.", required: true },
+    { name: "ROLE", description: "The role to check.", required: true },
+    { name: "ACCOUNT", description: "The address to check.", required: true },
     { name: "CONTRACT_ADDRESS", description: "The address of the contract.", required: true },
   ];
 

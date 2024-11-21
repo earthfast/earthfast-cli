@@ -7,7 +7,7 @@ import { formatNode, getAll, getContract, getProvider, parseHash, pretty } from 
 export default class NodeList extends BlockchainCommand {
   static summary = "List content nodes on the EarthFast Network.";
   static examples = ["<%= config.bin %> <%= command.id %>"];
-  static usage = "<%= command.id %> [--topology] [--operator ID] [--skip N] [--size N] [--page N] [--enabled]";
+  static usage = "<%= command.id %> [--operator ID] [--skip N] [--size N] [--page N] [--enabled]";
   static flags = {
     topology: Flags.boolean({ description: "[DEPRECATED]List topology nodes instead.", default: false, hidden: true }),
     operator: Flags.string({ description: "Filter by operator ID.", helpValue: "ID" }),
@@ -27,7 +27,7 @@ export default class NodeList extends BlockchainCommand {
     const operatorId = parseHash(flags.operator);
     const blockTag = await provider.getBlockNumber();
     let results: Result[] = await getAll(flags.page, async (i, n) => {
-      return await nodes.getNodes(operatorId, flags.topology, i, n, { blockTag });
+      return await nodes.getNodes(operatorId, i, n, { blockTag });
     });
     results = results.filter((v) => {
       // Filter out disabled nodes if onlyEnabled flag is true
