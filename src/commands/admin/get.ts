@@ -2,8 +2,8 @@ import { BlockchainCommand } from "../../base";
 import { getContract, getProvider, pretty } from "../../helpers";
 
 export default class Get extends BlockchainCommand {
-  static description = "Make GET calls to EarthFast registry";
-  static examples = ['<%= config.bin %> usdc ""'];
+  static description = "Make GET calls to EarthFast contracts";
+  static examples = ["<%= config.bin %> EarthfastRegistry getUSDC"];
   static args = [
     {
       name: "contract",
