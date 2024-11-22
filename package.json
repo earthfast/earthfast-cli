@@ -6,7 +6,7 @@
   "license": "MIT",
   "scripts": {
     "run": "export NODE_NO_WARNINGS=1 NODE_OPTIONS=--unhandled-rejections=none && npm run build && ./bin/run",
-    "dev": "export NODE_NO_WARNINGS=1 NODE_OPTIONS=--unhandled-rejections=none && npm run build && ./bin/dev",
+    "dev": "npm run build && ./bin/dev",
     "debug": "DEBUG=1 npm run build && ./bin/dev",
     "build": "rm -rf ./dist && tsc",
     "clean": "rm -rf ./dist",
