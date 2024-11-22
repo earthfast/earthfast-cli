@@ -5,7 +5,7 @@
   "homepage": "https://earthfast.com",
   "license": "MIT",
   "scripts": {
-    "run": "export NODE_NO_WARNINGS=1 NODE_OPTIONS=--unhandled-rejections=none && npm run build && ./bin/run",
+    "run": "npm run build && ./bin/run",
     "dev": "npm run build && ./bin/dev",
     "debug": "DEBUG=1 npm run build && ./bin/dev",
     "build": "rm -rf ./dist && tsc",
@@ -14,7 +14,7 @@
     "prepack": "npm run build && oclif manifest"
   },
   "bin": {
-    "earthfast": "export NODE_NO_WARNINGS=1 NODE_OPTIONS=--unhandled-rejections=none && ./bin/run"
+    "earthfast": "./bin/run"
   },
   "files": [
     "/bin",

@@ -1,4 +1,4 @@
-#!/usr/bin/env node
+#!/usr/bin/env node --require ./bin/suppressWarnings.js
 
 const oclif = require("@oclif/core");
 
