@@ -66,7 +66,7 @@ export const Permit: Record<string, Array<TypedDataField>> = {
 };
 
 export function pretty(value: unknown): string {
-  return typeof value === "string" ? value : inspect(value, { depth: 10 });
+  return typeof value === "string" ? value : inspect(value, { depth: 10, maxArrayLength: null });
 }
 
 export const parseUSDC = (value: string): BigNumber => parseUnits(value, 6);
