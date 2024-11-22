@@ -14,7 +14,8 @@ export default class NodeCreate extends TransactionCommand {
     { name: "ID", description: "The ID of the operator to own the nodes.", required: true },
     {
       name: "VALUES",
-      description: "The comma separated nodes data: HOST:REGION?:ENABLED?:PRICE?,...",
+      description: `The comma separated nodes data: HOST:REGION?:ENABLED?:PRICE?,...
+      Region options -> United States - 'us', Africa - 'af', Asia - 'as', Australia - 'au', Europe - 'eu', North America - 'na', South America - 'sa'`,
       required: true,
     },
     {
@@ -36,6 +37,9 @@ export default class NodeCreate extends TransactionCommand {
     if (defaultEnabled && !["true", "false"].includes(defaultEnabled)) {
       this.error(`Must specify true, false, or empty: ${args.DEFAULTS}.`);
     }
+    if (defaultRegion && !["us", "af", "as", "au", "eu", "na", "sa"].includes(defaultRegion)) {
+      this.error(`Must specify region from one of the following: 'us', 'af', 'as', 'au', 'eu', 'na', 'sa'.`);
+    }
 
     const records = await Promise.all(
       values.map(async (input) => {
@@ -45,11 +49,14 @@ export default class NodeCreate extends TransactionCommand {
         }
 
         const [host, region, enabled, price] = fields;
+        const regionFinal = region || defaultRegion;
         if (!host) {
           this.error(`Must specify node host: ${input}.`);
         }
-        if (!region && !defaultRegion) {
-          this.error(`Must specify region: ${input}.`);
+        if (!regionFinal || !["us", "af", "as", "au", "eu", "na", "sa"].includes(regionFinal)) {
+          this.error(
+            `Must specify region from one of the following: 'us', 'af', 'as', 'au', 'eu', 'na', 'sa'. Got: ${regionFinal}.`
+          );
         }
         if (enabled && !["true", "false"].includes(enabled)) {
           this.error(`Must specify true, false, or empty: ${input}.`);
@@ -57,7 +64,7 @@ export default class NodeCreate extends TransactionCommand {
 
         return {
           host,
-          region: region || defaultRegion,
+          region: regionFinal,
           disabled: enabled === "false" || (!enabled && defaultEnabled !== "true"),
           price: parseUSDC(price || defaultPrice || "0"),
         };
