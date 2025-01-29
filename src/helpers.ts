@@ -332,6 +332,9 @@ export async function decodeEvents(receipt: TransactionReceipt, contracts: Contr
 }
 
 // Returns all results of a paged function call (a function that accepts skip and size parameters).
+//
+// Page is the number of results to fetch per blockchain call and it keeps fetching until it gets less than page results.
+// This means the last call has less results than page, which indicates the end of the list.
 export async function getAll(page: number, call: (skip: number, size: number) => Promise<Result[]>): Promise<Result[]> {
   const results: Result[] = [];
   while (page > 0) {

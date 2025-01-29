@@ -12,27 +12,25 @@ export default class Status extends BlockchainCommand {
     const { flags } = await this.parse(Status);
     const provider = await getProvider(flags.network, flags.rpc);
     const registry = await getContract(flags.network, flags.abi, "EarthfastRegistry", provider);
+    const billing = await getContract(flags.network, flags.abi, "EarthfastBilling", provider);
     const netVersion = await registry.getVersion();
     const cliVersion = version;
 
-    // Round epoch start to Wednesday at 16:00 UTC
-    const lastEpochStart = new Date();
-    lastEpochStart.setUTCHours(16, 0, 0, 0);
-    // Get current day (0 = Sunday, 3 = Wednesday)
-    const currentDay = lastEpochStart.getUTCDay();
-    // Calculate days to subtract to reach previous Wednesday
-    const daysToSubtract = (currentDay - 3 + 7) % 7 || 7; // If result is 0, subtract 7 days
-    lastEpochStart.setUTCDate(lastEpochStart.getUTCDate() - daysToSubtract);
+    // last is current epoch
+    const lastEpochStart = Number(await registry.getLastEpochStart());
+    const lastEpochLength = Number(await registry.getLastEpochLength());
 
-    const nextEpochStart = new Date(lastEpochStart);
-    nextEpochStart.setUTCDate(nextEpochStart.getUTCDate() + 7);
+    const billingNodeIndex = Number(await billing.getBillingNodeIndex());
+    const renewalNodeIndex = Number(await billing.getRenewalNodeIndex());
 
     const output = {
       netVersion,
       cliVersion,
-      epochDuration: "7 days",
-      lastEpochStart: `${lastEpochStart}`,
-      nextEpochStart: `${nextEpochStart}`,
+      epochDuration: `${lastEpochLength} seconds`,
+      lastEpochStart: `${new Date(lastEpochStart * 1000).toISOString()}`,
+      lastEpochEnd: `${new Date((lastEpochStart + lastEpochLength) * 1000).toISOString()}`,
+      billingNodeIndex,
+      renewalNodeIndex,
       gracePeriod: "24 hours before the end of an epoch",
     };
 
