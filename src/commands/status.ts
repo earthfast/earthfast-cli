@@ -17,11 +17,17 @@ export default class Status extends BlockchainCommand {
     const cliVersion = version;
 
     // last is current epoch
-    const lastEpochStart = Number(await registry.getLastEpochStart());
-    const lastEpochLength = Number(await registry.getLastEpochLength());
+    const lastEpochStartRaw = await registry.getLastEpochStart();
+    const lastEpochLengthRaw = await registry.getLastEpochLength();
 
-    const billingNodeIndex = Number(await billing.getBillingNodeIndex());
-    const renewalNodeIndex = Number(await billing.getRenewalNodeIndex());
+    const lastEpochStart = lastEpochStartRaw ? Number(lastEpochStartRaw) : 0;
+    const lastEpochLength = lastEpochLengthRaw ? Number(lastEpochLengthRaw) : 0;
+
+    const billingNodeIndexRaw = await billing.getBillingNodeIndex();
+    const renewalNodeIndexRaw = await billing.getRenewalNodeIndex();
+
+    const billingNodeIndex = billingNodeIndexRaw ? Number(billingNodeIndexRaw) : 0;
+    const renewalNodeIndex = renewalNodeIndexRaw ? Number(renewalNodeIndexRaw) : 0;
 
     const output = {
       netVersion,
