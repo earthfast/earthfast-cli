@@ -11,6 +11,7 @@ import "../abi/testnet-sepolia/EarthfastNodes.json";
 import "../abi/testnet-sepolia/EarthfastOperators.json";
 import "../abi/testnet-sepolia/EarthfastProjects.json";
 import "../abi/testnet-sepolia/EarthfastReservations.json";
+import "../abi/testnet-sepolia/EarthfastBilling.json";
 
 // These imports are necessary to pull these files into dist/
 import "../abi/testnet-sepolia-staging/USDC.json";
@@ -20,7 +21,7 @@ import "../abi/testnet-sepolia-staging/EarthfastNodes.json";
 import "../abi/testnet-sepolia-staging/EarthfastOperators.json";
 import "../abi/testnet-sepolia-staging/EarthfastProjects.json";
 import "../abi/testnet-sepolia-staging/EarthfastReservations.json";
-
+import "../abi/testnet-sepolia-staging/EarthfastBilling.json";
 export type ContractName =
   | "EarthfastToken"
   | "EarthfastRegistry"
@@ -28,6 +29,7 @@ export type ContractName =
   | "EarthfastOperators"
   | "EarthfastProjects"
   | "EarthfastReservations"
+  | "EarthfastBilling"
   | "USDC";
 
 export interface ContractInfo {
