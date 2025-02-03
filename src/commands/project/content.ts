@@ -1,4 +1,5 @@
 import { Arg } from "@oclif/core/lib/interfaces";
+import axios from "axios";
 import { TransactionCommand } from "../../base";
 import { getContract, getSigner, parseHash, pretty, run } from "../../helpers";
 
@@ -20,6 +21,13 @@ export default class ProjectContent extends TransactionCommand {
     const { args, flags } = await this.parse(ProjectContent);
     if (args.URL === undefined || args.SHA === undefined) {
       this.error("Must specify both URL and SHA.");
+    }
+
+    // Check if the URL exists
+    try {
+      await axios.head(args.URL);
+    } catch (error) {
+      this.error(`The URL ${args.URL} does not exist or is not accessible.`);
     }
 
     const signer = await getSigner(flags.network, flags.rpc, flags.address, flags.signer, flags.key, flags.account);
