@@ -27,7 +27,7 @@ export default class ProjectContent extends TransactionCommand {
     try {
       await axios.head(args.URL);
     } catch (error) {
-      this.error(`The URL ${args.URL} does not exist or is not accessible.`);
+      this.error(`The URL ${args.URL} does not exist or is not publicly accessible.`);
     }
 
     const signer = await getSigner(flags.network, flags.rpc, flags.address, flags.signer, flags.key, flags.account);
