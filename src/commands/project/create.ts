@@ -6,8 +6,6 @@ import { getContract, getSigner, parseAddress, parseHash, pretty, run } from "..
 
 interface ProjectMetadata {
   type: "static" | "nextjs";
-  port?: number;
-  startCommand?: string;
   bundleUrl?: string;
 }
 
@@ -34,14 +32,6 @@ export default class ProjectCreate extends TransactionCommand {
       description: "Project type (static or nextjs)",
       options: ["static", "nextjs"],
       default: "static",
-    }),
-    port: Flags.integer({
-      description: "Port for Next.js server",
-      default: 3000,
-    }),
-    startCommand: Flags.string({
-      description: "Start command for Next.js server",
-      default: "node server.js",
     }),
   };
 
@@ -85,8 +75,6 @@ export default class ProjectCreate extends TransactionCommand {
     if (flags.type === "nextjs") {
       metadata = {
         ...metadata,
-        port: flags.port,
-        startCommand: flags.startCommand,
         bundleUrl: args.URL,
       };
     }
