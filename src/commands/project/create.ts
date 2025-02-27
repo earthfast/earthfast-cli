@@ -32,7 +32,7 @@ export default class ProjectCreate extends TransactionCommand {
     }),
     type: Flags.string({
       description: "Project type (static or nextjs)",
-      options: ["static", "nextjs"] as const,
+      options: ["static", "nextjs"],
       default: "static",
     }),
     port: Flags.integer({
@@ -61,15 +61,20 @@ export default class ProjectCreate extends TransactionCommand {
     const owner = flags.owner ? parseAddress(flags.owner) : await signer.getAddress();
     const bundleSha = parseHash(args.SHA);
 
+    // Validate project type
+    if (flags.type !== "static" && flags.type !== "nextjs") {
+      this.error("Project type must be either 'static' or 'nextjs'");
+    }
+
     // Handle metadata
     let metadata: ProjectMetadata = {
-      type: flags.type as "static" | "nextjs",
+      type: flags.type,
     };
 
     // Parse existing metadata if provided
     if (args.METADATA) {
       try {
-        const parsedMetadata = JSON.parse(args.METADATA);
+        const parsedMetadata = JSON.parse(args.METADATA) as Partial<ProjectMetadata>;
         metadata = { ...metadata, ...parsedMetadata };
       } catch (e) {
         this.error("METADATA must be valid JSON.");
