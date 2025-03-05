@@ -7,7 +7,7 @@ import { getContract, getSigner, parseAddress, parseHash, pretty, run } from "..
 export default class ProjectCreate extends TransactionCommand {
   static summary = "Register a new project on the EarthFast Network.";
   static examples = ['<%= config.bin %> <%= command.id %> "My Project" notify@myproject.com'];
-  static usage = "<%= command.id %> [--owner ADDR] NAME EMAIL [URL] [SHA] [METADATA]";
+  static usage = "<%= command.id %> [--owner ADDR] [--type TYPE] NAME EMAIL [URL] [SHA] [METADATA]";
   static args: Arg[] = [
     { name: "NAME", description: "The human readable name of the new project.", required: true },
     { name: "EMAIL", description: "The project email for admin notifications.", required: true },
@@ -16,7 +16,13 @@ export default class ProjectCreate extends TransactionCommand {
     { name: "METADATA", description: "JSON metadata to attach to this project.", default: "" },
   ];
   static flags = {
+    ...TransactionCommand.flags,
     owner: Flags.string({ description: "[default: caller] The owner for the new project.", helpValue: "ADDR" }),
+    type: Flags.string({
+      description: "Project type (static or nextjs)",
+      options: ["static", "nextjs"],
+      default: "static",
+    }),
   };
 
   public async run(): Promise<unknown> {
@@ -32,20 +38,30 @@ export default class ProjectCreate extends TransactionCommand {
     const projects = await getContract(flags.network, flags.abi, "EarthfastProjects", signer);
     const owner = flags.owner ? parseAddress(flags.owner) : await signer.getAddress();
     const bundleSha = parseHash(args.SHA);
-    if (args.METADATA !== "") {
+
+    // Handle metadata with project type
+    let metadata = args.METADATA;
+    if (metadata === "") {
+      // If no metadata was provided, create basic metadata with type
+      metadata = JSON.stringify({ type: flags.type });
+    } else {
       try {
-        JSON.parse(args.METADATA);
+        // If metadata was provided, merge with type
+        const parsedMetadata = JSON.parse(metadata);
+        parsedMetadata.type = flags.type;
+        metadata = JSON.stringify(parsedMetadata);
       } catch (e) {
         this.error("METADATA must be valid JSON.");
       }
     }
+
     const tx = await projects.populateTransaction.createProject([
       owner,
       args.NAME,
       args.EMAIL,
       args.URL,
       bundleSha,
-      args.METADATA,
+      metadata,
     ]);
     const output = await run(tx, signer, [projects]);
     this.log(pretty(output));
