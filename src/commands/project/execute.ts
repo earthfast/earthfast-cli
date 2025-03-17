@@ -12,6 +12,8 @@ export default class Execute extends Command {
     `$ earthfast project execute --network testnet-sepolia-staging --wallet 0x123... --password mypassword --function "createProject" --args '[{"owner":"0xowner","name":"Project Name","email":"email@example.com","content":"ipfs://content","checksum":"0xchecksum","metadata":"{\\"key\\":\\"value\\"}"}]'`,
   ];
 
+// ./bin/dev project execute --network testnet-sepolia --wallet 0x183921bD248aEB173312A794cFEf413fDE5bF5Ca --password mypassword --function createProject --args '[{"owner":"0x183921bD248aEB173312A794cFEf413fDE5bF5Ca","name":"Project Name","email":"email@example.com","content":"ipfs://content","checksum":"0x0000000000000000000000000000000000000000000000000000000000000000","metadata":"{}"}]'
+
   static flags = {
     network: Flags.string({
       char: "n",
@@ -98,4 +100,4 @@ export default class Execute extends Command {
       this.error(`Failed to execute function: ${error instanceof Error ? error.message : String(error)}`);
     }
   }
-} 
+}

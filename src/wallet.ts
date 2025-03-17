@@ -18,7 +18,7 @@ import {
   UserOperationReceipt
 } from "viem/account-abstraction"
 
-import { loadWallet } from './keystore';
+import { loadWallet, loadDynamicWallet } from './keystore';
 import { loadAbi, ContractName } from './contracts';
 import { NetworkName, Networks } from './networks';
 
@@ -26,7 +26,7 @@ import { NetworkName, Networks } from './networks';
 if (
     !process.env.BUNDLER_RPC ||
     !process.env.PAYMASTER_RPC ||
-    !process.env.PRIVATE_KEY
+    !process.env.ZERODEV_PROJECT_ID
   ) {
     throw new Error("BUNDLER_RPC or PAYMASTER_RPC or PRIVATE_KEY is not set")
   }
@@ -149,13 +149,27 @@ export async function batchUserOperations(
     }))
   );
 
-  // Send the batch operation
-  const userOpHash = await kernelClient.sendUserOperation({
-    callData: batchCallData,
-  });
+  console.log("Encoded batch call data:", batchCallData);
   
-  console.log("Batch userOp hash:", userOpHash);
-  return userOpHash;
+  try {
+    // Send the batch operation
+    const userOpHash = await kernelClient.sendUserOperation({
+      callData: batchCallData,
+    });
+
+    console.log("Batch userOp hash:", userOpHash);
+    return userOpHash;
+  } catch (error) {
+    console.error("Error sending user operation:", error);
+
+    // Check if this is a paymaster error
+    if (error instanceof Error && error.message.includes("paymaster")) {
+      console.error("This appears to be a paymaster error. The paymaster may not be configured to sponsor this type of transaction.");
+      console.error("You may need to fund your account with ETH or configure a different paymaster.");
+    }
+
+    throw error;
+  }
 }
 
 /**
@@ -216,4 +230,118 @@ export async function waitForUserOperationReceipt(
   console.log("User operation completed");
   
   return receipt;
+}
+
+// Import Dynamic SDK types (you would need to install @dynamic-labs/sdk-api)
+// import { DynamicAuthSigner } from "@dynamic-labs/sdk-api";
+
+/**
+ * Create a ZeroDev smart wallet using a Dynamic authentication signer
+ * This allows using the same wallet across applications where the user might authenticate with email
+ * @param dynamicAuthAddress The address obtained from Dynamic authentication
+ * @param dynamicAuthSigner The signer object from Dynamic authentication
+ * @param usePaymaster Whether to use the paymaster for gas sponsoring
+ * @returns A KernelAccountClient for the smart wallet
+ */
+export const createWalletFromDynamic = async (
+  dynamicAuthAddress: Address,
+  // dynamicAuthSigner: DynamicAuthSigner,
+  usePaymaster: boolean = true
+): Promise<KernelAccountClient> => {
+  // For this implementation, we'll assume Dynamic is configured to use ZeroDev
+  // and we have access to the address of the smart wallet
+
+  // Create a custom connector that uses the Dynamic signer
+  // This is a simplified example - actual implementation would depend on Dynamic's SDK
+  const customConnector = {
+    // Use the address from Dynamic
+    address: dynamicAuthAddress,
+    // Custom signing logic that delegates to Dynamic's signer
+    signMessage: async ({ message }: { message: string }) => {
+      // In a real implementation, this would call dynamicAuthSigner.signMessage
+      // return dynamicAuthSigner.signMessage(message);
+      throw new Error("Dynamic signer integration not fully implemented");
+    },
+    signTypedData: async (typedData: any) => {
+      // In a real implementation, this would call dynamicAuthSigner.signTypedData
+      // return dynamicAuthSigner.signTypedData(typedData);
+      throw new Error("Dynamic signer integration not fully implemented");
+    }
+  };
+
+  // Create a ZeroDev account using the custom connector
+  // This is a simplified approach - actual implementation would use Dynamic's integration with ZeroDev
+  const account = await createKernelAccount(publicClient, {
+    plugins: {
+      // Use a custom plugin that works with Dynamic's authentication
+      sudo: {
+        // This would be the actual implementation that works with Dynamic's signer
+        address: dynamicAuthAddress,
+        // Other required properties would be implemented here
+      } as any, // Type assertion for demonstration
+    },
+    entryPoint,
+    kernelVersion,
+  });
+
+  console.log("Dynamic-authenticated account:", account.address);
+
+  // Create the paymaster client if needed
+  const paymasterClient = createZeroDevPaymasterClient({
+    chain,
+    transport: http(process.env.PAYMASTER_RPC),
+  });
+  
+  // Create kernel client configuration
+  const kernelClientConfig = {
+    account,
+    chain,
+    bundlerTransport: http(process.env.BUNDLER_RPC),
+    client: publicClient,
+  };
+  
+  // Add paymaster configuration if usePaymaster is true
+  if (usePaymaster) {
+    console.log("Using paymaster for gas sponsoring");
+    return createKernelAccountClient({
+      ...kernelClientConfig,
+      paymaster: {
+        getPaymasterData: (userOperation) => {
+          return paymasterClient.sponsorUserOperation({
+            userOperation,
+          });
+        }
+      }
+    });
+  } else {
+    console.log("Using ETH for gas (no paymaster)");
+    return createKernelAccountClient(kernelClientConfig);
+  }
+};
+
+/**
+ * Get a wallet for a Dynamic-authenticated user
+ * @param dynamicAuthAddress The address from Dynamic authentication
+ * @param usePaymaster Whether to use the paymaster for gas sponsoring
+ * @returns A KernelAccountClient for the smart wallet
+ */
+export async function getWalletForDynamicAuth(
+  dynamicAuthAddress: Address,
+  usePaymaster: boolean = true
+): Promise<KernelAccountClient> {
+  try {
+    // Load the Dynamic wallet data from the keystore
+    const walletData = await loadDynamicWallet(dynamicAuthAddress as string);
+    
+    // In a real implementation, you would use the dynamicAuthData to reconnect to Dynamic
+    // const dynamicAuthSigner = await reconnectToDynamic(walletData.dynamicAuthData);
+    
+    // Create the wallet
+    return createWalletFromDynamic(dynamicAuthAddress, usePaymaster);
+  } catch (error) {
+    // If the wallet is not found in the keystore, we'll try to create it directly
+    console.warn(`Dynamic wallet not found in keystore: ${dynamicAuthAddress}`);
+    console.warn(`Creating wallet directly without keystore data.`);
+    return createWalletFromDynamic(dynamicAuthAddress, usePaymaster);
+  }
 }

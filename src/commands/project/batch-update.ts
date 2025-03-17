@@ -78,4 +78,4 @@ export default class BatchUpdate extends Command {
       this.error(`Failed to batch update projects: ${error instanceof Error ? error.message : String(error)}`);
     }
   }
-} 
+}
