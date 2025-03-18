@@ -5,23 +5,34 @@ import { TransactionCommand } from "../../base";
 import { approve, getContract, getSigner, parseAddress, parseHash, parseUSDC, pretty, run } from "../../helpers";
 import { ethers } from "ethers";
 
-// Correct usage example:
+// Correct usage examples:
+// With auto-assigned nodes (no NODE_IDS specified):
 // npm run dev project createWithEntrypoint --network localhost --spot 10 0x183921bD248aEB173312A794cFEf413fDE5bF5Ca test-project test@test.com
+
+// With specific node IDs:
+// npm run dev project createWithEntrypoint --network localhost --spot 10 0x183921bD248aEB173312A794cFEf413fDE5bF5Ca test-project test@test.com "0xb10e2d527612073b26eecdfd717e6a320cf44b4afac2b0732d9fcbe2b7fa0cf6,0x405787fa12a823e0f2b7631cc41b3ba8828b3321ca811111fa75cd3aa3bb5ace"
+
+// Common node IDs for testing:
+// 0xb10e2d527612073b26eecdfd717e6a320cf44b4afac2b0732d9fcbe2b7fa0cf6
+// 0x405787fa12a823e0f2b7631cc41b3ba8828b3321ca811111fa75cd3aa3bb5ace
 
 // assumes that the signer has already been funded with USDC
 export default class ProjectCreateWithEntrypoint extends TransactionCommand {
   static summary = "Atomically create a new project on the EarthFast Network, deposit escrow, and reserve nodes via the entrypoint contract.";
-  static examples = ['<%= config.bin %> <%= command.id %> "My Project" notify@myproject.com'];
-  static usage = "<%= command.id %> DEPOSIT_AMOUNT OWNER NAME EMAIL [URL] [SHA] [METADATA] [--type TYPE] [--spot BOOLEAN] [--renew BOOLEAN]";
+  static examples = [
+    '<%= config.bin %> <%= command.id %> 10 0x123456... "My Project" notify@myproject.com',
+    '<%= config.bin %> <%= command.id %> 10 0x123456... "My Project" notify@myproject.com "0xnode1,0xnode2"'
+  ];
+  static usage = "<%= command.id %> DEPOSIT_AMOUNT OWNER NAME EMAIL [NODE_IDS] [URL] [SHA] [METADATA] [--type TYPE] [--spot] [--renew]";
   static args: Arg[] = [
     { name: "DEPOSIT_AMOUNT", description: "The amount of USDC to deposit into escrow.", required: true },
     { name: "OWNER", description: "The owner for the new project.", required: true },
     { name: "NAME", description: "The human readable name of the new project.", required: true },
     { name: "EMAIL", description: "The project email for admin notifications.", required: true },
+    { name: "NODE_IDS", description: "The comma separated IDs of the nodes to reserve. Leave empty to auto-assign nodes.", default: "" },
     { name: "URL", description: "The public URL to fetch the content bundle.", default: "" },
     { name: "SHA", description: "The SHA-256 checksum of the content bundle.", default: "" },
     { name: "METADATA", description: "JSON metadata to attach to this project.", default: "" },
-    { name: "NODE_IDS", description: "The comma separated IDs of the nodes to reserve.", default: "[]" },
   ];
 
   static flags = {
@@ -96,16 +107,19 @@ export default class ProjectCreateWithEntrypoint extends TransactionCommand {
     }
 
     // Determine whether to use deploySite or deploySiteWithNodeIds based on NODE_IDS argument
-    const hasNodeIds = args.NODE_IDS && args.NODE_IDS !== "[]" && nodeIdArray.length > 0 && nodeIdArray[0] !== "";
+    const hasNodeIds = args.NODE_IDS !== "" && nodeIdArray.length > 0 && nodeIdArray[0] !== "";
 
     if (hasNodeIds) {
         // Parse the node IDs
         const nodeIds = nodeIdArray.map((id: string) => parseHash(id));
+        // FIXME: get the node prices from the contract
+        const nodePrices = nodeIds.map(() => parseUSDC("0"));
 
         console.log("Deploying site with specific node IDs:", {
             createProjectData,
             signerAddress,
             nodeIds,
+            nodePrices,
             depositAmount: depositAmount.toString(),
             slot,
             deadline,
@@ -115,8 +129,9 @@ export default class ProjectCreateWithEntrypoint extends TransactionCommand {
         const tx = await entrypoint.populateTransaction.deploySiteWithNodeIds(
             createProjectData, 
             signerAddress, 
-            nodeIds, 
-            depositAmount, 
+            nodeIds,
+            nodePrices,
+            depositAmount,
             slot, 
             deadline, 
             signature
@@ -136,17 +151,17 @@ export default class ProjectCreateWithEntrypoint extends TransactionCommand {
         });
 
         const tx = await entrypoint.populateTransaction.deploySite(
-            createProjectData, 
-            signerAddress, 
-            nodesToReserve, 
-            depositAmount, 
-            slot, 
-            deadline, 
+            createProjectData,
+            signerAddress,
+            nodesToReserve,
+            depositAmount,
+            slot,
+            deadline,
             signature
         );
         output.push(await run(tx, signer, [entrypoint]));
     }
-    
+
     this.log(pretty(output));
     return output;
   }
