@@ -8,7 +8,6 @@ import { ethers } from "ethers";
 // Correct usage example:
 // npm run dev project createWithEntrypoint --network localhost --spot 10 0x183921bD248aEB173312A794cFEf413fDE5bF5Ca test-project test@test.com
 
-// TODO: add a call to the faucet to get USDC
 // assumes that the signer has already been funded with USDC
 export default class ProjectCreateWithEntrypoint extends TransactionCommand {
   static summary = "Atomically create a new project on the EarthFast Network, deposit escrow, and reserve nodes via the entrypoint contract.";
@@ -45,24 +44,32 @@ export default class ProjectCreateWithEntrypoint extends TransactionCommand {
     const entrypoint = await getContract(flags.network, flags.abi, "EarthfastEntrypoint", signer);
     const projects = await getContract(flags.network, flags.abi, "EarthfastProjects", signer);
 
+    // Handle metadata with project type
+    let metadata = args.METADATA;
+    if (metadata === "") {
+      // If no metadata was provided, create basic metadata with type
+      metadata = JSON.stringify({ type: flags.type });
+    } else {
+      try {
+        // If metadata was provided, merge with type
+        const parsedMetadata = JSON.parse(metadata);
+        parsedMetadata.type = flags.type;
+        metadata = JSON.stringify(parsedMetadata);
+      } catch (e) {
+        this.error("METADATA must be valid JSON.");
+      }
+    }
+
     const createProjectData = {
         owner: args.OWNER,
         name: args.NAME,
         email: args.EMAIL,
         content: args.URL,
         checksum: args.SHA && args.SHA.length > 0 ? parseHash(args.SHA) : ethers.constants.HashZero,
-        metadata: args.METADATA,
+        metadata: metadata,
     };
 
-    // TODO: add a try/catch block to handle the case where ids are provided or not with calls to the respective methods
-    // const nodeIds = parseHash(args.NODE_IDS);
-    // FIXME: cleanup nodes reservations and/or add support for alternative method call
-    // if nodeIds is an empty array, reserve 2 nodes
     const nodeIdArray = args.NODE_IDS.split(",");
-    console.log(nodeIdArray);
-    // const nodeIds = nodeIdArray.length > 0 ? nodeIdArray.map((id: string) => parseHash(id)) : [];
-    // const nodesToReserve = nodeIds.length > 0 ? nodeIds : 2;
-    const nodesToReserve = 2;
     const slot = { last: !!flags.spot, next: !!flags.renew };
     const depositAmount = parseUSDC(args.DEPOSIT_AMOUNT);
 
@@ -70,9 +77,7 @@ export default class ProjectCreateWithEntrypoint extends TransactionCommand {
     const { tx: approveTx, deadline, sig } = await approve(signer, usdc, projects, depositAmount);
     if (approveTx) output.push(await run(approveTx, signer, [usdc]));
 
-    // The contract expects a raw bytes signature
-    console.log("Full signature object:", JSON.stringify(sig, null, 2));
-    
+    // format signature to match entrypoint contract requirements
     // We need to concat r + s + v (v is just 1 byte)
     const signature = ethers.utils.joinSignature(sig);
     console.log("Joined signature:", signature);
@@ -83,29 +88,60 @@ export default class ProjectCreateWithEntrypoint extends TransactionCommand {
     if (usdcBalance.lt(depositAmount)) {
       this.error("Signer does not have enough USDC to deposit into escrow");
     }
+
+    // Determine whether to use deploySite or deploySiteWithNodeIds based on NODE_IDS argument
+    const hasNodeIds = args.NODE_IDS && args.NODE_IDS !== "[]" && nodeIdArray.length > 0 && nodeIdArray[0] !== "";
+
+    if (hasNodeIds) {
+        // Parse the node IDs
+        const nodeIds = nodeIdArray.map((id: string) => parseHash(id));
+
+        console.log("Deploying site with specific node IDs:", {
+            createProjectData,
+            signerAddress,
+            nodeIds,
+            depositAmount: depositAmount.toString(),
+            slot,
+            deadline,
+            sig: signature
+        });
+
+        const tx = await entrypoint.populateTransaction.deploySiteWithNodeIds(
+            createProjectData, 
+            signerAddress, 
+            nodeIds, 
+            depositAmount, 
+            slot, 
+            deadline, 
+            signature
+        );
+        output.push(await run(tx, signer, [entrypoint]));
+    } else {
+        const nodesToReserve = 2;
+
+        console.log("Deploying site with number of nodes:", {
+            createProjectData,
+            signerAddress,
+            nodesToReserve,
+            depositAmount: depositAmount.toString(),
+            slot,
+            deadline,
+            sig: signature
+        });
+
+        const tx = await entrypoint.populateTransaction.deploySite(
+            createProjectData, 
+            signerAddress, 
+            nodesToReserve, 
+            depositAmount, 
+            slot, 
+            deadline, 
+            signature
+        );
+        output.push(await run(tx, signer, [entrypoint]));
+    }
     
-    console.log("Deploying site with parameters:", {
-      createProjectData,
-      signerAddress,
-      nodesToReserve,
-      depositAmount: depositAmount.toString(),
-      slot,
-      deadline,
-      sig: signature
-    });
-    
-    const tx = await entrypoint.populateTransaction.deploySite(
-      createProjectData, 
-      signerAddress, 
-      nodesToReserve, 
-      depositAmount, 
-      slot, 
-      deadline, 
-      signature  // Pass the joined signature that the contract will split
-    );
-    output.push(await run(tx, signer, [entrypoint]));
     this.log(pretty(output));
     return output;
   }
-  
 }
