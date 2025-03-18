@@ -70,7 +70,13 @@ export default class ProjectCreateWithEntrypoint extends TransactionCommand {
     };
 
     const nodeIdArray = args.NODE_IDS.split(",");
-    const slot = { last: !!flags.spot, next: !!flags.renew };
+
+    // Make slot default to true for both properties, but allow override by flags
+    const slot = {
+        last: flags.spot !== undefined ? !!flags.spot : true,
+        next: flags.renew !== undefined ? !!flags.renew : true
+    };
+
     const depositAmount = parseUSDC(args.DEPOSIT_AMOUNT);
 
     const output = [];
@@ -117,7 +123,7 @@ export default class ProjectCreateWithEntrypoint extends TransactionCommand {
         );
         output.push(await run(tx, signer, [entrypoint]));
     } else {
-        const nodesToReserve = 2;
+        const nodesToReserve = 1;
 
         console.log("Deploying site with number of nodes:", {
             createProjectData,
