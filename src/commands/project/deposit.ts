@@ -14,6 +14,7 @@ export default class ProjectDeposit extends TransactionCommand {
   public async run(): Promise<unknown> {
     const { args, flags } = await this.parse(ProjectDeposit);
     const signer = await getSigner(flags.network, flags.rpc, flags.address, flags.signer, flags.key, flags.account);
+    const signerAddress = await signer.getAddress();
     const usdc = await getContract(flags.network, flags.abi, "USDC", signer);
     const projects = await getContract(flags.network, flags.abi, "EarthfastProjects", signer);
     const id = parseHash(args.ID);
@@ -22,7 +23,7 @@ export default class ProjectDeposit extends TransactionCommand {
     const output = [];
     const { tx: approveTx, deadline, sig } = await approve(signer, usdc, projects, amount);
     if (approveTx) output.push(await run(approveTx, signer, [usdc]));
-    const tx = await projects.populateTransaction.depositProjectEscrow(id, amount, deadline, sig.v, sig.r, sig.s);
+    const tx = await projects.populateTransaction.depositProjectEscrow(signerAddress, id, amount, deadline, sig.v, sig.r, sig.s);
     output.push(await run(tx, signer, [projects]));
     this.log(pretty(output));
     return output;
