@@ -22,9 +22,7 @@ import "../abi/testnet-sepolia-staging/EarthfastOperators.json";
 import "../abi/testnet-sepolia-staging/EarthfastProjects.json";
 import "../abi/testnet-sepolia-staging/EarthfastReservations.json";
 import "../abi/testnet-sepolia-staging/EarthfastBilling.json";
-
-// These imports are necessary to pull these files into dist/
-import "../abi/localhost/EarthfastEntrypoint.json";
+import "../abi/testnet-sepolia-staging/EarthfastEntrypoint.json";
 
 export type ContractName =
   | "EarthfastToken"
@@ -50,16 +48,5 @@ export async function loadAbi(
   const filename = contract + ".json";
   if (abiDir) {
     return JSON.parse(fs.readFileSync(path.join(abiDir, filename)).toString());
-  }
-  
-  // FIXME: remove this fallback once we deploy the entrypoint on testnet-sepolia-staging
-  try {
-    return await import(path.join("../abi", network, filename));
-  } catch (error) {
-    // Fallback to localhost if the contract is not found in the specified network
-    if (contract === "EarthfastEntrypoint") {
-      return await import(path.join("../abi/localhost", filename));
-    }
-    throw error;
   }
 }
