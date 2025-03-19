@@ -49,4 +49,5 @@ export async function loadAbi(
   if (abiDir) {
     return JSON.parse(fs.readFileSync(path.join(abiDir, filename)).toString());
   }
+  return await import(path.join("../abi", network, filename));  
 }
