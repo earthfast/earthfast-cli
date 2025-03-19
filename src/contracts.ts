@@ -12,6 +12,7 @@ import "../abi/testnet-sepolia/EarthfastOperators.json";
 import "../abi/testnet-sepolia/EarthfastProjects.json";
 import "../abi/testnet-sepolia/EarthfastReservations.json";
 import "../abi/testnet-sepolia/EarthfastBilling.json";
+import "../abi/testnet-sepolia/EarthfastEntrypoint.json";
 
 // These imports are necessary to pull these files into dist/
 import "../abi/testnet-sepolia-staging/USDC.json";
