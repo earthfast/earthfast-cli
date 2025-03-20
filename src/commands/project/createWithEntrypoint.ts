@@ -5,17 +5,6 @@ import { TransactionCommand } from "../../base";
 import { approve, getContract, getSigner, parseAddress, parseHash, parseUSDC, pretty, run } from "../../helpers";
 import { ethers } from "ethers";
 
-// Correct usage examples:
-// With auto-assigned nodes (no NODE_IDS specified):
-// npm run dev project createWithEntrypoint --network localhost --spot 10 0x183921bD248aEB173312A794cFEf413fDE5bF5Ca test-project test@test.com
-
-// With specific node IDs:
-// npm run dev project createWithEntrypoint --network localhost --spot 10 0x183921bD248aEB173312A794cFEf413fDE5bF5Ca test-project test@test.com "0xb10e2d527612073b26eecdfd717e6a320cf44b4afac2b0732d9fcbe2b7fa0cf6,0x405787fa12a823e0f2b7631cc41b3ba8828b3321ca811111fa75cd3aa3bb5ace"
-
-// Common node IDs for testing:
-// 0xb10e2d527612073b26eecdfd717e6a320cf44b4afac2b0732d9fcbe2b7fa0cf6
-// 0x405787fa12a823e0f2b7631cc41b3ba8828b3321ca811111fa75cd3aa3bb5ace
-
 // assumes that the signer has already been funded with USDC
 export default class ProjectCreateWithEntrypoint extends TransactionCommand {
   static summary = "Atomically create a new project on the EarthFast Network, deposit escrow, and reserve nodes via the entrypoint contract.";
@@ -54,6 +43,7 @@ export default class ProjectCreateWithEntrypoint extends TransactionCommand {
     const usdc = await getContract(flags.network, flags.abi, "USDC", signer);
     const entrypoint = await getContract(flags.network, flags.abi, "EarthfastEntrypoint", signer);
     const projects = await getContract(flags.network, flags.abi, "EarthfastProjects", signer);
+    const nodes = await getContract(flags.network, flags.abi, "EarthfastNodes", signer);
 
     // Handle metadata with project type
     let metadata = args.METADATA;
@@ -91,6 +81,8 @@ export default class ProjectCreateWithEntrypoint extends TransactionCommand {
     const depositAmount = parseUSDC(args.DEPOSIT_AMOUNT);
 
     const output = [];
+
+    // generate the approval signature for the escrow deposit to the projects contract
     const { tx: approveTx, deadline, sig } = await approve(signer, usdc, projects, depositAmount);
     if (approveTx) output.push(await run(approveTx, signer, [usdc]));
 
@@ -112,8 +104,24 @@ export default class ProjectCreateWithEntrypoint extends TransactionCommand {
     if (hasNodeIds) {
         // Parse the node IDs
         const nodeIds = nodeIdArray.map((id: string) => parseHash(id));
-        // FIXME: get the node prices from the contract
-        const nodePrices = nodeIds.map(() => parseUSDC("0"));
+
+        // get the node prices from the contract
+        // if spot is true, use the current price
+        // if renew is true, use the next price
+        // otherwise, use the current price
+        // if both are true, use the next price
+        let slotToUse = 0;
+        if (slot.last && slot.next) {
+            slotToUse = 1;
+        } else if (slot.last) {
+            slotToUse = 0;
+        } else if (slot.next) {
+            slotToUse = 1;
+        }
+        const nodePrices = await Promise.all(nodeIds.map(async (id: string) => {
+            const node = await nodes.getNode(id);
+            return node.prices[slotToUse];
+        }));
 
         console.log("Deploying site with specific node IDs:", {
             createProjectData,
