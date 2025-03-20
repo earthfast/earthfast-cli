@@ -25,7 +25,7 @@ export default class ProjectContent extends TransactionCommand {
 
     // Check if the URL exists
     try {
-      await axios.head(args.URL);
+      await axios.get(args.URL);
     } catch (error) {
       this.error(`The URL ${args.URL} does not exist or is not publicly accessible.`);
     }
