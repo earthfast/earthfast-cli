@@ -4,6 +4,7 @@ import { NetworkName, NetworkNames } from "../../networks";
 import { encodeFunctionData, Address, Abi } from "viem";
 import { loadAbi } from "../../contracts";
 
+// TODO: projectsAddress is the only project specific reference, and it can be replaced with dynamic contractInfo.address
 export default class Execute extends Command {
   static description = "Execute a function on the EarthfastProjects contract";
 
