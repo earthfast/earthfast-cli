@@ -23,7 +23,13 @@ export default class ProjectDeposit extends TransactionCommand {
     const output = [];
     const { tx: approveTx, deadline, sig } = await approve(signer, usdc, projects, amount);
     if (approveTx) output.push(await run(approveTx, signer, [usdc]));
-    const tx = await projects.populateTransaction.depositProjectEscrow(signerAddress, id, amount, deadline, sig.v, sig.r, sig.s);
+    // TODO: remove this one entrypoint contracts are deployed on testnet-sepolia
+    let tx;
+    if (flags.network !== 'testnet-sepolia') {
+      tx = await projects.populateTransaction.depositProjectEscrow(signerAddress, id, amount, deadline, sig.v, sig.r, sig.s);
+    } else {
+      tx = await projects.populateTransaction.depositProjectEscrow(id, amount, deadline, sig.v, sig.r, sig.s);
+    }
     output.push(await run(tx, signer, [projects]));
     this.log(pretty(output));
     return output;
