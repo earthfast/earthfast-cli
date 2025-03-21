@@ -299,6 +299,19 @@
     {
       "inputs": [
         {
+          "internalType": "address",
+          "name": "entrypoint",
+          "type": "address"
+        }
+      ],
+      "name": "authorizeEntrypoint",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
           "internalType": "bytes32",
           "name": "projectId",
           "type": "bytes32"
@@ -599,6 +612,25 @@
       "type": "function"
     },
     {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "entrypoint",
+          "type": "address"
+        }
+      ],
+      "name": "isAuthorizedEntrypoint",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
       "inputs": [],
       "name": "pause",
       "outputs": [],
@@ -669,6 +701,19 @@
         }
       ],
       "name": "renounceRole",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "entrypoint",
+          "type": "address"
+        }
+      ],
+      "name": "revokeEntrypoint",
       "outputs": [],
       "stateMutability": "nonpayable",
       "type": "function"

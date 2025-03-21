@@ -12,6 +12,7 @@ import "../abi/testnet-sepolia/EarthfastOperators.json";
 import "../abi/testnet-sepolia/EarthfastProjects.json";
 import "../abi/testnet-sepolia/EarthfastReservations.json";
 import "../abi/testnet-sepolia/EarthfastBilling.json";
+import "../abi/testnet-sepolia/EarthfastEntrypoint.json";
 
 // These imports are necessary to pull these files into dist/
 import "../abi/testnet-sepolia-staging/USDC.json";
@@ -22,6 +23,8 @@ import "../abi/testnet-sepolia-staging/EarthfastOperators.json";
 import "../abi/testnet-sepolia-staging/EarthfastProjects.json";
 import "../abi/testnet-sepolia-staging/EarthfastReservations.json";
 import "../abi/testnet-sepolia-staging/EarthfastBilling.json";
+import "../abi/testnet-sepolia-staging/EarthfastEntrypoint.json";
+
 export type ContractName =
   | "EarthfastToken"
   | "EarthfastRegistry"
@@ -30,6 +33,7 @@ export type ContractName =
   | "EarthfastProjects"
   | "EarthfastReservations"
   | "EarthfastBilling"
+  | "EarthfastEntrypoint"
   | "USDC";
 
 export interface ContractInfo {
@@ -46,5 +50,5 @@ export async function loadAbi(
   if (abiDir) {
     return JSON.parse(fs.readFileSync(path.join(abiDir, filename)).toString());
   }
-  return await import(path.join("../abi", network, filename));
+  return await import(path.join("../abi", network, filename));  
 }
