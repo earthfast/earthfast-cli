@@ -74,70 +74,70 @@ export async function listWallets(): Promise<{ address: string; description: str
   return wallets;
 }
 
-/**
- * Save a Dynamic-authenticated wallet to the keystore
- * @param address The smart wallet address
- * @param description A description for this wallet
- * @param dynamicAuthData Additional data needed for Dynamic authentication
- * @returns The wallet address
- */
-export async function saveDynamicWallet(
-  address: string,
-  description: string,
-  dynamicAuthData: any = {}
-): Promise<string> {
-  // Normalize the address
-  address = address.toLowerCase();
+// /**
+//  * Save a Dynamic-authenticated wallet to the keystore
+//  * @param address The smart wallet address
+//  * @param description A description for this wallet
+//  * @param dynamicAuthData Additional data needed for Dynamic authentication
+//  * @returns The wallet address
+//  */
+// export async function saveDynamicWallet(
+//   address: string,
+//   description: string,
+//   dynamicAuthData: any = {}
+// ): Promise<string> {
+//   // Normalize the address
+//   address = address.toLowerCase();
   
-  // Create the keystore directory if it doesn't exist
-  const keystoreDir = getKeystoreDir();
-  if (!fs.existsSync(keystoreDir)) {
-    fs.mkdirSync(keystoreDir, { recursive: true });
-  }
+//   // Create the keystore directory if it doesn't exist
+//   const keystoreDir = getKeystoreDir();
+//   if (!fs.existsSync(keystoreDir)) {
+//     fs.mkdirSync(keystoreDir, { recursive: true });
+//   }
   
-  // Create the wallet data
-  const walletData = {
-    address,
-    description,
-    type: "dynamic",
-    dynamicAuthData,
-    createdAt: new Date().toISOString(),
-  };
+//   // Create the wallet data
+//   const walletData = {
+//     address,
+//     description,
+//     type: "dynamic",
+//     dynamicAuthData,
+//     createdAt: new Date().toISOString(),
+//   };
   
-  // Save the wallet data to a JSON file
-  const walletPath = path.join(keystoreDir, `${address}.json`);
-  fs.writeFileSync(walletPath, JSON.stringify(walletData, null, 2));
+//   // Save the wallet data to a JSON file
+//   const walletPath = path.join(keystoreDir, `${address}.json`);
+//   fs.writeFileSync(walletPath, JSON.stringify(walletData, null, 2));
   
-  console.log(`Dynamic-authenticated wallet saved to ${walletPath}`);
+//   console.log(`Dynamic-authenticated wallet saved to ${walletPath}`);
   
-  return address;
-}
+//   return address;
+// }
 
-/**
- * Load a Dynamic-authenticated wallet from the keystore
- * @param address The wallet address
- * @returns The wallet data
- */
-export async function loadDynamicWallet(address: string): Promise<any> {
-  // Normalize the address
-  address = address.toLowerCase();
+// /**
+//  * Load a Dynamic-authenticated wallet from the keystore
+//  * @param address The wallet address
+//  * @returns The wallet data
+//  */
+// export async function loadDynamicWallet(address: string): Promise<any> {
+//   // Normalize the address
+//   address = address.toLowerCase();
   
-  // Get the wallet path
-  const keystoreDir = getKeystoreDir();
-  const walletPath = path.join(keystoreDir, `${address}.json`);
+//   // Get the wallet path
+//   const keystoreDir = getKeystoreDir();
+//   const walletPath = path.join(keystoreDir, `${address}.json`);
   
-  // Check if the wallet file exists
-  if (!fs.existsSync(walletPath)) {
-    throw new Error(`Wallet not found: ${address}`);
-  }
+//   // Check if the wallet file exists
+//   if (!fs.existsSync(walletPath)) {
+//     throw new Error(`Wallet not found: ${address}`);
+//   }
   
-  // Read the wallet data
-  const walletData = JSON.parse(fs.readFileSync(walletPath, "utf8"));
+//   // Read the wallet data
+//   const walletData = JSON.parse(fs.readFileSync(walletPath, "utf8"));
   
-  // Verify that this is a Dynamic-authenticated wallet
-  if (walletData.type !== "dynamic") {
-    throw new Error(`Wallet is not a Dynamic-authenticated wallet: ${address}`);
-  }
+//   // Verify that this is a Dynamic-authenticated wallet
+//   if (walletData.type !== "dynamic") {
+//     throw new Error(`Wallet is not a Dynamic-authenticated wallet: ${address}`);
+//   }
   
-  return walletData;
-}
+//   return walletData;
+// }

@@ -1,19 +1,23 @@
 import { Command, Flags } from "@oclif/core";
-import { getWalletForAddress, getContractAddress, batchUserOperations, waitForUserOperationReceipt } from "../../wallet";
-import { NetworkName, NetworkNames } from "../../networks";
+import { getWalletForAddress, getContractAddress, batchUserOperations, waitForUserOperationReceipt } from "../wallet";
+import { NetworkName, NetworkNames } from "../networks";
 import { encodeFunctionData, Address, Abi } from "viem";
-import { loadAbi } from "../../contracts";
+import { loadAbi, ContractName } from "../contracts";
 
-// TODO: projectsAddress is the only project specific reference, and it can be replaced with dynamic contractInfo.address
+// TODO: generalize this to take encoded function data as input, and potentially as an array so multiple user operations can be sent in a single transaction
 export default class Execute extends Command {
-  static description = "Execute a function on the EarthfastProjects contract";
+  static description = "Execute a function on a contract via smart wallet user operation";
 
   static examples = [
-    `$ earthfast project execute --network testnet-sepolia-staging --wallet 0x123... --password mypassword --function "setProjectMetadata" --args '["0xprojectId", "{\\"key\\":\\"value\\"}"]'`,
-    `$ earthfast project execute --network testnet-sepolia-staging --wallet 0x123... --password mypassword --function "createProject" --args '[{"owner":"0xowner","name":"Project Name","email":"email@example.com","content":"ipfs://content","checksum":"0xchecksum","metadata":"{\\"key\\":\\"value\\"}"}]'`,
+    `$ earthfast execute --network testnet-sepolia-staging --wallet 0x123... --password mypassword --function "setProjectMetadata" --args '["0xprojectId", "{\\"key\\":\\"value\\"}"]' --contract EarthfastProjects`,
+    `$ earthfast execute --network testnet-sepolia-staging --wallet 0x123... --password mypassword --function "createProject" --args '[{"owner":"0xowner","name":"Project Name","email":"email@example.com","content":"ipfs://content","checksum":"0xchecksum","metadata":"{\\"key\\":\\"value\\"}"}]' --contract EarthfastProjects`,
   ];
 
-// ./bin/dev project execute --network testnet-sepolia --wallet 0x183921bD248aEB173312A794cFEf413fDE5bF5Ca --password mypassword --function createProject --args '[{"owner":"0x183921bD248aEB173312A794cFEf413fDE5bF5Ca","name":"Project Name","email":"email@example.com","content":"ipfs://content","checksum":"0x0000000000000000000000000000000000000000000000000000000000000000","metadata":"{}"}]'
+// ./bin/dev execute --network testnet-sepolia --wallet 0x183921bD248aEB173312A794cFEf413fDE5bF5Ca --password mypassword --function createProject --args '[{"owner":"0x183921bD248aEB173312A794cFEf413fDE5bF5Ca","name":"Project Name","email":"email@example.com","content":"ipfs://content","checksum":"0x0000000000000000000000000000000000000000000000000000000000000000","metadata":"{}"}]'
+// ./bin/dev execute --network testnet-sepolia --wallet 0x183921bD248aEB173312A794cFEf413fDE5bF5Ca --password mypassword --function deploySite --args '[
+// {"owner":"0x183921bD248aEB173312A794cFEf413fDE5bF5Ca","name":"Project Name","email":"email@example.com","content":"ipfs://content","checksum":"0x0000000000000000000000000000000000000000000000000000000000000000","metadata":"{}"},
+// 0x183921bD248aEB173312A794cFEf413fDE5bF5Ca, 1, "4.000000000000000000", {last: true, next: true}, <DEADLINE>, <SIGNATURE>
+// ]'
 
   static flags = {
     network: Flags.string({
@@ -42,6 +46,12 @@ export default class Execute extends Command {
       description: "Function arguments as a JSON array string",
       required: true,
     }),
+    contract: Flags.string({
+      char: "c",
+      description: "Contract name to use",
+      required: true,
+      options: ["EarthfastProjects", "EarthfastNodes", "EarthfastEntrypoint", "USDC"] as ContractName[],
+    }),
   };
 
   async run(): Promise<void> {
@@ -65,8 +75,7 @@ export default class Execute extends Command {
       const kernelClient = await getWalletForAddress(walletAddress, password);
       
       // Get the contract info
-      const contractInfo = await loadAbi(network, undefined, "EarthfastProjects");
-      const projectsAddress = contractInfo.address as Address;
+      const contractInfo = await loadAbi(network, undefined, flags.contract as ContractName);
       
       // Convert ContractInterface to Abi type for viem compatibility
       const abi = contractInfo.abi as unknown as Abi;
@@ -79,11 +88,11 @@ export default class Execute extends Command {
       });
       
       // Send the operation
-      this.log(`Executing ${functionName} on EarthfastProjects contract...`);
+      this.log(`Executing ${functionName} on ${flags.contract} contract...`);
       const userOpHash = await batchUserOperations(
         kernelClient,
         [{
-          target: projectsAddress,
+          target: contractInfo.address as `0x${string}`,
           callData,
         }]
       );
