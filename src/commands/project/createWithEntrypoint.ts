@@ -38,6 +38,10 @@ export default class ProjectCreateWithEntrypoint extends TransactionCommand {
   public async run(): Promise<unknown> {
     const { args, flags } = await this.parse(ProjectCreateWithEntrypoint);
     console.log("flags: ", flags);
+
+    if (!flags.spot && !flags.renew) {
+      this.error("Must specify at least one of --spot and/or --renew.");
+    }
     const signer = await getSigner(flags.network, flags.rpc, flags.address, flags.signer, flags.key, flags.account);
     const signerAddress = await signer.getAddress();
     const usdc = await getContract(flags.network, flags.abi, "USDC", signer);
@@ -73,10 +77,9 @@ export default class ProjectCreateWithEntrypoint extends TransactionCommand {
     const nodeIdArray = args.NODE_IDS.split(",");
 
     // Make slot default to true for both properties, but allow override by flags
-    const slot = {
-        last: flags.spot !== undefined ? !!flags.spot : true,
-        next: flags.renew !== undefined ? !!flags.renew : true
-    };
+    const slot = { last: !!flags.spot, next: !!flags.renew };
+
+    console.log("slot: ", slot, "flags.spot: ", flags.spot, "flags.renew: ", flags.renew);
 
     const depositAmount = parseUSDC(args.DEPOSIT_AMOUNT);
 
