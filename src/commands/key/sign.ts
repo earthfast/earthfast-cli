@@ -75,6 +75,7 @@ export default class Sign extends TransactionCommand {
     const amount = flags.amount;
     const deadline = parseInt(flags.deadline);
     const useKernel = flags["use-kernel"];
+    const spender = flags.spender;
 
     if (!flags.token && !flags["token-address"]) {
       this.error("Either --token or --token-address must be provided");
@@ -104,9 +105,6 @@ export default class Sign extends TransactionCommand {
       } else {
         throw new Error("Either --token or --token-address must be provided");
       }
-
-      // TODO: parameterize the spender contract
-      const projectsInfo = await loadAbi(network, undefined, "EarthfastProjects" as ContractName);
       
       // Convert amount using the token's decimals
       const amountInTokens = ethers.utils.parseUnits(amount, tokenInfo.decimals);
@@ -170,7 +168,7 @@ export default class Sign extends TransactionCommand {
         
         const permitData = {
           owner: smartWalletAddress,
-          spender: projectsInfo.address,
+          spender: spender,
           value: BigInt(amountInTokens.toString()),
           nonce: BigInt(nonce.toString()),
           deadline: BigInt(deadline),
@@ -208,7 +206,7 @@ export default class Sign extends TransactionCommand {
 
         const permitData = {
           owner: walletAddress,
-          spender: projectsInfo.address,
+          spender: spender,
           value: amountInTokens,
           nonce,
           deadline,
