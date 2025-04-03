@@ -90,17 +90,6 @@ export async function getWalletForAddress(address: string, password: string): Pr
 }
 
 /**
- * Get the address of a contract from the ABI files
- * @param network The network to use
- * @param contractName The name of the contract
- * @returns The contract address
- */
-export async function getContractAddress(network: NetworkName, contractName: ContractName): Promise<Address> {
-  const contractInfo = await loadAbi(network, Networks[network].abi, contractName);
-  return contractInfo.address as Address;
-}
-
-/**
  * Send a batch of user operations in a single transaction via the kernel client
  * @param kernelClient The kernel client to use
  * @param operations Array of callData and target address pairs

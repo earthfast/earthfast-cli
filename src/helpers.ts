@@ -311,6 +311,17 @@ export async function getContract(
   }
 }
 
+/**
+ * Get the address of a contract from the ABI files
+ * @param network The network to use
+ * @param contractName The name of the contract
+ * @returns The contract address
+ */
+export async function getContractAddress(network: NetworkName, contractName: ContractName): Promise<string> {
+  const contractInfo = await loadAbi(network, Networks[network].abi, contractName);
+  return contractInfo.address;
+}
+
 export async function decodeEvents(receipt: TransactionReceipt, contracts: Contract[]): Promise<TransactionLog[]> {
   const results = [];
   for (let i = 0; i < receipt.logs.length; i++) {

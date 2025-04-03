@@ -1,34 +1,21 @@
-import { Command, Flags } from "@oclif/core";
-import { getWalletForAddress, getContractAddress, batchUserOperations, waitForUserOperationReceipt } from "../wallet";
-import { NetworkName, NetworkNames } from "../networks";
+import { Flags } from "@oclif/core";
+import { createWallet, batchUserOperations, waitForUserOperationReceipt } from "../zeroDevWallet";
+import { NetworkName } from "../networks";
 import { encodeFunctionData, Address, Abi } from "viem";
 import { loadAbi, ContractName } from "../contracts";
+import { Wallet } from "ethers";
+import { getSigner } from "../helpers";
+import { TransactionCommand } from "../base";
 
-export default class Execute extends Command {
+export default class Execute extends TransactionCommand {
   static description = "Execute one or more functions on contracts via smart wallet user operation";
 
   static examples = [
-    `$ earthfast execute --network testnet-sepolia-staging --wallet 0x123... --password mypassword --calls '[{"contract":"EarthfastProjects","function":"setProjectMetadata","args":["0xprojectId","{\\"key\\":\\"value\\"}"]}]'`,
-    `$ earthfast execute --network testnet-sepolia-staging --wallet 0x123... --password mypassword --calls '[{"contract":"EarthfastProjects","function":"createProject","args":[{"owner":"0xowner","name":"Project Name","email":"email@example.com","content":"ipfs://content","checksum":"0xchecksum","metadata":"{\\"key\\":\\"value\\"}"}]},{"contract":"EarthfastNodes","function":"registerNode","args":["0xnodeId"]}]'`,
+    `$ earthfast execute --network testnet-sepolia-staging --calls '[{"contract":"EarthfastProjects","function":"setProjectMetadata","args":["0xprojectId","{\\"key\\":\\"value\\"}"]}]'`,
+    `$ earthfast execute --network testnet-sepolia-staging --calls '[{"contract":"EarthfastProjects","function":"createProject","args":[{"owner":"0xowner","name":"Project Name","email":"email@example.com","content":"ipfs://content","checksum":"0xchecksum","metadata":"{\\"key\\":\\"value\\"}"}]},{"contract":"EarthfastNodes","function":"registerNode","args":["0xnodeId"]}]'`,
   ];
 
   static flags = {
-    network: Flags.string({
-      char: "n",
-      description: "Network to use",
-      options: NetworkNames,
-      default: "testnet-sepolia-staging",
-    }),
-    wallet: Flags.string({
-      char: "w",
-      description: "Wallet address to use",
-      required: true,
-    }),
-    password: Flags.string({
-      char: "p",
-      description: "Wallet password",
-      required: true,
-    }),
     calls: Flags.string({
       char: "c",
       description: "Array of function calls as a JSON string. Each call should have contract, function, and args fields.",
@@ -39,9 +26,9 @@ export default class Execute extends Command {
   async run(): Promise<void> {
     const { flags } = await this.parse(Execute);
     const network = flags.network as NetworkName;
-    const walletAddress = flags.wallet;
-    const password = flags.password;
-    
+    const signer = await getSigner(flags.network, flags.rpc, flags.address, flags.signer, flags.key, flags.account);
+    const privateKey = ((signer as Wallet).privateKey);
+
     // Parse the function calls
     let calls;
     try {
@@ -56,7 +43,7 @@ export default class Execute extends Command {
 
     try {
       // Get the wallet client
-      const kernelClient = await getWalletForAddress(walletAddress, password);
+      const kernelClient = await createWallet(privateKey);
 
       // Process each function call
       const operations = await Promise.all(calls.map(async (call) => {

@@ -1,18 +1,14 @@
 import { Command, Flags } from "@oclif/core";
-import { getWalletForAddress } from "../../wallet";
+import { createWallet } from "../../zeroDevWallet";
 import { NetworkName, NetworkNames, Networks } from "../../networks";
 import { loadAbi, ContractName } from "../../contracts";
-import { loadWallet } from "../../keystore";
 import { ethers } from "ethers";
 import { TransactionCommand } from "../../base";
 import { getSigner } from "../../helpers";
 import { TypedDataSigner } from "@ethersproject/abstract-signer";
-import { signerToEcdsaValidator } from "@zerodev/ecdsa-validator";
 import { createPublicClient, http } from "viem";
 import { sepolia } from "viem/chains";
-import { KERNEL_V3_1 } from "@zerodev/sdk/constants";
-import { entryPoint07Address } from "viem/account-abstraction";
-import { privateKeyToAccount } from "viem/accounts";
+import { Wallet } from "ethers";
 
 export default class Sign extends TransactionCommand {
   static description = "Generate an approval signature for deploySite";
@@ -25,16 +21,6 @@ export default class Sign extends TransactionCommand {
 
   static flags = {
     ...super.flags,
-    wallet: Flags.string({
-      char: "w",
-      description: "Wallet address to use",
-      required: true,
-    }),
-    password: Flags.string({
-      char: "p",
-      description: "Wallet password",
-      required: true,
-    }),
     amount: Flags.string({
       char: "a",
       description: "Amount of tokens to approve",
@@ -70,8 +56,9 @@ export default class Sign extends TransactionCommand {
   async run(): Promise<void> {
     const { flags } = await this.parse(Sign);
     const network = flags.network as NetworkName;
-    const walletAddress = flags.wallet;
-    const password = flags.password;
+    const signer = await getSigner(flags.network, flags.rpc, flags.address, flags.signer, flags.key, flags.account);
+    const signerAddress = await signer.getAddress();
+    const privateKey = ((signer as Wallet).privateKey);
     const amount = flags.amount;
     const deadline = parseInt(flags.deadline);
     const useKernel = flags["use-kernel"];
@@ -133,8 +120,7 @@ export default class Sign extends TransactionCommand {
 
       if (useKernel) {
         // Use ZeroDev kernel client for signing
-        const ownerWallet = await loadWallet(walletAddress, password);
-        const smartWallet = await getWalletForAddress(walletAddress, password);
+        const smartWallet = await createWallet(privateKey);
         if (!smartWallet || !smartWallet.account) {
           throw new Error("Failed to create smart wallet");
         }
@@ -142,20 +128,6 @@ export default class Sign extends TransactionCommand {
         const publicClient = createPublicClient({
           transport: http(Networks[network].url),
           chain: sepolia,
-        });
-
-        // Create a viem account from the private key
-        const viemAccount = privateKeyToAccount(ownerWallet.privateKey as `0x${string}`);
-
-        console.log("viemAccount", viemAccount);
-
-        const ecdsaValidator = await signerToEcdsaValidator(publicClient, {
-          signer: viemAccount,
-          entryPoint: {
-            address: entryPoint07Address,
-            version: "0.7",
-          },
-          kernelVersion: KERNEL_V3_1,
         });
 
         // Get nonce from token contract
@@ -192,20 +164,17 @@ export default class Sign extends TransactionCommand {
 
         // Concatenate the signature components into a single string
         signature = r + s.slice(2) + v.toString(16).padStart(2, '0');
-      } else {
-        // Use direct signing from keystore
-        const signer = await getSigner(flags.network, flags.rpc, flags.address, flags.signer, flags.key, flags.account);
-        
+      } else {        
         // Get nonce from token contract
         const tokenContract = new ethers.Contract(
           tokenInfo.address,
           ["function nonces(address) view returns (uint256)"],
           signer
         );
-        nonce = await tokenContract.nonces(walletAddress);
+        nonce = await tokenContract.nonces(signerAddress);
 
         const permitData = {
-          owner: walletAddress,
+          owner: signerAddress,
           spender: spender,
           value: amountInTokens,
           nonce,
