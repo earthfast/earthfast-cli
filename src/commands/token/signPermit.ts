@@ -11,12 +11,12 @@ import { sepolia } from "viem/chains";
 import { Wallet } from "ethers";
 
 export default class Sign extends TransactionCommand {
-  static description = "Generate an approval signature for deploySite";
+  static description = "Generate an approval signature for a token transfer permit using EIP-712";
 
   static examples = [
-    `$ earthfast key sign --network testnet-sepolia --wallet 0x123... --password mypassword --amount 10 --deadline 1742434970 --token USDC`,
-    `$ earthfast key sign --network testnet-sepolia --wallet 0x123... --password mypassword --amount 10 --deadline 1742434970 --token-address 0x456...`,
-    `$ earthfast key sign --network testnet-sepolia --wallet 0x123... --password mypassword --amount 10 --deadline 1742434970 --token USDC --use-kernel`,
+    `$ earthfast token sign --network testnet-sepolia --amount 10 --deadline 1742434970 --token USDC`,
+    `$ earthfast token sign --network testnet-sepolia --amount 10 --deadline 1742434970 --token-address 0x456...`,
+    `$ earthfast token sign --network testnet-sepolia --amount 10 --deadline 1742434970 --token USDC --use-kernel`,
   ];
 
   static flags = {

@@ -22,7 +22,6 @@ import { loadWallet } from './keystore';
 import { loadAbi, ContractName } from './contracts';
 import { NetworkName, Networks } from './networks';
 
-// Should this validation be moved within the createWallet function?
 if (
     !process.env.BUNDLER_RPC ||
     !process.env.PAYMASTER_RPC ||
