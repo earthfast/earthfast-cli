@@ -363,6 +363,99 @@
         },
         {
           "internalType": "uint256",
+          "name": "nodesToReserve",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "escrowAmount",
+          "type": "uint256"
+        },
+        {
+          "components": [
+            {
+              "internalType": "bool",
+              "name": "last",
+              "type": "bool"
+            },
+            {
+              "internalType": "bool",
+              "name": "next",
+              "type": "bool"
+            }
+          ],
+          "internalType": "struct EarthfastSlot",
+          "name": "slot",
+          "type": "tuple"
+        }
+      ],
+      "name": "deploySiteWithApproval",
+      "outputs": [
+        {
+          "internalType": "bytes32",
+          "name": "projectId",
+          "type": "bytes32"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "components": [
+            {
+              "internalType": "address",
+              "name": "owner",
+              "type": "address"
+            },
+            {
+              "internalType": "string",
+              "name": "name",
+              "type": "string"
+            },
+            {
+              "internalType": "string",
+              "name": "email",
+              "type": "string"
+            },
+            {
+              "internalType": "string",
+              "name": "content",
+              "type": "string"
+            },
+            {
+              "internalType": "bytes32",
+              "name": "checksum",
+              "type": "bytes32"
+            },
+            {
+              "internalType": "string",
+              "name": "metadata",
+              "type": "string"
+            }
+          ],
+          "internalType": "struct EarthfastCreateProjectData",
+          "name": "project",
+          "type": "tuple"
+        },
+        {
+          "internalType": "address",
+          "name": "fundingWallet",
+          "type": "address"
+        },
+        {
+          "internalType": "bytes32[]",
+          "name": "nodeIds",
+          "type": "bytes32[]"
+        },
+        {
+          "internalType": "uint256[]",
+          "name": "nodePrices",
+          "type": "uint256[]"
+        },
+        {
+          "internalType": "uint256",
           "name": "escrowAmount",
           "type": "uint256"
         },
