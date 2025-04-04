@@ -54,36 +54,36 @@ export default class Execute extends TransactionCommand {
 
         // Get the contract info
         const contractInfo = await loadAbi(network, undefined, call.contract as ContractName);
-        
+
         // Convert ContractInterface to Abi type for viem compatibility
         const abi = contractInfo.abi as unknown as Abi;
-        
+
         // Encode the function call
         const callData = encodeFunctionData({
           abi,
           functionName: call.function,
           args: call.args,
         });
-        
+
         return {
           target: contractInfo.address as `0x${string}`,
           callData,
         };
       }));
-      
+
       // Send the batch operation
       this.log(`Executing ${calls.length} function calls in a single transaction...`);
       const userOpHash = await batchUserOperations(kernelClient, operations);
-      
+
       this.log(`User operation hash: ${userOpHash}`);
-      
+
       // Wait for the receipt
       this.log("Waiting for transaction to be mined...");
       const receipt = await waitForUserOperationReceipt(kernelClient, userOpHash);
-      
+
       this.log(`Transaction successful! Hash: ${receipt.receipt.transactionHash}`);
       this.log(`Gas used: ${receipt.receipt.gasUsed}`);
-      
+
     } catch (error) {
       this.error(`Failed to execute functions: ${error instanceof Error ? error.message : String(error)}`);
     }
