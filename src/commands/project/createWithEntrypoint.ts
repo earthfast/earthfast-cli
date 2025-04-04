@@ -37,7 +37,6 @@ export default class ProjectCreateWithEntrypoint extends TransactionCommand {
 
   public async run(): Promise<unknown> {
     const { args, flags } = await this.parse(ProjectCreateWithEntrypoint);
-    console.log("flags: ", flags);
 
     if (!flags.spot && !flags.renew) {
       this.error("Must specify at least one of --spot and/or --renew.");

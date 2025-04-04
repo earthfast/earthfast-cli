@@ -27,60 +27,60 @@ if (
     !process.env.PAYMASTER_RPC ||
     !process.env.ZERODEV_PROJECT_ID
   ) {
-    throw new Error("BUNDLER_RPC or PAYMASTER_RPC or PRIVATE_KEY is not set")
-  }
-  
-const chain = sepolia
-const publicClient = createPublicClient({
-  transport: http(process.env.BUNDLER_RPC),
-  chain,
-})
-
-const entryPoint = {
-  address: entryPoint07Address as Address,
-  version: "0.7" as EntryPointVersion,
+    throw new Error("BUNDLER_RPC or PAYMASTER_RPC or PROJECT_ID is not set")
 }
-const kernelVersion = KERNEL_V3_1
 
 // create a ZeroDev smart wallet for the user given a private key
 export const createWallet = async (privateKey: string): Promise<KernelAccountClient> => {
-    const signer = privateKeyToAccount(privateKey as Hex)
+  const chain = sepolia
+  const signer = privateKeyToAccount(privateKey as Hex)
 
-    const ecdsaValidator = await signerToEcdsaValidator(publicClient, {
-        signer,
-        entryPoint,
-        kernelVersion,
-    })
+  const entryPoint = {
+    address: entryPoint07Address as Address,
+    version: "0.7" as EntryPointVersion,
+  }
+  const kernelVersion = KERNEL_V3_1
 
-    const account = await createKernelAccount(publicClient, {
-        plugins: {
-          sudo: ecdsaValidator,
-        },
-        entryPoint,
-        kernelVersion,
-    })
-      console.log("My account:", account.address)
+  const publicClient = createPublicClient({
+    transport: http(process.env.BUNDLER_RPC),
+    chain,
+  })
 
-    const paymasterClient = createZeroDevPaymasterClient({
-        chain,
-        transport: http(process.env.PAYMASTER_RPC),
-    })
+  const ecdsaValidator = await signerToEcdsaValidator(publicClient, {
+    signer,
+    entryPoint,
+    kernelVersion,
+  })
+
+  const account = await createKernelAccount(publicClient, {
+      plugins: {
+        sudo: ecdsaValidator,
+      },
+      entryPoint,
+      kernelVersion,
+  })
+  console.log("My account:", account.address)
+
+  const paymasterClient = createZeroDevPaymasterClient({
+      chain,
+      transport: http(process.env.PAYMASTER_RPC),
+  })
     
-    const kernelClient = createKernelAccountClient({
-        account,
-        chain,
-        bundlerTransport: http(process.env.BUNDLER_RPC),
-        client: publicClient,
-        paymaster: {
-          getPaymasterData: (userOperation) => {
-            return paymasterClient.sponsorUserOperation({
-              userOperation,
-            })
-          }
-        }
-    })
+  const kernelClient = createKernelAccountClient({
+    account,
+    chain,
+    bundlerTransport: http(process.env.BUNDLER_RPC),
+    client: publicClient,
+    paymaster: {
+      getPaymasterData: (userOperation) => {
+        return paymasterClient.sponsorUserOperation({
+          userOperation,
+        })
+      }
+    }
+  })
 
-    return kernelClient;
+  return kernelClient;
 }
 
 export async function getWalletForAddress(address: string, password: string): Promise<KernelAccountClient> {
@@ -129,16 +129,6 @@ export async function batchUserOperations(
       console.error("This appears to be a paymaster error. The paymaster may not be configured to sponsor this type of transaction.");
       console.error("You may need to fund your account with ETH or configure a different paymaster.");
     }
-
-    // // try simulating user op to get more information on the revert reason
-    // try {
-    //   const simulatedOp = await kernelClient.simulateUserOperation({
-    //     callData: batchCallData,
-    //   });
-    //   console.error("Simulation failed with:", simulatedOp);
-    // } catch (simError) {
-    //   console.error("Simulation error:", simError);
-    // }
 
     throw error;
   }
