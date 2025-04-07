@@ -1,6 +1,6 @@
 {
   "name": "earthfast-cli",
-  "version": "0.11.2",
+  "version": "0.12.0",
   "description": "Command line utility for EarthFast",
   "homepage": "https://earthfast.com",
   "license": "MIT",
@@ -67,12 +67,15 @@
     "@ledgerhq/hw-transport-node-hid": "^6.27.6",
     "@oclif/core": "^1.20.2",
     "@oclif/plugin-help": "^5.1.17",
+    "@zerodev/ecdsa-validator": "^5.4.4",
+    "@zerodev/sdk": "^5.4.25",
     "axios": "^1.7.7",
     "dotenv": "^16.4.5",
     "ethers": "^5.7.1",
     "inquirer": "^7.1.4",
     "keytar": "^7.9.0",
     "tar": "^6.1.11",
+    "viem": "^2.23.6",
     "yargs": "^17.6.0"
   },
   "devDependencies": {
@@ -97,6 +100,6 @@
     "oclif": "^3.2.24",
     "prettier": "^2.7.1",
     "ts-node": "^10.9.1",
-    "typescript": "^4.8.4"
+    "typescript": "^5.0.4"
   }
 }
