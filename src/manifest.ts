@@ -1,4 +1,5 @@
 import { sha256File } from "./checksum";
+import { computeCIDv1 } from "./cid";
 import { NodeFilesystem } from "./filesystem";
 
 const MANIFEST_FILENAME = "earthfast.json";
@@ -36,6 +37,7 @@ interface Manifest {
   navigationUrls: { positive: boolean; regex: string }[];
   navigationRequestStrategy: "freshness" | "performance";
   hashTable: { [url: string]: string };
+  cidTable: { [url: string]: string };
 }
 
 function newManifest(): Manifest {
@@ -55,6 +57,7 @@ function newManifest(): Manifest {
     ],
     dataGroups: [],
     hashTable: {},
+    cidTable: {},
     navigationUrls: [
       { positive: true, regex: "^\\/.*$" },
       { positive: false, regex: "^\\/(?:.+\\/)?[^/]*\\.[^/]*$" },
@@ -70,11 +73,16 @@ export async function generateManifest(buildDir: string) {
   const fs = new NodeFilesystem(buildDir);
 
   const files = (await fs.list("/")).filter((val: string) => val != MANIFEST_PATH);
+
   for (const fPath of files) {
-    const hash: string = await sha256File(fs.canonical(fPath));
+    const canonicalPath = fs.canonical(fPath);
+    const hash: string = await sha256File(canonicalPath);
+    const cid: string = await computeCIDv1(canonicalPath);
+
     const url: string = encodeURI(fPath);
     manifest.assetGroups[0].urls.push(url);
     manifest.hashTable[url] = hash;
+    manifest.cidTable[url] = cid;
   }
 
   fs.write(MANIFEST_FILENAME, JSON.stringify(manifest, null, 2));

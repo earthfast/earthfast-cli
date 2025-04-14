@@ -23,11 +23,17 @@ export default class BundleCreate extends Command {
       this.error("Error: Output directory must be a subdirectory of the current working directory");
     }
 
-    await generateManifest(args.DIR);
+    const manifestPath = await generateManifest(args.DIR);
     const bundleName = normalizeBundleExtension(args.NAME);
     await compress(bundleName, args.DIR);
-    this.log(bundleName);
-    return bundleName;
+
+    this.log(`Bundle created: ${bundleName}`);
+    this.log(`Manifest with SHA256 checksums and CIDv1 identifiers created at: ${manifestPath}`);
+
+    return {
+      bundleName,
+      manifestPath
+    };
   }
 }
 
