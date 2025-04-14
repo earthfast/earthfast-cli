@@ -1,19 +1,9 @@
-import fs from "fs";
-import { CID } from "multiformats/cid";
-import { sha256 } from "multiformats/hashes/sha2";
-import { sha256File } from "./checksum";
+import { sha256File, computeCIDv1 } from "./checksum";
 
 // Interface for hash functions
 export interface HashFunction {
   name: string;
   compute: (filePath: string) => Promise<string>;
-}
-
-export async function computeCIDv1(filePath: string): Promise<string> {
-  const fileBuffer = fs.readFileSync(filePath);
-  const hash = await sha256.digest(fileBuffer);
-  const cid = CID.create(1, 0x70, hash); // 0x70 is the codec for raw
-  return cid.toString();
 }
 
 // Registry of available hash functions
