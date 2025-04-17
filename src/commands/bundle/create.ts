@@ -1,5 +1,6 @@
 import path from "path";
 import { Command, Flags } from "@oclif/core";
+import { Arg } from "@oclif/core/lib/interfaces";
 import tar from "tar";
 import { hashRegistry } from "../../hash-registry";
 import { generateManifest } from "../../manifest";
@@ -10,7 +11,20 @@ export default class BundleCreate extends Command {
     "<%= config.bin %> <%= command.id %> my-site-v1.0.0 ./dist",
     "<%= config.bin %> <%= command.id %> my-site-v1.0.0 ./dist --hash-function=ipfs-cid-v1",
   ];
-
+  static usage = "<NAME> <DIR>";
+  static enableJsonFlag = true;
+  static args: Arg[] = [
+    {
+      name: "NAME",
+      description: "The name of the bundle to create (e.g. my-site-v1.0.0).",
+      required: true,
+    },
+    {
+      name: "DIR",
+      description: "Relative path to the app's build directory (e.g. ./dist).",
+      required: true,
+    },
+  ];
   static flags = {
     "hash-function": Flags.string({
       char: "h",
@@ -29,24 +43,17 @@ export default class BundleCreate extends Command {
       this.error("Error: Output directory must be a subdirectory of the current working directory");
     }
 
-    // Get the hash function specified by the user
     const hashFunction = flags["hash-function"];
-
-    // Validate hash function
     if (!hashRegistry.get(hashFunction)) {
       this.error(`Error: Hash function "${hashFunction}" not supported`);
     }
 
-    // Generate manifest with specified hash function
     this.log(`Generating manifest using hash function: ${hashFunction}`);
     const manifestPath = await generateManifest(args.DIR, hashFunction);
-
     const bundleName = normalizeBundleExtension(args.NAME);
     await compress(bundleName, args.DIR);
-
     this.log(`Bundle created: ${bundleName}`);
     this.log(`Manifest created at: ${manifestPath}`);
-
     return {
       bundleName,
       manifestPath,
