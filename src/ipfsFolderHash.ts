@@ -2,9 +2,9 @@
 import { promises as fs } from "fs";
 import path from "path";
 import { encode, prepare } from "@ipld/dag-pb";
+import { UnixFS } from "ipfs-unixfs";
 import { CID } from "multiformats/cid";
 import { sha256 } from "multiformats/hashes/sha2";
-import { UnixFS } from "ipfs-unixfs";
 
 // Define our own type for a DAG-PB Link
 export interface PBLink {
@@ -14,10 +14,7 @@ export interface PBLink {
 }
 
 // Helper: create a DAG-PB node from a UnixFS node and an array of links.
-async function createDagNode(
-  unixFs: UnixFS,
-  links: PBLink[]
-): Promise<{ cid: CID; size: number; buf: Uint8Array }> {
+async function createDagNode(unixFs: UnixFS, links: PBLink[]): Promise<{ cid: CID; size: number; buf: Uint8Array }> {
   // Prepare the DAG-PB node with the UnixFS marshaled data and links list.
   const node = prepare({ Data: unixFs.marshal(), Links: links });
   const buf = encode(node);
