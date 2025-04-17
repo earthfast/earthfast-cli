@@ -7,7 +7,7 @@ import { generateManifest } from "../../manifest";
 
 export default class BundleCreate extends Command {
   static summary = "Bundle an application for use on the EarthFast Network.";
-  static examples = ["<%= config.bin %> <%= command.id %> my-site-v1.0.0 ./dist"];
+  static examples = ["<%= config.bin %> <%= command.id %> my-site-v1.0.0 ./dist --hash-function=ipfs-cid-v1"];
   static usage = "<%= command.id %> NAME DIR";
   static enableJsonFlag = true;
   static args: Arg[] = [

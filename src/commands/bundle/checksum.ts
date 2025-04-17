@@ -6,11 +6,8 @@ import { computeDirCid } from "../../ipfsFolderHash";
 
 export default class BundleChecksum extends Command {
   static summary = "Print the checksum of the provided file or directory using the specified hash function.";
-  static examples = [
-    "<%= config.bin %> <%= command.id %> my-site-v1.0.0.tgz",
-    "<%= config.bin %> <%= command.id %> ./dist --hash-function=ipfs-cid-v1",
-  ];
-  static usage = "<FILE|DIR>";
+  static examples = ["<%= config.bin %> <%= command.id %> my-site-v1.0.0.tgz --hash-function=ipfs-cid-v1"];
+  static usage = "<%= command.id %> <FILE|DIR>";
   static args: Arg[] = [
     {
       name: "target",
