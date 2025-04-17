@@ -11,7 +11,7 @@ interface AssetGroupConfig {
   updateMode: "prefetch" | "lazy";
   urls: string[];
   patterns: string[];
-  cacheQueryOptions?: any;
+  cacheQueryOptions?: CacheQueryOptions;
 }
 
 interface DataGroupConfig {
@@ -24,7 +24,7 @@ interface DataGroupConfig {
   timeoutMs?: number;
   refreshAheadMs?: number;
   cacheOpaqueResponses?: boolean;
-  cacheQueryOptions?: any;
+  cacheQueryOptions?: CacheQueryOptions;
 }
 
 interface Manifest {
@@ -42,7 +42,7 @@ interface Manifest {
   folderCid?: string;
 }
 
-function newManifest(hashFunction = "sha256"): Manifest {
+function newManifest(hashFunction = "ipfs-cid-v1"): Manifest {
   return {
     configVersion: 1,
     timestamp: Date.now(),
