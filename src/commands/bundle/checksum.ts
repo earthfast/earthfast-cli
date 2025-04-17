@@ -22,7 +22,7 @@ export default class BundleChecksum extends Command {
     "hash-function": Flags.string({
       char: "h",
       description: "Hash function to use (sha256 for file checksum, ipfs-cid-v1 for directory CID)",
-      default: "sha256",
+      default: "ipfs-cid-v1",
       options: ["sha256", "ipfs-cid-v1"],
     }),
     json: Flags.boolean({
