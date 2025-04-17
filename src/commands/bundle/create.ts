@@ -7,23 +7,12 @@ import { generateManifest } from "../../manifest";
 
 export default class BundleCreate extends Command {
   static summary = "Bundle an application for use on the EarthFast Network.";
-  static examples = [
-    "<%= config.bin %> <%= command.id %> my-site-v1.0.0 ./dist",
-    "<%= config.bin %> <%= command.id %> my-site-v1.0.0 ./dist --hash-function=ipfs-cid-v1",
-  ];
-  static usage = "<NAME> <DIR>";
+  static examples = ["<%= config.bin %> <%= command.id %> my-site-v1.0.0 ./dist"];
+  static usage = "<%= command.id %> NAME DIR";
   static enableJsonFlag = true;
   static args: Arg[] = [
-    {
-      name: "NAME",
-      description: "The name of the bundle to create (e.g. my-site-v1.0.0).",
-      required: true,
-    },
-    {
-      name: "DIR",
-      description: "Relative path to the app's build directory (e.g. ./dist).",
-      required: true,
-    },
+    { name: "NAME", description: "The name of the bundle to create (e.g. my-site-v1.0.0).", required: true },
+    { name: "DIR", description: "Relative path to the app's build directory (e.g. ./dist).", required: true },
   ];
   static flags = {
     "hash-function": Flags.string({
