@@ -15,16 +15,13 @@ export default class BundleChecksum extends Command {
       required: true,
     },
   ];
+  static enableJsonFlag = true;
   static flags = {
     "hash-function": Flags.string({
       char: "h",
       description: "Hash function to use (sha256 for file checksum, ipfs-cid-v1 for directory CID)",
       default: "ipfs-cid-v1",
       options: ["sha256", "ipfs-cid-v1"],
-    }),
-    json: Flags.boolean({
-      description: "Output in JSON format.",
-      allowNo: false,
     }),
   };
 
