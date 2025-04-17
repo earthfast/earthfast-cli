@@ -43,11 +43,7 @@ export default class BundleCreate extends Command {
     await compress(bundleName, args.DIR);
     this.log(`Bundle created: ${bundleName}`);
     this.log(`Manifest created at: ${manifestPath}`);
-    return {
-      bundleName,
-      manifestPath,
-      hashFunction,
-    };
+    return bundleName;
   }
 }
 
