@@ -19,7 +19,7 @@ export default class BundleCreate extends Command {
       char: "h",
       description: "Hash function to use (sha256, ipfs-cid-v1)",
       default: "sha256",
-      options: hashRegistry.listAvailable(),
+      options: ["sha256", "ipfs-cid-v1"],
     }),
   };
 

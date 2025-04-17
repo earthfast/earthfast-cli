@@ -32,11 +32,6 @@ class HashRegistry {
   get(name: string): HashFunction | undefined {
     return this.hashFunctions.get(name);
   }
-
-  // List all available hash functions
-  listAvailable(): string[] {
-    return Array.from(this.hashFunctions.keys());
-  }
 }
 
 // Singleton instance
