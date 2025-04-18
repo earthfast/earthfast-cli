@@ -2,7 +2,7 @@ import path from "path";
 import { Command, Flags } from "@oclif/core";
 import { Arg } from "@oclif/core/lib/interfaces";
 import tar from "tar";
-import { hashRegistry } from "../../hash-registry";
+import { hashRegistry } from "../../checksum";
 import { generateManifest } from "../../manifest";
 
 export default class BundleCreate extends Command {

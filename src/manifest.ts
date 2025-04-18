@@ -1,5 +1,5 @@
+import { hashRegistry } from "./checksum";
 import { NodeFilesystem } from "./filesystem";
-import { hashRegistry } from "./hash-registry";
 import { computeDirCid, computeFileCid } from "./ipfsFolderHash";
 
 const MANIFEST_FILENAME = "earthfast.json";
