@@ -1,24 +1,33 @@
-import { AddressZero } from "@ethersproject/constants";
+import fs from "fs";
 import { Flags } from "@oclif/core";
 import { Arg } from "@oclif/core/lib/interfaces";
-import { TransactionCommand } from "../../base";
-import { approve, getContract, getSigner, parseAddress, parseHash, parseUSDC, pretty, run } from "../../helpers";
 import { ethers } from "ethers";
+import { create as ipfsCreate } from "ipfs-http-client";
+import { TransactionCommand } from "../../base";
+import { computeCIDv1 } from "../../checksum";
+import { approve, getContract, getSigner, parseHash, parseUSDC, pretty, run } from "../../helpers";
 
 // assumes that the signer has already been funded with USDC
 export default class ProjectCreateWithEntrypoint extends TransactionCommand {
-  static summary = "Atomically create a new project on the EarthFast Network, deposit escrow, and reserve nodes via the entrypoint contract.";
+  static summary =
+    "Atomically create a new project on the EarthFast Network, deposit escrow, and reserve nodes via the entrypoint contract.";
   static examples = [
     '<%= config.bin %> <%= command.id %> 10 0x123456... "My Project" notify@myproject.com',
-    '<%= config.bin %> <%= command.id %> 10 0x123456... "My Project" notify@myproject.com "0xnode1,0xnode2"'
+    '<%= config.bin %> <%= command.id %> 10 0x123456... "My Project" notify@myproject.com "0xnode1,0xnode2"',
+    '<%= config.bin %> <%= command.id %> 10 0x123456... "My Project" notify@myproject.com --bundle ./path/to/file --ens myproject.eth --publish',
   ];
-  static usage = "<%= command.id %> DEPOSIT_AMOUNT OWNER NAME EMAIL [NODE_IDS] [URL] [SHA] [METADATA] [--type TYPE] [--spot] [--renew]";
+  static usage =
+    "<%= command.id %> DEPOSIT_AMOUNT OWNER NAME EMAIL [NODE_IDS] [URL] [SHA] [METADATA] [--type TYPE] [--bundle PATH] [--ens NAME] [--publish] [--spot] [--renew]";
   static args: Arg[] = [
     { name: "DEPOSIT_AMOUNT", description: "The amount of USDC to deposit into escrow.", required: true },
     { name: "OWNER", description: "The owner for the new project.", required: true },
     { name: "NAME", description: "The human readable name of the new project.", required: true },
     { name: "EMAIL", description: "The project email for admin notifications.", required: true },
-    { name: "NODE_IDS", description: "The comma separated IDs of the nodes to reserve. Leave empty to auto-assign nodes.", default: "" },
+    {
+      name: "NODE_IDS",
+      description: "The comma separated IDs of the nodes to reserve. Leave empty to auto-assign nodes.",
+      default: "",
+    },
     { name: "URL", description: "The public URL to fetch the content bundle.", default: "" },
     { name: "SHA", description: "The SHA-256 checksum of the content bundle.", default: "" },
     { name: "METADATA", description: "JSON metadata to attach to this project.", default: "" },
@@ -32,6 +41,18 @@ export default class ProjectCreateWithEntrypoint extends TransactionCommand {
       description: "Project type (static or nextjs)",
       options: ["static", "nextjs"],
       default: "static",
+    }),
+    bundle: Flags.string({
+      description: "Path to the local content bundle file to generate and add IPFS CID",
+      default: "",
+    }),
+    ens: Flags.string({
+      description: "ENS domain to attach to the project",
+      default: "",
+    }),
+    publish: Flags.boolean({
+      description: "If provided along with --bundle, publish the file to IPFS.",
+      default: false,
     }),
   };
 
@@ -49,28 +70,54 @@ export default class ProjectCreateWithEntrypoint extends TransactionCommand {
     const nodes = await getContract(flags.network, flags.abi, "EarthfastNodes", signer);
 
     // Handle metadata with project type
-    let metadata = args.METADATA;
-    if (metadata === "") {
+    let metadataObj;
+    if (args.METADATA === "") {
       // If no metadata was provided, create basic metadata with type
-      metadata = JSON.stringify({ type: flags.type });
+      metadataObj = { type: flags.type };
     } else {
       try {
         // If metadata was provided, merge with type
-        const parsedMetadata = JSON.parse(metadata);
-        parsedMetadata.type = flags.type;
-        metadata = JSON.stringify(parsedMetadata);
+        metadataObj = JSON.parse(args.METADATA);
+        metadataObj.type = flags.type;
       } catch (e) {
         this.error("METADATA must be valid JSON.");
       }
     }
 
+    // If a bundle file is provided, compute its IPFS CID and merge it into metadata
+    if (flags.bundle) {
+      try {
+        const cid = await computeCIDv1(flags.bundle);
+        metadataObj.ipfsCID = cid;
+        this.log(`Computed CID for bundle: ${cid}`);
+
+        // Optionally publish the file to IPFS if the --publish flag is provided
+        if (flags.publish) {
+          const ipfs = ipfsCreate({ url: "https://ipfs.io:5001" });
+          const fileBuffer = fs.readFileSync(flags.bundle);
+          const result = await ipfs.add(fileBuffer);
+          this.log(`File published to IPFS with CID: ${result.cid.toString()}`);
+        }
+      } catch (e) {
+        this.error(`Failed to process bundle file: ${e}`);
+      }
+    }
+
+    // If an ENS domain is provided, attach it in metadata
+    if (flags.ens) {
+      metadataObj.ens = flags.ens;
+    }
+
+    // Convert metadata object back to string
+    const metadata = JSON.stringify(metadataObj);
+
     const createProjectData = {
-        owner: args.OWNER,
-        name: args.NAME,
-        email: args.EMAIL,
-        content: args.URL,
-        checksum: args.SHA && args.SHA.length > 0 ? parseHash(args.SHA) : ethers.constants.HashZero,
-        metadata: metadata,
+      owner: args.OWNER,
+      name: args.NAME,
+      email: args.EMAIL,
+      content: args.URL,
+      checksum: args.SHA && args.SHA.length > 0 ? parseHash(args.SHA) : ethers.constants.HashZero,
+      metadata: metadata,
     };
 
     const nodeIdArray = args.NODE_IDS.split(",");
@@ -104,72 +151,74 @@ export default class ProjectCreateWithEntrypoint extends TransactionCommand {
     const hasNodeIds = args.NODE_IDS !== "" && nodeIdArray.length > 0 && nodeIdArray[0] !== "";
 
     if (hasNodeIds) {
-        // Parse the node IDs
-        const nodeIds = nodeIdArray.map((id: string) => parseHash(id));
+      // Parse the node IDs
+      const nodeIds = nodeIdArray.map((id: string) => parseHash(id));
 
-        // get the node prices from the contract
-        // if spot is true, use the current price
-        // if renew is true, use the next price
-        // otherwise, use the current price
-        // if both are true, use the next price
-        let slotToUse = 0;
-        if (slot.last && slot.next) {
-            slotToUse = 1;
-        } else if (slot.last) {
-            slotToUse = 0;
-        } else if (slot.next) {
-            slotToUse = 1;
-        }
-        const nodePrices = await Promise.all(nodeIds.map(async (id: string) => {
-            const node = await nodes.getNode(id);
-            return node.prices[slotToUse];
-        }));
+      // get the node prices from the contract
+      // if spot is true, use the current price
+      // if renew is true, use the next price
+      // otherwise, use the current price
+      // if both are true, use the next price
+      let slotToUse = 0;
+      if (slot.last && slot.next) {
+        slotToUse = 1;
+      } else if (slot.last) {
+        slotToUse = 0;
+      } else if (slot.next) {
+        slotToUse = 1;
+      }
+      const nodePrices = await Promise.all(
+        nodeIds.map(async (id: string) => {
+          const node = await nodes.getNode(id);
+          return node.prices[slotToUse];
+        })
+      );
 
-        console.log("Deploying site with specific node IDs:", {
-            createProjectData,
-            signerAddress,
-            nodeIds,
-            nodePrices,
-            depositAmount: depositAmount.toString(),
-            slot,
-            deadline,
-            sig: signature
-        });
+      console.log("Deploying site with specific node IDs:", {
+        createProjectData,
+        signerAddress,
+        nodeIds,
+        nodePrices,
+        depositAmount: depositAmount.toString(),
+        slot,
+        deadline,
+        sig: signature,
+      });
 
-        const tx = await entrypoint.populateTransaction.deploySiteWithNodeIds(
-            createProjectData, 
-            signerAddress, 
-            nodeIds,
-            nodePrices,
-            depositAmount,
-            slot, 
-            deadline, 
-            signature
-        );
-        output.push(await run(tx, signer, [entrypoint]));
+      const tx = await entrypoint.populateTransaction.deploySiteWithNodeIds(
+        createProjectData,
+        signerAddress,
+        nodeIds,
+        nodePrices,
+        depositAmount,
+        slot,
+        deadline,
+        signature
+      );
+      output.push(await run(tx, signer, [entrypoint]));
     } else {
-        const nodesToReserve = 1;
+      const nodesToReserve = 1;
 
-        console.log("Deploying site with number of nodes:", {
-            createProjectData,
-            signerAddress,
-            nodesToReserve,
-            depositAmount: depositAmount.toString(),
-            slot,
-            deadline,
-            sig: signature
-        });
+      console.log("Deploying site with number of nodes:", {
+        createProjectData,
+        signerAddress,
+        nodesToReserve,
+        depositAmount: depositAmount.toString(),
+        slot,
+        deadline,
+        sig: signature,
+      });
 
-        const tx = await entrypoint.populateTransaction.deploySite(
-            createProjectData,
-            signerAddress,
-            nodesToReserve,
-            depositAmount,
-            slot,
-            deadline,
-            signature
-        );
-        output.push(await run(tx, signer, [entrypoint]));
+      const tx = await entrypoint.populateTransaction.deploySite(
+        createProjectData,
+        signerAddress,
+        nodesToReserve,
+        depositAmount,
+        slot,
+        deadline,
+        signature
+      );
+      output.push(await run(tx, signer, [entrypoint]));
     }
 
     this.log(pretty(output));
