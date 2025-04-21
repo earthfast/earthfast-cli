@@ -74,6 +74,7 @@
     "dotenv": "^16.4.5",
     "ethers": "^5.7.1",
     "inquirer": "^7.1.4",
+    "ipfs-http-client": "^50.1.2",
     "ipfs-unixfs": "^6.0.9",
     "keytar": "^7.9.0",
     "multiformats": "9.4.2",
