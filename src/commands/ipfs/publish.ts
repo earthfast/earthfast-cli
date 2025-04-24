@@ -1,32 +1,37 @@
 import fs from "fs";
 import path from "path";
 import { Command, Flags } from "@oclif/core";
-import axios, { AxiosError, isAxiosError } from "axios";
+import axios, { isAxiosError } from "axios";
 import FormData from "form-data";
 
 export default class IpfsPublish extends Command {
-  static description = "Publish content to IPFS";
+  static description = "Publish content to IPFS using Filebase";
 
   static examples = [
     "<%= config.bin %> <%= command.id %> ./my-site",
     '<%= config.bin %> <%= command.id %> ./my-file.txt --name "My Important File"',
     "<%= config.bin %> <%= command.id %> ./my-directory --quiet",
+    "<%= config.bin %> <%= command.id %> ./my-bundle.tgz --endpoint https://api.filebase.io/v1/ipfs/add",
   ];
 
   static flags = {
     apiKey: Flags.string({
-      description: "IPFS service API Key",
-      env: "IPFS_API_KEY",
+      description: "Filebase API Key/Token",
+      env: "FILEBASE_API_KEY",
       required: true,
     }),
-    secretKey: Flags.string({
-      description: "IPFS service Secret Key",
-      env: "IPFS_SECRET_KEY",
-      required: true,
+    endpoint: Flags.string({
+      description: "IPFS API endpoint",
+      env: "IPFS_API_ENDPOINT",
+      default: "https://api.filebase.io/v1/ipfs/add",
     }),
     name: Flags.string({
       description: "Name for the pinned content",
       default: "",
+    }),
+    pin: Flags.boolean({
+      description: "Pin the content to Filebase",
+      default: true,
     }),
     quiet: Flags.boolean({
       char: "q",
@@ -52,17 +57,30 @@ export default class IpfsPublish extends Command {
 
     try {
       if (!flags.quiet) {
-        this.log(`Publishing to IPFS: ${args.path}`);
+        this.log(`Publishing to Filebase IPFS: ${args.path}`);
       }
 
       // Create form data
       const formData = new FormData();
+
+      // Add common parameters for Filebase
+      if (flags.pin) {
+        formData.append("pin", "true");
+      }
+
+      if (flags.name) {
+        formData.append("name", flags.name);
+      }
 
       // Handle files or directories
       const stats = fs.statSync(args.path);
       if (stats.isDirectory()) {
         // Add all files from the directory
         const files = this.walkDirectory(args.path);
+
+        if (!flags.quiet) {
+          this.log(`Found ${files.length} files in directory`);
+        }
 
         for (const file of files) {
           const relativePath = path.relative(args.path, file);
@@ -75,60 +93,42 @@ export default class IpfsPublish extends Command {
         formData.append("file", readStream);
       }
 
-      // Add optional metadata - using generic approach
-      if (flags.name) {
-        const metadata = JSON.stringify({
-          name: flags.name,
-          keyvalues: {
-            source: "earthfast-cli",
-          },
-        });
-        formData.append("pinataMetadata", metadata); // Service-specific field name
-      }
-
-      // SERVICE-SPECIFIC CONFIG - EASY TO SWAP
-      const uploadUrl = "https://api.pinata.cloud/pinning/pinFileToIPFS";
-      const headers = {
-        "Content-Type": `multipart/form-data; boundary=${formData.getBoundary()}`,
-        pinata_api_key: flags.apiKey,
-        pinata_secret_api_key: flags.secretKey,
-      };
-
-      // Make API request
-      const response = await axios.post(uploadUrl, formData, {
+      // Make API request to Filebase with token-based authentication
+      const response = await axios.post(flags.endpoint, formData, {
         maxBodyLength: Infinity,
-        headers: headers,
+        headers: {
+          "Content-Type": `multipart/form-data; boundary=${formData.getBoundary()}`,
+          Authorization: `Bearer ${flags.apiKey}`,
+        },
       });
 
-      // SERVICE-SPECIFIC RESPONSE HANDLING
-      const cid = response.data.IpfsHash;
+      // Parse the response based on Filebase's format
+      const cid = response.data.cid || response.data.ipfs_cid || response.data.Hash;
+
+      if (!cid) {
+        this.error(`Failed to get CID from response: ${JSON.stringify(response.data)}`);
+      }
 
       if (!flags.quiet) {
         this.log(`\nSuccessfully published to IPFS with CID: ${cid}`);
-
-        // Generic gateway URLs
         this.log(`View on IPFS.io: https://ipfs.io/ipfs/${cid}`);
         this.log(`View on Cloudflare: https://cloudflare-ipfs.com/ipfs/${cid}`);
-
-        // Service-specific URLs
-        this.log(`View on Pinata: https://gateway.pinata.cloud/ipfs/${cid}`);
+        this.log(`View on Filebase: https://ipfs.filebase.io/ipfs/${cid}`);
       }
 
-      // Output just the CID
+      // Output just the CID (for piping to other commands)
       this.log(cid);
 
       return cid;
     } catch (error) {
-      // Proper error handling with type checking
       if (isAxiosError(error)) {
         // Handle Axios-specific errors
-        const axiosError = error as AxiosError;
-        if (axiosError.response) {
-          this.error(`IPFS upload failed: ${axiosError.response.status} - ${axiosError.response.statusText}`);
-        } else if (axiosError.request) {
+        if (error.response) {
+          this.error(`IPFS upload failed: ${error.response.status} - ${JSON.stringify(error.response.data)}`);
+        } else if (error.request) {
           this.error(`IPFS upload failed: No response received`);
         } else {
-          this.error(`IPFS upload failed: ${axiosError.message}`);
+          this.error(`IPFS upload failed: ${error.message}`);
         }
       } else {
         // Handle generic errors
