@@ -1,13 +1,13 @@
-import fs, { createReadStream } from "fs";
+import crypto from "crypto";
 import path from "path";
 import { Command, Flags } from "@oclif/core";
 import { Arg } from "@oclif/core/lib/interfaces";
-import axios, { isAxiosError } from "axios";
-import FormData from "form-data";
+import AWS from "aws-sdk";
+import fs from "fs-extra";
 import glob from "glob-promise";
 
 export default class IpfsPublish extends Command {
-  static summary = "Publish a directory to IPFS using Filebase for direct gateway access.";
+  static summary = "Publish a directory to IPFS using Filebase.";
   static examples = [
     "<%= config.bin %> <%= command.id %> ./dist",
     "<%= config.bin %> <%= command.id %> ./dist --name=my-project",
@@ -33,7 +33,7 @@ export default class IpfsPublish extends Command {
     }),
     name: Flags.string({
       char: "n",
-      description: "Optional name prefix for the Filebase pin (defaults to directory name)",
+      description: "Optional folder name prefix in IPFS",
       required: false,
     }),
   };
@@ -42,109 +42,103 @@ export default class IpfsPublish extends Command {
     const { args, flags } = await this.parse(IpfsPublish);
 
     const resolvedDir = path.resolve(args.DIR);
-    const cwd = process.cwd();
-
-    if (resolvedDir === cwd || !resolvedDir.startsWith(cwd)) {
-      this.error("Error: Directory must be a subdirectory of the current working directory");
-    }
 
     if (!fs.existsSync(resolvedDir)) {
       this.error(`Error: Directory '${args.DIR}' does not exist`);
     }
 
-    // Determine the pin name
-    const directoryName = path.basename(resolvedDir);
-    const pinName = flags.name || `${directoryName}-${new Date().toISOString().replace(/[:.]/g, "-")}`;
+    // Setup S3 Client for Filebase
+    const s3 = new AWS.S3({
+      endpoint: "https://s3.filebase.com",
+      accessKeyId: flags["filebase-key"],
+      secretAccessKey: flags["filebase-secret"],
+      region: "us-east-1",
+      s3ForcePathStyle: true,
+    });
 
-    this.log(`Publishing directory '${directoryName}' to IPFS via Filebase...`);
+    const bucketName = flags["filebase-bucket"];
+    const folderPrefix = flags.name || path.basename(resolvedDir);
 
     try {
-      // Upload directory to Filebase
-      const result = await this.uploadDirectoryToFilebase(
-        resolvedDir,
-        pinName,
-        flags["filebase-key"],
-        flags["filebase-secret"],
-        flags["filebase-bucket"]
-      );
+      // Get all files in the directory
+      const files = await glob("**/*", {
+        cwd: resolvedDir,
+        nodir: true,
+        dot: true,
+      });
 
-      // Display results
-      this.log(`Upload successful!`);
-      this.log(`IPFS CID: ${result.cid}`);
-      this.log(`Gateway URLs:`);
-      this.log(`- https://ipfs.filebase.io/ipfs/${result.cid}/`);
-      this.log(`- https://${result.cid}.ipfs.dweb.link/`);
-      this.log(`- https://${result.cid}.ipfs.cf-ipfs.com/`);
-      this.log(`- https://${result.cid}.eth.limo/`);
+      if (files.length === 0) {
+        this.error("Directory is empty, nothing to upload");
+      }
+
+      this.log(`Found ${files.length} files to upload to IPFS...`);
+
+      // Upload each file to Filebase
+      for (const file of files) {
+        const filePath = path.join(resolvedDir, file);
+        const fileKey = path.join(folderPrefix, file).replace(/\\/g, "/");
+        const fileContent = await fs.readFile(filePath);
+
+        this.log(`Uploading: ${file}`);
+
+        await s3
+          .putObject({
+            Bucket: bucketName,
+            Key: fileKey,
+            Body: fileContent,
+            ContentType: this.getContentType(file),
+          })
+          .promise();
+      }
+
+      this.log(`Successfully uploaded ${files.length} files to IPFS via Filebase`);
+      this.log(`Folder prefix in bucket: ${folderPrefix}/`);
+      this.log(`Folder URL: https://${bucketName}.s3.filebase.com/${folderPrefix}/`);
 
       return {
-        cid: result.cid,
-        url: `https://ipfs.filebase.io/ipfs/${result.cid}/`,
-        ethLimoUrl: `https://${result.cid}.eth.limo/`,
-        name: pinName,
+        bucket: bucketName,
+        folderPrefix: folderPrefix,
+        filesCount: files.length,
+        url: `https://${bucketName}.s3.filebase.com/${folderPrefix}/`,
+        message: "Files uploaded to IPFS. Use the URL with project:publish.",
       };
-    } catch (error) {
-      if (error instanceof Error) {
-        this.error(`Failed to upload to IPFS: ${error.message}`);
-      } else {
-        this.error(`Failed to upload to IPFS: Unknown error`);
-      }
+    } catch (error: any) {
+      this.error(`Failed to upload to IPFS: ${error.message}`);
     }
   }
 
-  private async uploadDirectoryToFilebase(
-    directoryPath: string,
-    name: string,
-    apiKey: string,
-    apiSecret: string,
-    bucket: string
-  ): Promise<{ cid: string }> {
-    const formData = new FormData();
-    const auth = Buffer.from(`${apiKey}:${apiSecret}`).toString("base64");
+  private getContentType(filePath: string): string {
+    const ext = path.extname(filePath).toLowerCase();
+    const contentTypes: Record<string, string> = {
+      ".html": "text/html",
+      ".css": "text/css",
+      ".js": "application/javascript",
+      ".json": "application/json",
+      ".png": "image/png",
+      ".jpg": "image/jpeg",
+      ".jpeg": "image/jpeg",
+      ".gif": "image/gif",
+      ".svg": "image/svg+xml",
+      ".pdf": "application/pdf",
+      ".txt": "text/plain",
+    };
 
-    // Use Filebase's folder upload API
-    // First, get all files in the directory
-    const files = await glob("**/*", {
-      cwd: directoryPath,
-      nodir: true,
-      dot: true,
-    });
+    return contentTypes[ext] || "application/octet-stream";
+  }
 
-    if (files.length === 0) {
-      throw new Error("Directory is empty, nothing to upload");
-    }
+  private async calculateDirectorySha256(dirPath: string): Promise<string> {
+    const hash = crypto.createHash("sha256");
+    const files = await glob("**/*", { cwd: dirPath, nodir: true, dot: true });
 
-    // Add each file to the form data
+    // Sort files for consistent hashing
+    files.sort();
+
     for (const file of files) {
-      const filePath = path.join(directoryPath, file);
-      const stats = fs.statSync(filePath);
-
-      if (stats.isFile()) {
-        // Use the relative path as the form field name to preserve directory structure
-        formData.append(file, createReadStream(filePath));
-      }
+      const filePath = path.join(dirPath, file);
+      const fileContent = await fs.readFile(filePath);
+      hash.update(fileContent);
     }
 
-    try {
-      // Use Filebase's directory upload endpoint
-      const response = await axios.post(`https://api.filebase.io/v1/ipfs/pins/${name}`, formData, {
-        headers: {
-          ...formData.getHeaders(),
-          Authorization: `Basic ${auth}`,
-          "X-Bucket": bucket,
-          "X-Folder": "true", // This header tells Filebase to create a directory structure
-        },
-        maxBodyLength: Infinity,
-        maxContentLength: Infinity,
-        timeout: 300000, // 5 minutes timeout for larger uploads
-      });
-
-      return { cid: response.data.cid };
-    } catch (error) {
-      if (isAxiosError(error) && error.response) {
-        throw new Error(`Filebase API error: ${error.response.status} - ${JSON.stringify(error.response.data)}`);
-      }
-      throw error;
-    }
+    return hash.digest("hex");
   }
 }
