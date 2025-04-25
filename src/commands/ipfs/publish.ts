@@ -151,14 +151,6 @@ export default class IpfsPublish extends Command {
         this.log(`Note: Automatic CID retrieval not available (${cidError.message})`);
       }
 
-      // Manually guide the user
-      this.log("\nTo get the IPFS CID for eth.limo:");
-      this.log("1. Log into Filebase console: https://console.filebase.com/");
-      this.log(`2. Navigate to bucket: ${bucketName}`);
-      this.log(`3. Find your folder: ${folderPrefix}/`);
-      this.log("4. Copy the CID from the object details");
-      this.log("5. Access via eth.limo: https://YOUR_CID.eth.limo/");
-
       // Usage instructions for project:publish
       this.log("\nTo publish with earthfast-cli:");
       this.log(`earthfast-cli project:publish YOUR_PROJECT_ID ${s3Url} ${sha256}\n`);
