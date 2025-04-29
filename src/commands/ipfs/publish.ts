@@ -1,14 +1,34 @@
-import { exec } from "child_process";
 import os from "os";
 import path from "path";
-import { promisify } from "util";
 import { Command, Flags } from "@oclif/core";
 import { Arg } from "@oclif/core/lib/interfaces";
 import axios from "axios";
 import FormData from "form-data";
 import fs from "fs-extra";
 
-const execAsync = promisify(exec);
+// Define types for IPFS API responses
+interface IpfsIdResponse {
+  ID: string;
+  Addresses: string[];
+  AgentVersion: string;
+  ProtocolVersion: string;
+  Protocols: string[];
+}
+
+interface IpfsSwarmPeersResponse {
+  Peers: Array<{
+    Addr: string;
+    Peer: string;
+    Latency: string;
+  }> | null;
+}
+
+interface IpfsFileEntry {
+  Name: string;
+  Hash: string;
+  Size?: number;
+  Type?: number;
+}
 
 export default class IpfsPublish extends Command {
   static summary = "Publish a directory to IPFS using an IPFS node";
@@ -21,7 +41,6 @@ export default class IpfsPublish extends Command {
   static examples = [
     "<%= config.bin %> <%= command.id %> ./dist",
     "<%= config.bin %> <%= command.id %> ./dist --host=52.21.60.134",
-    "<%= config.bin %> <%= command.id %> ./website --use-docker=false",
   ];
 
   static usage = "<%= command.id %> DIR";
@@ -61,16 +80,6 @@ export default class IpfsPublish extends Command {
       default: 8080,
       env: "IPFS_GATEWAY_PORT",
     }),
-    "use-docker": Flags.boolean({
-      description: "Use Docker exec for upload (most reliable method)",
-      default: true,
-      env: "IPFS_USE_DOCKER",
-    }),
-    "container-name": Flags.string({
-      description: "Docker container name for IPFS",
-      default: "ipfs",
-      env: "IPFS_CONTAINER_NAME",
-    }),
     timeout: Flags.integer({
       description: "Timeout for IPFS operations in milliseconds",
       default: 120000, // 2 minutes
@@ -83,23 +92,23 @@ export default class IpfsPublish extends Command {
     }),
   };
 
-  private getGatewayHost(flags: any): string {
+  private getGatewayHost(flags: Record<string, any>): string {
     return flags["gateway-host"] || flags.host;
   }
 
-  private getGatewayUrl(flags: any): string {
+  private getGatewayUrl(flags: Record<string, any>): string {
     const host = this.getGatewayHost(flags);
     return `${flags.protocol}://${host}:${flags["gateway-port"]}`;
   }
 
-  private getApiUrl(flags: any): string {
+  private getApiUrl(flags: Record<string, any>): string {
     return `${flags.protocol}://${flags.host}:${flags.port}/api/v0`;
   }
 
-  private async checkNodeConnection(flags: any): Promise<string> {
+  private async checkNodeConnection(flags: Record<string, any>): Promise<string> {
     try {
       const apiUrl = this.getApiUrl(flags);
-      const response = await axios.post(
+      const response = await axios.post<IpfsIdResponse>(
         `${apiUrl}/id`,
         {},
         {
@@ -135,79 +144,10 @@ export default class IpfsPublish extends Command {
     return Array.prototype.concat(...files);
   }
 
-  private async checkDockerAvailability(containerName: string): Promise<boolean> {
-    try {
-      await execAsync(`docker ps -q -f "name=${containerName}"`);
-      return true;
-    } catch (error) {
-      return false;
-    }
-  }
-
-  private async uploadDirectoryWithDockerExec(
+  private async uploadDirectory(
     sourceDir: string,
-    flags: any
+    flags: Record<string, any>
   ): Promise<{ cid: string; duration: number }> {
-    const startTime = Date.now();
-    const containerName = flags["container-name"];
-
-    // Verify Docker container is available
-    const isDockerAvailable = await this.checkDockerAvailability(containerName);
-    if (!isDockerAvailable) {
-      throw new Error(`Docker container "${containerName}" not found or Docker is not running`);
-    }
-
-    // Create a temporary directory with a unique name
-    const uploadId = Date.now();
-    const tempDir = path.join(os.tmpdir(), `ipfs-upload-${uploadId}`);
-    const containerDir = `/tmp/upload-${uploadId}`;
-
-    try {
-      // Copy content to temp directory
-      await fs.copy(sourceDir, tempDir);
-
-      if (flags.verbose) {
-        this.log(`Copying files to Docker container ${containerName}...`);
-      }
-
-      // Copy directory to Docker container
-      await execAsync(`docker cp "${tempDir}/." ${containerName}:${containerDir}`);
-
-      if (flags.verbose) {
-        this.log(`Running ipfs add inside container...`);
-      }
-
-      // Use ipfs add command directly inside the container
-      const { stdout } = await execAsync(
-        `docker exec ${containerName} ipfs add -r --cid-version=1 --progress=false "${containerDir}"`,
-        { maxBuffer: 10 * 1024 * 1024 } // 10MB buffer for large directories
-      );
-
-      // Parse the results to find the root CID
-      const lines = stdout.trim().split("\n");
-      const lastLine = lines[lines.length - 1];
-      // Format is typically: "added <cid> <name>"
-      const parts = lastLine.split(" ");
-      if (parts.length < 2) {
-        throw new Error(`Unexpected output format from ipfs add: ${lastLine}`);
-      }
-
-      const cid = parts[1];
-
-      // Clean up inside container
-      await execAsync(`docker exec ${containerName} rm -rf "${containerDir}"`);
-
-      return {
-        cid,
-        duration: (Date.now() - startTime) / 1000,
-      };
-    } finally {
-      // Clean up the temp directory
-      await fs.remove(tempDir);
-    }
-  }
-
-  private async uploadDirectoryWithCurl(sourceDir: string, flags: any): Promise<{ cid: string; duration: number }> {
     const startTime = Date.now();
     const apiUrl = this.getApiUrl(flags);
 
@@ -262,21 +202,22 @@ export default class IpfsPublish extends Command {
 
       // Parse response
       const responseData = response.data;
-      const lines = Array.isArray(responseData) ? responseData : responseData.trim().split("\n");
+      const lines: string[] = Array.isArray(responseData) ? responseData : responseData.trim().split("\n");
 
-      const results = lines.map((line: any) => {
+      const results: IpfsFileEntry[] = lines.map((line: string | IpfsFileEntry) => {
         if (typeof line === "string") {
           try {
-            return JSON.parse(line);
+            return JSON.parse(line) as IpfsFileEntry;
           } catch (e) {
             return { Name: line, Hash: line };
           }
         }
-        return line;
+        return line as IpfsFileEntry;
       });
 
       // Find the root directory entry (usually the last one or with empty name)
-      const rootEntry = results.find((entry: any) => !entry.Name || entry.Name === "") || results[results.length - 1];
+      const rootEntry =
+        results.find((entry: IpfsFileEntry) => !entry.Name || entry.Name === "") || results[results.length - 1];
 
       if (!rootEntry || !rootEntry.Hash) {
         throw new Error(`Could not find root directory CID in IPFS response`);
@@ -322,7 +263,7 @@ export default class IpfsPublish extends Command {
       // Get peer count
       try {
         const apiUrl = this.getApiUrl(flags);
-        const peersResponse = await axios.post(`${apiUrl}/swarm/peers`);
+        const peersResponse = await axios.post<IpfsSwarmPeersResponse>(`${apiUrl}/swarm/peers`);
         const peerCount = peersResponse.data.Peers?.length || 0;
         this.log(`Node is connected to ${peerCount} peers`);
       } catch (error) {
@@ -332,18 +273,8 @@ export default class IpfsPublish extends Command {
       this.log(`Found ${items.length} items in directory`);
       this.log("Uploading to IPFS...");
 
-      // Choose upload method based on flags
-      let uploadResult;
-      if (flags["use-docker"] && (await this.checkDockerAvailability(flags["container-name"]))) {
-        uploadResult = await this.uploadDirectoryWithDockerExec(sourceDir, flags);
-      } else {
-        if (flags["use-docker"]) {
-          this.log("Docker not available, falling back to HTTP API");
-        }
-        uploadResult = await this.uploadDirectoryWithCurl(sourceDir, flags);
-      }
-
-      const { cid, duration } = uploadResult;
+      // Upload the directory
+      const { cid, duration } = await this.uploadDirectory(sourceDir, flags);
 
       this.log(`Upload completed in ${duration.toFixed(2)} seconds`);
 
@@ -375,9 +306,6 @@ export default class IpfsPublish extends Command {
       if (flags.verbose) {
         this.log(`\nTo verify the content structure:`);
         this.log(`curl -X POST "${this.getApiUrl(flags)}/ls?arg=${cid}"`);
-
-        this.log(`\nTo check if the content is pinned:`);
-        this.log(`curl -X POST "${this.getApiUrl(flags)}/pin/ls?arg=${cid}"`);
       }
 
       return {
